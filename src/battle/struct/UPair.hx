@@ -3,7 +3,6 @@ import battle.Unit;
 import battle.enums.Team;
 import hxassert.Assert;
 
-using MathUtils;
 using Lambda;
 
 /**
@@ -33,6 +32,11 @@ class UPair<T>
 	{
 		var coords:UnitCoords = UnitCoords.get(unit);
 		return get(coords);
+	}
+	
+	public function getTeam(team:Team):Array<T>
+	{
+		return team == Team.Left? left : right;
 	}
 	
 	///Return an array of unit's enemies (or objects bound to them)

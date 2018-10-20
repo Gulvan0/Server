@@ -61,9 +61,9 @@ class Player extends Unit
 			abilityPoints--;
 	}
 	
-	public function new(element:Element, ?name:Null<String>, ?params:Null<RoamUnitParameters>) 
+	public function new(login:String, element:Element, ?params:Null<RoamUnitParameters>, ?name:Null<String>) 
 	{
-		super(ID.Player, element, name, params);
+		super(ID.Player(login), element, (name == null)? login : name, params);
 		
 		this.tree = (params == null)? new Tree(element) : params.tree;
 		this.wheel = (params == null)? [] : params.wheel;
@@ -74,7 +74,7 @@ class Player extends Unit
 	
 	public function setName(newName:String):Bool
 	{
-		if (!newName.length.inRange(3, 18))
+		if (!newName.length.inRange(2, 18))
 			return false;
 		
 		name = newName;

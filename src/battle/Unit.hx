@@ -1,16 +1,15 @@
 package battle;
-import battle.data.Units;
-import battle.struct.FloatPool;
-import battle.struct.UnitCoords;
-import battle.struct.Wheel;
-import hxassert.Assert;
-import battle.struct.BuffQueue;
-import battle.struct.Pool;
 import battle.enums.Team;
 import battle.enums.UnitType;
+import battle.struct.BuffQueue;
+import battle.struct.FloatPool;
+import battle.struct.Pool;
+import battle.struct.Wheel;
+import hxassert.Assert;
 
 typedef ParameterList = {
 	var name:String;
+	var element:Null<Element>;
 	var hp:Int;
 	var mana:Int;
 	var wheel:Array<ID>;
@@ -40,7 +39,6 @@ class Unit
 {
 	
 	public var id(default, null):ID;
-	public var peerID(default, null):Int;
 	public var name(default, null):String;
 	public var element(default, null):Element;
 	public var team(default, null):Team;
@@ -79,7 +77,7 @@ class Unit
 		return hpPool.value > 0;
 	}
 	
-	public function new(id:ID, element:Element, team:Team, position:Int, ?params:Null<ParameterList>, ?subparams:Null<SubordinaryParameterList>) 
+	public function new(id:ID, team:Team, position:Int, ?params:Null<ParameterList>, ?subparams:Null<SubordinaryParameterList>) 
 	{
 		Assert.assert(position >= 0 && position <= 2);
 		
@@ -87,12 +85,8 @@ class Unit
 			params = XMLUtils.parseUnit(id);
 			
 		this.id = id;
-		this.peerID = switch (id) {
-			case ID.Player(pid): pid;
-			default: 0;
-		}
 		this.name = params.name;
-		this.element = element;
+		this.element = params.element;
 		this.team = team;
 		this.position = position;
 		

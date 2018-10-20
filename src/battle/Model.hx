@@ -1,22 +1,15 @@
 package battle;
+import Element;
 import battle.Ability;
+import battle.IInteractiveModel;
 import battle.data.Abilities;
-import battle.data.Buffs;
-import battle.data.Passives;
 import battle.data.Units;
-import battle.enums.AbilityTarget;
 import battle.enums.AbilityType;
-import battle.enums.InputMode;
-import battle.struct.BuffQueue;
+import battle.enums.Source;
+import battle.enums.Team;
 import battle.struct.UPair;
 import battle.struct.UnitCoords;
-import battle.IInteractiveModel;
-import haxe.CallStack;
-import haxe.Constraints.Function;
-import battle.enums.Source;
-import Element;
-import battle.enums.Team;
-using MathUtils;
+import battle.struct.Wheel;
 
 enum ChooseResult 
 {
@@ -38,7 +31,7 @@ enum TargetResult
 /**
  * @author Gulvan
  */
-class Model implements IInteractiveModel implements IMutableModel implements ISimpleModel
+class Model implements IInteractiveModel implements IMutableModel
 {
 	
 	private var observers:Array<IModelObserver>;
@@ -53,12 +46,32 @@ class Model implements IInteractiveModel implements IMutableModel implements ISi
 		return units;
 	}
 	
-	private function checkPeer(id:Int):Bool
+	public function getState():Model
 	{
-		return switch (units.get(currentUnit).id) {
-			case ID.Player(pid): pid == id;
-			default: false;
-		}
+		return this;
+	}
+	
+	public function getPersonal(login:String):Wheel
+	{
+		return units.get(getUnit(login)).wheel;
+	}
+	
+	private function getUnit(login:String):UnitCoords
+	{
+		for (u in units)
+			switch (u.id) 
+			{
+				case ID.Player(l): 
+					if (l == login)
+						return UnitCoords.get(u);
+				default:
+			}
+		return UnitCoords.nullC();
+	}
+	
+	private function checkTurn(login:String):Bool
+	{
+		return getUnit(login).equals(currentUnit);
 	}
 	
     //================================================================================
@@ -138,25 +151,25 @@ class Model implements IInteractiveModel implements IMutableModel implements ISi
     // Using Ability
     //================================================================================
 	
-	public function useRequest(peerID:Int, abilityPos:Int, targetCoords:UnitCoords)
+	public function useRequest(login:String, abilityPos:Int, targetCoords:UnitCoords)
 	{
-		if (!checkPeer(peerID))
+		if (!checkTurn(login))
 		{
-			//Main.send(peerID, PackageBuilder.buildWarn("It's not your turn currently"));
+			Main.warn(login, "It's not your turn currently");
 			return;
 		}
 		
 		var chooseResult:ChooseResult = checkChoose(abilityPos);
 		if (chooseResult != ChooseResult.Ok)
 		{
-			//Main.send(peerID, PackageBuilder.buildWarn(switch (chooseResult)
-			//{
-				//case ChooseResult.Empty: "There is no ability in this slot";
-				//case ChooseResult.Manacost: "Not enough mana";
-				//case ChooseResult.Cooldown: "This ability is currently on cooldown";
-				//case ChooseResult.Passive: "This ability is passive, you can't use it";
-				//default: "";
-			//}));
+			Main.warn(login, switch (chooseResult)
+			{
+				case ChooseResult.Empty: "There is no ability in this slot";
+				case ChooseResult.Manacost: "Not enough mana";
+				case ChooseResult.Cooldown: "This ability is currently on cooldown";
+				case ChooseResult.Passive: "This ability is passive, you can't use it";
+				default: "";
+			});
 			return;
 		}
 		
@@ -165,7 +178,7 @@ class Model implements IInteractiveModel implements IMutableModel implements ISi
 			case TargetResult.Ok:
 				useAbility(targetCoords, currentUnit, units.get(currentUnit).wheel.getActive(abilityPos));
 			case TargetResult.Invalid:
-				//Main.send(peerID, PackageBuilder.buildWarn("Chosen ability cannot be used on this target"));
+				Main.warn(login, "Chosen ability cannot be used on this target");
 			default: //Skip
 		}
 	}
@@ -290,26 +303,26 @@ class Model implements IInteractiveModel implements IMutableModel implements ISi
     // Battle ending
     //================================================================================
 	
-	public function end(winner:Null<Team>) //Rewrite
+	public function end(winner:Null<Team>)
 	{
-		//if (winner == Team.Left) //If PvE
-			//if (Main.progress.isBossStage())
-			//{
-				//Main.player.gainXP(50);
-				//Main.progress.proceed();
-			//}
-			//else
-			//{
-				//Main.progress.proceed();
-				//if (Main.progress.isBossStage())
-					//Main.player.gainXP(75);
-				//else
-					//Main.player.gainXP(40);
-			//}
-		////+ If PvP
-			//
-		//Main.save();//Work with db, pass the peer id
-		//Main.instance.battleFinished(); //delete model, splice array etc.
+		var winners:Array<String> = [];
+		var losers:Array<String> = [];
+		var draw:Bool = winner == null;
+		
+		for (u in draw? units.both : units.getTeam(winner)) 
+			switch (u.id)
+			{
+				case ID.Player(pid): winners.push(pid);
+				default:
+			}
+		for (u in draw? units.both : units.getTeam(winner == Team.Left? Team.Right : Team.Left)) 
+			switch (u.id)
+			{
+				case ID.Player(pid): losers.push(pid);
+				default:
+			}
+			
+		Main.terminate(winners, losers, draw);
 	}
 	
 	private function defineWinner():Null<Team>
@@ -339,16 +352,16 @@ class Model implements IInteractiveModel implements IMutableModel implements ISi
     // Special Input
     //================================================================================	
 	
-	public function skipTurn(peerID:Int)
+	public function skipTurn(peerID:String)
 	{
-		if (checkPeer(peerID))
+		if (checkTurn(peerID))
 		{
 			changeAlacrity(currentUnit, currentUnit, -100, Source.God);
 			postTurnProcess();
 		}
 	}
 	
-	public function quit(peerID:Int)
+	public function quit(peerID:String)
 	{
 		for (u in units)
 			switch (u.id)

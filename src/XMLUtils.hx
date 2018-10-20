@@ -173,6 +173,7 @@ class XMLUtils
 		
 		return {
 			name:castNode(findNode(xml, "name").firstChild().nodeValue, ""),
+			element:castNode(findNode(xml, "element").firstChild().nodeValue, Element),
 			hp:castNode(findNode(xml, "hp").firstChild().nodeValue, 1),
 			mana:castNode(findNode(xml, "mana").firstChild().nodeValue, 1),
 			strength:castNode(findNode(xml, "strength").firstChild().nodeValue, 1),

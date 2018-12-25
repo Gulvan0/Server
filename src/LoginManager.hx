@@ -2,6 +2,7 @@ package;
 import haxe.crypto.Md5;
 import mphx.connection.IConnection;
 import Main.LoginPair;
+import neko.Lib;
 import sys.io.File;
 
 /**
@@ -37,6 +38,7 @@ class LoginManager
 				logins[c.getContext().peerToString()] = data.login;
 				connections[data.login] = c;
 				c.send("LoggedIn");
+				Lib.println('(J/L) ${data.login} logged in');
 			}
 			else
 				c.send("BadLogin");
@@ -52,6 +54,7 @@ class LoginManager
 		var l:String = logins[c.getContext().peerToString()];
 		logins.remove(c.getContext().peerToString());
 		connections.remove(l);
+		Lib.println('(J/L) $l disconnected');
 	}
 	
 	public function register(pair:LoginPair, c:IConnection):Bool
@@ -73,6 +76,7 @@ class LoginManager
 		if (pair.login.length >= 2)
 		{
 			File.saveContent(loginPath(), content + "\n<player login=\"" + pair.login + "\">" + Md5.encode(pair.password) + "</player>");
+			Lib.println('(Join) Registered ${pair.login}');
 			return true;
 		}
 		else

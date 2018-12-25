@@ -417,16 +417,13 @@ class Model implements IInteractiveModel implements IMutableModel
 	
     //================================================================================
 	
-	public function new(allies:Array<Unit>, enemies:Array<Unit>) 
+	public function new(allies:Array<Unit>, enemies:Array<Unit>, room:BattleRoom) 
 	{
 		this.units = new UPair(allies, enemies);
 		this.readyUnits = [];
-	}
-	
-	public function init()
-	{
+		
 		var effectHandler:EffectHandler = new EffectHandler();
-		this.observers = [effectHandler];
+		this.observers = [effectHandler, new SnapshotSender(room)];
 		effectHandler.init(this);
 		
 		alacrityIncrement();

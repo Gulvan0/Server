@@ -4,6 +4,7 @@ import battle.IInteractiveModel;
 import battle.Model;
 import battle.Unit;
 import battle.enums.Team;
+import battle.struct.UnitCoords;
 import haxe.crypto.Md5;
 import mphx.connection.IConnection;
 import mphx.server.impl.Server;
@@ -17,10 +18,11 @@ typedef LoginPair = {
   var password:String;
 }
 
-typedef Update = {
-	var model:Model;
-	var event:String;
+typedef Focus = {
+  var abilityNum:Int;
+  var target:UnitCoords;
 }
+
 /**
  * ...
  * @author Gulvan
@@ -37,13 +39,14 @@ class Main
 	
 	static function main() 
 	{
+		server = new Server("localhost", 5000);
 		loginManager = new LoginManager();
-		server = new Server("0.0.0.0", 5000);
-		trace("Server started");
 		
 		server.events.on("Login", function(data:LoginPair, sender:IConnection){
 			loginManager.login(data, sender);
 		});
+		
+		server.onConnectionClose = function(s:String, c:IConnection){loginManager.logout(c); };
 		
 		server.events.on("Register", function(data:LoginPair, sender:IConnection){
 			if (loginManager.register(data, sender))
@@ -79,7 +82,50 @@ class Main
 				sender.send("LoginNeeded");
 		});
 		
-		while (true) {}
+		server.events.on("UseRequest", function(focus:Focus, sender:IConnection){
+			var l:String = loginManager.getLogin(sender);
+			if (l != null)
+			{
+				var b:String = battleidByLogin[l];
+				if (b != null)
+					models[b].useRequest(l, focus.abilityNum, focus.target);
+				else
+					sender.send("NotInBattle");
+			}
+			else
+				sender.send("LoginNeeded");
+		});
+		
+		server.events.on("SkipTurn", function(data:Dynamic, sender:IConnection){
+			var l:String = loginManager.getLogin(sender);
+			if (l != null)
+			{
+				var b:String = battleidByLogin[l];
+				if (b != null)
+					models[b].skipTurn(l);
+				else
+					sender.send("NotInBattle");
+			}
+			else
+				sender.send("LoginNeeded");
+		});
+		
+		server.events.on("Abandon", function(data:Dynamic, sender:IConnection){
+			var l:String = loginManager.getLogin(sender);
+			if (l != null)
+			{
+				var b:String = battleidByLogin[l];
+				if (b != null)
+					models[b].quit(l);
+				else
+					sender.send("NotInBattle");
+			}
+			else
+				sender.send("LoginNeeded");
+		});
+		
+		server.start();
+		trace("Server started");
 	}
 	
 	public static function terminate(winners:Array<String>, losers:Array<String>, ?draw:Bool = false)
@@ -146,9 +192,19 @@ class Main
 			battleidByLogin[peer] = battleID;
 			sender.putInRoom(rooms[battleID]);
 			rooms[battleID].map(peer, sender);
-			models[battleID] = new Model([loadUnit(battleID, Team.Left, 0)], [loadUnit(peer, Team.Right, 0)]); //battleID as login - temporary
+			models[battleID] = new Model([loadUnit(battleID, Team.Left, 0)], [loadUnit(peer, Team.Right, 0)], rooms[battleID]); //battleID as login - temporary
 			rooms[battleID].broadcast("BattleStarted", models[battleID].getState());
 		}
+	}
+	
+	private function createEnemyArray(zone:Zone, stage:Int):Array<Unit>
+	{
+		var enemyIDs:Array<ID> = XMLUtils.parseStage(zone, stage);
+		var enemies:Array<Unit> = [];
+		for (i in 0...enemyIDs.length)
+			enemies.push(new Unit(enemyIDs[i], Team.Right, i));
+			
+		return enemies;
 	}
 	
 	private static function loadUnit(login:String, team:Team, pos:Int):Unit

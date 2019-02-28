@@ -14,7 +14,6 @@ using StringTools;
 class SaveLoad 
 {
 
-	public static var CORRUPTION_ERROR:String = "Corrupted file";
 	public var xml:Null<Xml>;
 	private static var playerFields:Array<String> = ["name", "element", "xp", "level", "abp", "attp", "st", "fl", "in"];
 	
@@ -28,14 +27,9 @@ class SaveLoad
 		var path:String = exefolder() + "\\" + fileName;
 		
 		if (!FileSystem.exists(path))
-			throw "File not found";
+			throw "File not found: " + path;
 		
 		xml = Xml.parse(File.getContent(path));
-		if (!checkMD5(xml))
-		{
-			xml = null;
-			throw SaveLoad.CORRUPTION_ERROR;
-		}
 	}
 	
 	public function close()
@@ -48,11 +42,6 @@ class SaveLoad
 		xml = Xml.createDocument();
 		xml.addChild(createProgressNode(progress));
 		xml.addChild(createPlayerNode(player));
-		
-		var checkSum:Xml = Xml.createElement("checksum");
-		checkSum.addChild(Xml.createPCData(generateMD5(xml)));
-		xml.addChild(checkSum);
-		
 		File.saveContent(exefolder() + "\\" + fileName, XMLUtils.print(xml));
 		xml = null;
 	}
@@ -99,89 +88,6 @@ class SaveLoad
 		}
 		
 		return pl;
-	}
-	
-	public function loadProgress():Progress
-	{
-		if (xml == null)
-			throw "File not opened";
-			
-		var outputMap:Map<Zone, Int> = new Map<Zone, Int>();
-		var currentZone:Zone = Zone.NullSpace;
-		
-		for (p in xml.elementsNamed("progress"))
-		{
-			for (z in p.elementsNamed("zone"))
-			{
-				var zoneName:Zone = Type.createEnum(Zone, z.get("id"));
-				var zoneStage:Int = Std.parseInt(z.firstChild().nodeValue);
-				outputMap[zoneName] = zoneStage;
-			}
-			for (c in p.elementsNamed("current"))
-				currentZone = Type.createEnum(Zone, strip(c.firstChild().nodeValue));
-		}
-		
-		return new Progress(outputMap, currentZone);
-	}
-	
-	public function loadPlayer():Player
-	{
-		if (xml == null)
-			throw "File not opened";
-			
-		var name:String;
-		var element:Element;
-		var params:RoamUnitParameters = new RoamUnitParameters();
-		
-		for (p in xml.elementsNamed("player"))
-		{
-			for (n in p.elementsNamed("name"))
-				name = strip(n.firstChild().nodeValue);
-			for (n in p.elementsNamed("element"))
-				element = Type.createEnum(Element, strip(n.firstChild().nodeValue));
-			for (n in p.elementsNamed("xp"))
-				params.xp = Std.parseInt(n.firstChild().nodeValue);
-			for (n in p.elementsNamed("level"))
-				params.level = Std.parseInt(n.firstChild().nodeValue);
-			for (n in p.elementsNamed("abp"))
-				params.abilityPoints = Std.parseInt(n.firstChild().nodeValue);
-			for (n in p.elementsNamed("attp"))
-				params.attributePoints = Std.parseInt(n.firstChild().nodeValue);
-			for (n in p.elementsNamed("st"))
-				params.strength = Std.parseInt(n.firstChild().nodeValue);
-			for (n in p.elementsNamed("fl"))
-				params.flow = Std.parseInt(n.firstChild().nodeValue);
-			for (n in p.elementsNamed("in"))
-				params.intellect = Std.parseInt(n.firstChild().nodeValue);
-		}
-		
-		return new Player(element, name, params);
-	}
-	
-	private static function generateMD5(xml:Xml):String
-	{
-		var toEncode:String = "";
-		for (p in xml.elementsNamed("progress"))
-		{
-			for (z in p.elementsNamed("zone"))
-				toEncode += z.get("id") + "_" + z.firstChild().nodeValue + "-";
-			for (c in p.elementsNamed("current"))
-				toEncode += c.firstChild().nodeValue + "-";
-		}
-		for (p in xml.elementsNamed("player"))
-			for (fieldName in playerFields)
-				for (x in p.elementsNamed(fieldName))
-					toEncode += x.firstChild().nodeValue + "-";
-		toEncode = strip(toEncode);
-		return Md5.encode(toEncode);
-	}
-	
-	private static function checkMD5(xml:Xml):Bool
-	{
-		for (c in xml.elementsNamed("checksum"))
-			if (strip(c.firstChild().nodeValue) == generateMD5(xml))
-				return true;
-		return false;
 	}
 	
 	private static function exefolder():String

@@ -249,7 +249,6 @@ class Main
 	{
 		var path:String = Sys.programPath();
 		path = path.substring(0, path.lastIndexOf("\\"));
-		path = path.substring(0, path.lastIndexOf("\\"));
 		path += "\\playerdata\\";
 		return path;
 	}

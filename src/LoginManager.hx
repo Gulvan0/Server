@@ -30,6 +30,14 @@ class LoginManager
 			return null;
 	}
 	
+	public function sendPlPrData(c:IConnection)
+	{
+		var sl:SaveLoad = new SaveLoad();
+		sl.open("playerdata\\" + getLogin(c) + ".xml");
+		c.send("PlayerProgressData", sl.xml.toString());
+		sl.close();
+	}
+	
 	public function login(data:LoginPair, c:IConnection)
 	{
 		if (getLogin(c) == null)
@@ -39,6 +47,7 @@ class LoginManager
 				connections[data.login] = c;
 				c.send("LoggedIn");
 				Lib.println('(J/L) ${data.login} logged in');
+				sendPlPrData(c);
 			}
 			else
 				c.send("BadLogin");

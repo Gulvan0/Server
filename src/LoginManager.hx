@@ -45,7 +45,7 @@ class LoginManager
 			{
 				logins[c.getContext().peerToString()] = data.login;
 				connections[data.login] = c;
-				c.send("LoggedIn");
+				c.send("LoggedIn", data.login);
 				Lib.println('(J/L) ${data.login} logged in');
 				sendPlPrData(c);
 			}
@@ -76,7 +76,7 @@ class LoginManager
 			
 		var content:String = File.getContent(loginPath());
 		for (p in Xml.parse(content).elementsNamed("player"))
-			if (p.get("login") == pair.login)
+			if (p.get("login").toLowerCase() == pair.login.toLowerCase())
 			{
 				c.send("AlreadyRegistered");
 				return false;

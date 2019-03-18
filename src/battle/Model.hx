@@ -26,7 +26,7 @@ enum TargetResult
 	Invalid;
 	Nonexistent;
 	Dead;
-}
+} 
 
 /**
  * @author Gulvan
@@ -52,7 +52,7 @@ class Model implements IInteractiveModel implements IMutableModel
 		return this;//REPLACE!
 	}
 	
-	public function getInitialPersonal(login:String):Dynamic
+	public function getPersonal(login:String):Dynamic
 	{
 		return {wheel: units.get(getUnit(login)).wheel};
 	}

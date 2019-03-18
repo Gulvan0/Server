@@ -45,19 +45,14 @@ class Main
 			loginManager.login(data, sender);
 		});
 		
-		server.onConnectionClose = function(s:String, c:IConnection){loginManager.logout(c); };
+		server.onConnectionClose = function(s:String, c:IConnection){
+			loginManager.logout(c); 
+			battleExecute(true, c, function(l:String){models[l].quit(l); });
+		};
 		
 		server.events.on("Register", function(data:LoginPair, sender:IConnection){
 			if (loginManager.register(data, sender))
 				loginManager.login(data, sender);
-		});
-		
-		server.events.on("GetPlayer", function(data:Dynamic, sender:IConnection){
-			var l:String = loginManager.getLogin(sender);
-			if (l != null)
-				sender.send("SendPlayer", File.getContent(playersDir() + l + ".xml"));
-			else
-				sender.send("LoginNeeded");
 		});
 		
 		server.events.on("FindMatch", function(data:Dynamic, sender:IConnection){
@@ -67,61 +62,34 @@ class Main
 				sender.send("LoginNeeded");
 		});
 		
-		//server.events.on("GetBattlePersonal", function(data:Dynamic, sender:IConnection){
-			//var l:String = loginManager.getLogin(sender);
-			//if (l != null)
-			//{
-				//var b:String = battleidByLogin[l];
-				//if (b != null)
-					//sender.send("BattlePersonalInfo", models[b].getPersonal(l));
-				//else
-					//sender.send("NotInBattle");
-			//}
-			//else
-				//sender.send("LoginNeeded");
-		//});
-		
 		server.events.on("UseRequest", function(focus:Focus, sender:IConnection){
-			var l:String = loginManager.getLogin(sender);
-			if (l != null)
-			{
-				if (models[l] != null)
-					models[l].useRequest(l, focus.abilityNum, focus.target); //Maybe extract method interactRequest() - code is dublicated
-				else
-					sender.send("NotInBattle");
-			}
-			else
-				sender.send("LoginNeeded");
+			battleExecute(false, sender, function(l:String, fcs:Focus){models[l].useRequest(l, fcs.abilityNum, fcs.target); }, focus);
 		});
 		
 		server.events.on("SkipTurn", function(data:Dynamic, sender:IConnection){
-			var l:String = loginManager.getLogin(sender);
-			if (l != null)
-			{
-				if (models[l] != null)
-					models[l].skipTurn(l);
-				else
-					sender.send("NotInBattle");
-			}
-			else
-				sender.send("LoginNeeded");
+			battleExecute(false, sender, function(l:String){models[l].skipTurn(l); });
 		});
 		
 		server.events.on("Abandon", function(data:Dynamic, sender:IConnection){
-			var l:String = loginManager.getLogin(sender);
-			if (l != null)
-			{
-				if (models[l] != null)
-					models[l].quit(l);
-				else
-					sender.send("NotInBattle");
-			}
-			else
-				sender.send("LoginNeeded");
+			battleExecute(false, sender, function(l:String){models[l].quit(l); });
 		});
 		
 		server.start();
 		trace("Server started");
+	}
+	
+	private static function battleExecute(silent:Bool, requester:IConnection, ?func:String->Void, ?hfunc:String->Focus->Void, ?hdata:Focus)
+	{
+		var l:String = loginManager.getLogin(requester);
+		if (l != null)
+		{
+			if (models[l] != null)
+				func != null? func(l) : hfunc(l, hdata);
+			else if (!silent)
+				requester.send("NotInBattle");
+		}
+		else if (!silent)
+			requester.send("LoginNeeded");
 	}
 	
 	public static function terminate(winners:Array<String>, losers:Array<String>, ?draw:Bool = false)
@@ -152,11 +120,11 @@ class Main
 		for (l in players) rooms.remove(l);
 	}
 	
-	public static function warn(login:String, warning:String)
+	public static function warn(login:String, message:String)
 	{
 		var c:IConnection = loginManager.getConnection(login);
 		if (c != null)
-			c.send("Warning", warning);
+			c.send("BattleWarning", {message:message, state: models[login].getPersonal(login)});
 	}
 	
 	private static function findMatch(sender:IConnection)
@@ -194,7 +162,7 @@ class Main
 			});
 			rooms[peer].broadcast("BattleStarted", models[peer].getInitialState());
 			for (l in rooms[peer].clientMap.keys())
-				rooms[peer].clientMap[l].send("BattlePersonal", models[peer].getInitialPersonal(l));
+				rooms[peer].clientMap[l].send("BattlePersonal", models[peer].getPersonal(l));
 		}
 	}
 	

@@ -57,11 +57,12 @@ class LoginManager
 	
 	public function logout(c:IConnection)
 	{
-		if (!logins.exists(c.getContext().peerToString()))
+		var peer:String = c.getContext().peerToString();
+		if (!logins.exists(peer))
 			return;
 		
-		var l:String = logins[c.getContext().peerToString()];
-		logins.remove(c.getContext().peerToString());
+		var l:String = logins[peer];
+		logins.remove(peer);
 		connections.remove(l);
 		Lib.println('(J/L) $l disconnected');
 	}
@@ -85,7 +86,7 @@ class LoginManager
 		if (pair.login.length >= 2)
 		{
 			File.saveContent(loginPath(), content + "\n<player login=\"" + pair.login + "\">" + Md5.encode(pair.password) + "</player>");
-			Lib.println('(Join) Registered ${pair.login}');
+			Lib.println('(J/L) Registered ${pair.login}');
 			return true;
 		}
 		else

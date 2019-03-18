@@ -35,6 +35,7 @@ class Model implements IInteractiveModel implements IMutableModel
 {
 	
 	private var observers:Array<IModelObserver>;
+	private var room:BattleRoom;
 
 	public var units(default, null):UPair<Unit>;
 	public var currentUnit:UnitCoords;
@@ -46,14 +47,14 @@ class Model implements IInteractiveModel implements IMutableModel
 		return units;
 	}
 	
-	public function getState():Model
+	public function getInitialState():Dynamic
 	{
-		return this;
+		return this;//REPLACE!
 	}
 	
-	public function getPersonal(login:String):Wheel
+	public function getInitialPersonal(login:String):Dynamic
 	{
-		return units.get(getUnit(login)).wheel;
+		return {wheel: units.get(getUnit(login)).wheel};
 	}
 	
 	private function getUnit(login:String):UnitCoords
@@ -199,9 +200,10 @@ class Model implements IInteractiveModel implements IMutableModel
 				for (o in observers) o.miss(UnitCoords.get(t), ability.element);
 			}
 			else
+			{
+				for (o in observers) o.abStriked(UnitCoords.get(t), caster, ability.id, ability.strikeType, ability.element);
 				Abilities.useAbility(this, ability.id, UnitCoords.get(t), caster, ability.element);
-					
-			for (o in observers) o.abStriked(UnitCoords.get(t), caster, ability.id, ability.strikeType, ability.element);
+			}
 		}
 			
 		postTurnProcess();
@@ -248,6 +250,8 @@ class Model implements IInteractiveModel implements IMutableModel
 			{
 				if (!unit.isPlayer())
 					botMakeTurn(unit);
+				else
+					room.player(unit).send("Turn");
 			}
 			else
 				postTurnProcess();
@@ -417,16 +421,20 @@ class Model implements IInteractiveModel implements IMutableModel
 	
     //================================================================================
 	
+	public function start()
+	{
+		alacrityIncrement();
+	}
+	
 	public function new(allies:Array<Unit>, enemies:Array<Unit>, room:BattleRoom) 
 	{
+		this.room = room;
 		this.units = new UPair(allies, enemies);
 		this.readyUnits = [];
 		
 		var effectHandler:EffectHandler = new EffectHandler();
-		this.observers = [effectHandler, new SnapshotSender(room)];
+		this.observers = [effectHandler, new EventSender(room)];
 		effectHandler.init(this);
-		
-		alacrityIncrement();
 	}
 	
 }

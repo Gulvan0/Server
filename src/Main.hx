@@ -29,10 +29,9 @@ typedef Focus = {
  */
 class Main 
 {
-	private static var models:Map<String, IInteractiveModel> = new Map(); // id -> Model
-	private static var rooms:Map<String, BattleRoom> = new Map(); // id -> Room
-	private static var battleidByLogin:Map<String, String> = new Map(); // login -> id
-	private static var openRoomIDs:Array<String> = [];
+	private static var models:Map<String, IInteractiveModel> = new Map(); // login -> Model
+	private static var rooms:Map<String, BattleRoom> = new Map(); // login -> Room
+	private static var openRooms:Array<String> = [];
 	
 	private static var server:Server;
 	private static var loginManager:LoginManager;
@@ -68,27 +67,26 @@ class Main
 				sender.send("LoginNeeded");
 		});
 		
-		server.events.on("GetBattlePersonal", function(data:Dynamic, sender:IConnection){
-			var l:String = loginManager.getLogin(sender);
-			if (l != null)
-			{
-				var b:String = battleidByLogin[l];
-				if (b != null)
-					sender.send("BattlePersonalInfo", models[b].getPersonal(l));
-				else
-					sender.send("NotInBattle");
-			}
-			else
-				sender.send("LoginNeeded");
-		});
+		//server.events.on("GetBattlePersonal", function(data:Dynamic, sender:IConnection){
+			//var l:String = loginManager.getLogin(sender);
+			//if (l != null)
+			//{
+				//var b:String = battleidByLogin[l];
+				//if (b != null)
+					//sender.send("BattlePersonalInfo", models[b].getPersonal(l));
+				//else
+					//sender.send("NotInBattle");
+			//}
+			//else
+				//sender.send("LoginNeeded");
+		//});
 		
 		server.events.on("UseRequest", function(focus:Focus, sender:IConnection){
 			var l:String = loginManager.getLogin(sender);
 			if (l != null)
 			{
-				var b:String = battleidByLogin[l];
-				if (b != null)
-					models[b].useRequest(l, focus.abilityNum, focus.target);
+				if (models[l] != null)
+					models[l].useRequest(l, focus.abilityNum, focus.target); //Maybe extract method interactRequest() - code is dublicated
 				else
 					sender.send("NotInBattle");
 			}
@@ -100,9 +98,8 @@ class Main
 			var l:String = loginManager.getLogin(sender);
 			if (l != null)
 			{
-				var b:String = battleidByLogin[l];
-				if (b != null)
-					models[b].skipTurn(l);
+				if (models[l] != null)
+					models[l].skipTurn(l);
 				else
 					sender.send("NotInBattle");
 			}
@@ -114,9 +111,8 @@ class Main
 			var l:String = loginManager.getLogin(sender);
 			if (l != null)
 			{
-				var b:String = battleidByLogin[l];
-				if (b != null)
-					models[b].quit(l);
+				if (models[l] != null)
+					models[l].quit(l);
 				else
 					sender.send("NotInBattle");
 			}
@@ -147,23 +143,13 @@ class Main
 			//}
 		////+ If PvP
 			// +xp +xp
-			// Additional processing when draw == true
+			// Additional processing when draw == true AND MAKE SURE PLAYERS ARRAY WONT BE EMPTY
 		//Then save all the changes
 		
-		var bid:String = battleidByLogin[Lambda.empty(winners)? losers[0] : winners[0]];
-		models.remove(bid);
-		rooms[bid].broadcast("BattleEnded", winners);
-		rooms.remove(bid);
-		
-		for (l in winners.concat(losers))
-			battleidByLogin.remove(l);
-	}
-	
-	public static function update(someoneFromBattle:String, event:String)
-	{
-		var b:String = battleidByLogin[someoneFromBattle];
-		if (b != null)
-			rooms[b].broadcast("BattleUpdated", {model: models[b].getState(), event: event});
+		var players:Array<String> = winners.concat(losers);
+		for (l in players) models.remove(l);
+		rooms[players[0]].broadcast("BattleEnded", winners);
+		for (l in players) rooms.remove(l);
 	}
 	
 	public static function warn(login:String, warning:String)
@@ -176,24 +162,39 @@ class Main
 	private static function findMatch(sender:IConnection)
 	{
 		var peer:String = loginManager.getLogin(sender);
-		if (Lambda.empty(openRoomIDs))
+		if (Lambda.empty(openRooms))
 		{
 			var room:BattleRoom = new BattleRoom();
-			sender.putInRoom(room);
-			room.map(peer, sender);
-			rooms[peer] = room;
-			server.rooms.push(room);
-			battleidByLogin[peer] = peer; // (Refers to this assumption)
-			openRoomIDs.push(peer);
+			sender.putInRoom(room); //Putting in room
+			room.map(peer, sender); //Allowing to access from it by login
+			rooms[peer] = room; //Creating a link
+			server.rooms.push(room); //Adding the room to server
+			openRooms.push(peer); //Hey, I'm lfg
 		}
 		else
 		{
-			var battleID:String = openRoomIDs.splice(0, 1)[0];
-			battleidByLogin[peer] = battleID;
-			sender.putInRoom(rooms[battleID]);
-			rooms[battleID].map(peer, sender);
-			models[battleID] = new Model([loadUnit(battleID, Team.Left, 0)], [loadUnit(peer, Team.Right, 0)], rooms[battleID]); //battleID as login - temporary
-			rooms[battleID].broadcast("BattleStarted", models[battleID].getState());
+			var enemy:String = openRooms.splice(0, 1)[0];
+			sender.putInRoom(rooms[enemy]);
+			rooms[enemy].map(peer, sender);
+			rooms[peer] = rooms[enemy];
+			models[enemy] = new Model([loadUnit(enemy, Team.Left, 0)], [loadUnit(peer, Team.Right, 0)], rooms[peer]);
+			models[peer] = models[enemy];
+			var awaitingAnswer:Array<String> = [for (k in rooms[peer].clientMap.keys()) k];
+			server.events.on("InitialDataRecieved", function(data:Dynamic, sender:IConnection){
+				var l:String = loginManager.getLogin(sender);
+				if (l != null)
+					for (i in 0...awaitingAnswer.length)
+						if (awaitingAnswer[i] == l)
+						{
+							awaitingAnswer.splice(i, 1);
+							if (Lambda.empty(awaitingAnswer))
+								models[peer].start();
+							break;
+						}
+			});
+			rooms[peer].broadcast("BattleStarted", models[peer].getInitialState());
+			for (l in rooms[peer].clientMap.keys())
+				rooms[peer].clientMap[l].send("BattlePersonal", models[peer].getInitialPersonal(l));
 		}
 	}
 	

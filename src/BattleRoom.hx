@@ -1,5 +1,7 @@
 package;
 
+import battle.Unit;
+import hxassert.Assert;
 import mphx.server.room.Room;
 import mphx.connection.IConnection;
 
@@ -16,10 +18,15 @@ class BattleRoom extends Room
 		clientMap.remove(client.getContext().peerToString());
 	}
 	
+	public function player(unit:Unit):IConnection
+	{
+		Assert.assert(unit.isPlayer());
+		return clientMap[unit.id.getParameters()[0]];
+	}
+	
 	public function new() 
 	{
 		super();
-		
 	}
 	
 }

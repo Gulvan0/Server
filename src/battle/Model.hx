@@ -47,9 +47,18 @@ class Model implements IInteractiveModel implements IMutableModel
 		return units;
 	}
 	
-	public function getInitialState():Dynamic
+	public function getInitialState():Array<Dynamic>
 	{
-		return this;//REPLACE!
+		return [for (u in units) {
+		name: u.name,
+		element: u.element,
+		team: u.team,
+		pos: u.position,
+		hp: u.hpPool,
+		mana: u.manaPool,
+		alacrity: u.alacrityPool,
+		buffs: u.buffQueue
+		}];
 	}
 	
 	public function getPersonal(login:String):Dynamic

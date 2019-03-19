@@ -37,14 +37,14 @@ class SaveLoad
 		xml = null;
 	}
 	
-	public function save(progress:Progress, player:Player, ?fileName:String = "savefile.xml")
-	{
-		xml = Xml.createDocument();
-		xml.addChild(createProgressNode(progress));
-		xml.addChild(createPlayerNode(player));
-		File.saveContent(exefolder() + "\\" + fileName, XMLUtils.print(xml));
-		xml = null;
-	}
+	//public function save(progress:Progress, player:Player, ?fileName:String = "savefile.xml")
+	//{
+		//xml = Xml.createDocument();
+		//xml.addChild(createProgressNode(progress));
+		//xml.addChild(createPlayerNode(player));
+		//File.saveContent(exefolder() + "\\" + fileName, XMLUtils.print(xml));
+		//xml = null;
+	//}
 	
 	private static function createProgressNode(progress:Progress):Xml
 	{

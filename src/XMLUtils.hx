@@ -14,6 +14,23 @@ using StringTools;
 class XMLUtils 
 {
 	
+	public static function generate(values:Array<Map<String, String>>, typeNodeName:String):Xml
+	{
+		var xml:Xml = Xml.createDocument();
+		for (m in values)
+		{
+			var node:Xml = Xml.createElement(typeNodeName);
+			for (k in m.keys())
+			{
+				var el:Xml = Xml.createElement(k);
+				el.addChild(Xml.createPCData(m[k]));
+				node.addChild(el);
+			}
+			xml.addChild(node);
+		}
+		return xml;
+	}
+	
 	public static function getGlobal<T>(node:String, attribute:String, typeObj:T):Null<T>
 	{
 		var xml:Xml = fromFile("data\\Globals.xml");

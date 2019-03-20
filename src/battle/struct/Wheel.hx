@@ -17,6 +17,11 @@ class Wheel
 	
 	public var numOfSlots:Int;
 	
+	public function getlwArray():Array<LightweightAbility>
+	{
+		return [for (a in wheel) a.toLightweight()];
+	}
+	
 	public function get(pos:Int):Ability
 	{
 		Assert.assert(pos >= 0 && pos <= 9);

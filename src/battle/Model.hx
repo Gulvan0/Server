@@ -57,13 +57,13 @@ class Model implements IInteractiveModel implements IMutableModel
 		hp: u.hpPool,
 		mana: u.manaPool,
 		alacrity: u.alacrityPool,
-		buffs: u.buffQueue
+		buffs: [for (b in u.buffQueue.queue) b.toLightweight()]
 		}];
 	}
 	
 	public function getPersonal(login:String):Dynamic
 	{
-		return {wheel: units.get(getUnit(login)).wheel};
+		return units.get(getUnit(login)).wheel.getlwArray();
 	}
 	
 	private function getUnit(login:String):UnitCoords

@@ -1,13 +1,20 @@
 package battle;
-import battle.enums.AbilityTarget;
 import battle.enums.AbilityType;
-import battle.struct.Countdown;
-import battle.enums.Source;
 import Element;
-import battle.struct.Pool;
-import battle.enums.UnitType;
-import battle.data.Abilities;
-import battle.struct.UnitCoords;
+
+class LightweightAbility
+{
+	public var id:ID;
+	public var name:String;
+	public var description:String;
+	public var type:AbilityType;
+	public var element:Element;
+	
+	public function new()
+	{
+		
+	}
+}
 
 /**
  * model OF ability IN battle
@@ -21,6 +28,17 @@ class Ability
 	public var description(default, null):String;
 	public var type(default, null):AbilityType;
 	public var element(default, null):Element;
+	
+	public function toLightweight():LightweightAbility
+	{
+		var la:LightweightAbility = new LightweightAbility();
+		la.id = id;
+		la.name = name;
+		la.description = description;
+		la.type = type;
+		la.element = element;
+		return la;
+	}
 	
 	public function new(id:ID) 
 	{

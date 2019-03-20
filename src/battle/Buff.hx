@@ -1,11 +1,24 @@
 package battle;
-import battle.Unit;
 import battle.data.Buffs;
 import battle.data.Passives.BattleEvent;
 import battle.enums.BuffMode;
-import battle.struct.Countdown;
 import Element;
 import battle.struct.UnitCoords;
+
+class LightweightBuff
+{
+	public var id:ID;
+	public var name:String;
+	public var description:String;
+	public var element:Element;
+	
+	public var duration:Int;
+	
+	public function new() 
+	{
+		
+	}
+}
 
 /**
  * model OF buff IN battle
@@ -27,6 +40,17 @@ class Buff
 	public var caster(default, null):UnitCoords;
 	
 	public var duration(default, null):Int;
+	
+	public function toLightweight():LightweightBuff
+	{
+		var lb:LightweightBuff = new LightweightBuff();
+		lb.id = id;
+		lb.name = name;
+		lb.description = description;
+		lb.element = element;
+		lb.duration = duration;
+		return lb;
+	}
 	
 	public function reactsTo(e:BattleEvent):Bool
 	{

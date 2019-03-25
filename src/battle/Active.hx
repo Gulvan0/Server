@@ -1,4 +1,5 @@
 package battle;
+import battle.Ability.LightweightAbility;
 import battle.enums.AbilityTarget;
 import battle.enums.StrikeType;
 import battle.enums.UnitType;
@@ -19,6 +20,23 @@ class Active extends Ability
 	public var cooldown(get, null):Int;
 	public var maxCooldown(get, null):Int;
 	public var manacost(default, null):Int;
+	
+	public override function toLightweight():LightweightAbility
+	{
+		var la:LightweightAbility = new LightweightAbility();
+		la.id = id;
+		la.name = name;
+		la.description = description;
+		la.type = type;
+		la.element = element;
+		
+		la.cooldown = maxCooldown;
+		la.delay = cooldown;
+		la.manacost = manacost;
+		la.target = possibleTarget;
+		
+		return la;
+	}
 	
 	public function putOnCooldown()
 	{

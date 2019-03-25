@@ -50,6 +50,7 @@ class Model implements IInteractiveModel implements IMutableModel
 	public function getInitialState():Array<Dynamic>
 	{
 		return [for (u in units) {
+		id: u.id,
 		name: u.name,
 		element: u.element,
 		team: u.team,

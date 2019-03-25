@@ -1,4 +1,5 @@
 package battle;
+import battle.enums.AbilityTarget;
 import battle.enums.AbilityType;
 import Element;
 
@@ -9,6 +10,11 @@ class LightweightAbility
 	public var description:String;
 	public var type:AbilityType;
 	public var element:Element;
+	
+	public var target:Null<AbilityTarget>;
+	public var manacost:Null<Int>;
+	public var cooldown:Null<Int>;
+	public var delay:Null<Int>;
 	
 	public function new()
 	{

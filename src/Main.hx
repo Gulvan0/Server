@@ -70,7 +70,7 @@ class Main
 			battleExecute(false, sender, function(l:String){models[l].skipTurn(l); });
 		});
 		
-		server.events.on("Abandon", function(data:Dynamic, sender:IConnection){
+		server.events.on("QuitBattle", function(data:Dynamic, sender:IConnection){
 			battleExecute(false, sender, function(l:String){models[l].quit(l); });
 		});
 		

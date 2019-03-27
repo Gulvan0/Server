@@ -211,8 +211,8 @@ class Model implements IInteractiveModel implements IMutableModel
 			}
 			else
 			{
-				for (o in observers) o.abStriked(UnitCoords.get(t), caster, ability.id, ability.strikeType, ability.element);
 				Abilities.useAbility(this, ability.id, UnitCoords.get(t), caster, ability.element);
+				for (o in observers) o.abStriked(UnitCoords.get(t), caster, ability.id, ability.strikeType, ability.element);
 			}
 		}
 			

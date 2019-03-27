@@ -24,7 +24,7 @@ class EventSender implements IModelObserver
 	
 	public function hpUpdate(target:Unit, caster:Unit, dhp:Int, element:Element, crit:Bool, source:Source):Void 
 	{
-		room.broadcast("HPUpdate", {target: UnitCoords.get(target), delta: dhp, newV: target.hpPool.value, element: element, crit: crit});
+		room.broadcast("HPUpdate", {target: UnitCoords.get(target), delta: dhp, newV: target.hpPool.value, element: element, crit: crit, fromAbility: source == Source.Ability});
 	}
 	
 	public function manaUpdate(target:Unit, dmana:Int, source:Source):Void 
@@ -39,7 +39,7 @@ class EventSender implements IModelObserver
 	
 	public function buffQueueUpdate(unit:UnitCoords, queue:Array<Buff>):Void 
 	{
-		room.broadcast("BuffQueueUpdate", {target: unit, queue: queue});
+		room.broadcast("BuffQueueUpdate", {target: unit, queue: [for (b in queue) b.toLightweight()]});
 	}
 	
 	public function preTick(current:Unit):Void 

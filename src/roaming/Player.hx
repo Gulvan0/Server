@@ -66,7 +66,7 @@ class Player extends Unit
 		super(ID.Player(login), element, (name == null)? login : name, params);
 		
 		this.tree = (params == null)? new Tree(element) : params.tree;
-		this.wheel = (params == null)? [] : params.wheel;
+		//this.wheel = (params == null)? [] : params.wheel;
 		
 		this.abilityPoints = (params == null)? 1 : params.abilityPoints;
 		this.attributePoints = (params == null)? 4 : params.attributePoints;

@@ -4,6 +4,7 @@ import battle.enums.Team;
 import hxassert.Assert;
 
 using Lambda;
+using MathUtils;
 
 /**
  * @author Gulvan

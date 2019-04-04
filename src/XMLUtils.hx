@@ -1,6 +1,7 @@
 package;
 import battle.Unit.ParameterList;
 import battle.data.Passives.BattleEvent;
+import haxe.CallStack;
 import haxe.xml.Printer;
 import roaming.Ability;
 import sys.FileSystem;
@@ -143,7 +144,6 @@ class XMLUtils
 		xml = findNode(xml, "ability", "id", ability.getName());
 		xml = findNode(xml, param);
 		xml = xml.firstChild();
-		
 		return castNode(xml.nodeValue, paramType);
 	}
 	
@@ -316,7 +316,7 @@ class XMLUtils
 	
 	private static function fromFile(path:String):Xml
 	{
-		var srcPath:String = Sys.programPath().substring(0, Sys.programPath().indexOf("bin")) + "src\\";
+		var srcPath:String = Sys.programPath().substring(0, Sys.programPath().indexOf("bin")) + "bin\\";
 		
 		if (FileSystem.exists(srcPath))
 			return Xml.parse(File.getContent(srcPath + path));

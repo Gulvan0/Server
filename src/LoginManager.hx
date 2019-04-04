@@ -33,14 +33,14 @@ class LoginManager
 	public function sendPlPrData(c:IConnection)
 	{
 		var sl:SaveLoad = new SaveLoad();
-		sl.open("playerdata\\" + getLogin(c) + ".xml");
+		sl.open("playerdata\\" + getLogin(c).toLowerCase() + ".xml");
 		c.send("PlayerProgressData", sl.xml.toString());
 		sl.close();
 	}
 	
 	public function login(data:LoginPair, c:IConnection)
 	{
-		if (getLogin(c) == null)
+		if (getLogin(c) == null && getConnection(data.login) == null)
 			if (checkPassword(data))
 			{
 				logins[c.getContext().peerToString()] = data.login;
@@ -85,7 +85,7 @@ class LoginManager
 		
 		if (pair.login.length >= 2)
 		{
-			File.saveContent(loginPath(), content + "\n<player login=\"" + pair.login + "\">" + Md5.encode(pair.password) + "</player>");
+			File.saveContent(loginPath(), content + "\n<player login=\"" + pair.login.toLowerCase() + "\">" + Md5.encode(pair.password) + "</player>");
 			Lib.println('(J/L) Registered ${pair.login}');
 			return true;
 		}
@@ -102,7 +102,7 @@ class LoginManager
 		
 		for (p in xml.elementsNamed("player"))
 		{
-			if (p.get("login") == pair.login)
+			if (p.get("login") == pair.login.toLowerCase())
 				return Md5.encode(pair.password) == p.firstChild().nodeValue;
 		}
 		

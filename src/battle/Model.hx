@@ -10,6 +10,7 @@ import battle.enums.Team;
 import battle.struct.UPair;
 import battle.struct.UnitCoords;
 import battle.struct.Wheel;
+import haxe.Json;
 
 enum ChooseResult 
 {
@@ -47,9 +48,9 @@ class Model implements IInteractiveModel implements IMutableModel
 		return units;
 	}
 	
-	public function getInitialState():Array<Dynamic>
+	public function getInitialState():String
 	{
-		return [for (u in units) {
+		return Json.stringify([for (u in units) {
 		id: u.id,
 		name: u.name,
 		element: u.element,
@@ -59,12 +60,12 @@ class Model implements IInteractiveModel implements IMutableModel
 		mana: u.manaPool,
 		alacrity: u.alacrityPool,
 		buffs: [for (b in u.buffQueue.queue) b.toLightweight()]
-		}];
+		}]);
 	}
 	
-	public function getPersonal(login:String):Dynamic
+	public function getPersonal(login:String):String
 	{
-		return units.get(getUnit(login)).wheel.getlwArray();
+		return Json.stringify(units.get(getUnit(login)).wheel.getlwArray());
 	}
 	
 	private function getUnit(login:String):UnitCoords

@@ -53,8 +53,8 @@ class Ability
 		{
 			this.name = XMLUtils.parseAbility(id, "name", "");
 			this.description = XMLUtils.parseAbility(id, "description", "");
-			this.type = XMLUtils.parseAbility(id, "type", AbilityType.Active);
-			this.element = XMLUtils.parseAbility(id, "element", Element.Physical);
+			this.type = XMLUtils.parseAbility(id, "type", AbilityType);
+			this.element = XMLUtils.parseAbility(id, "element", Element);
 		}
 	}
 	

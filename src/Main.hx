@@ -5,6 +5,7 @@ import battle.Model;
 import battle.Unit;
 import battle.enums.Team;
 import battle.struct.UnitCoords;
+import haxe.Timer;
 import haxe.crypto.Md5;
 import mphx.connection.IConnection;
 import mphx.server.impl.Server;
@@ -47,7 +48,25 @@ class Main
 		
 		server.onConnectionClose = function(s:String, c:IConnection){
 			loginManager.logout(c); 
-			battleExecute(true, c, function(l:String){models[l].quit(l); });
+			battleExecute(true, c, function(l:String){models[l].quit(l); models.remove(l); });
+			var l:String = loginManager.getLogin(c);
+			if (l != null)
+				if (rooms[l] != null)
+				{
+					for (i in 0...openRooms.length)
+						if (openRooms[i] == l)
+						{
+							openRooms.splice(i, 1);
+							break;
+						}
+					for (i in 0...server.rooms.length)
+						if (server.rooms[i] == rooms[l])
+						{
+							server.rooms.splice(i, 1);
+							break;
+						}
+					rooms.remove(l);
+				}
 		};
 		
 		server.events.on("Register", function(data:LoginPair, sender:IConnection){
@@ -75,7 +94,6 @@ class Main
 		});
 		
 		server.start();
-		trace("Server started");
 	}
 	
 	private static function battleExecute(silent:Bool, requester:IConnection, ?func:String->Void, ?hfunc:String->Focus->Void, ?hdata:Focus)
@@ -138,6 +156,7 @@ class Main
 			rooms[peer] = room; //Creating a link
 			server.rooms.push(room); //Adding the room to server
 			openRooms.push(peer); //Hey, I'm lfg
+			trace(openRooms);
 		}
 		else
 		{
@@ -145,9 +164,16 @@ class Main
 			sender.putInRoom(rooms[enemy]);
 			rooms[enemy].map(peer, sender);
 			rooms[peer] = rooms[enemy];
-			models[enemy] = new Model([loadUnit(enemy, Team.Left, 0)], [loadUnit(peer, Team.Right, 0)], rooms[peer]);
+			#if debug trace(1); #end
+			var p1:Unit = loadUnit(enemy, Team.Left, 0);
+			#if debug trace(1); #end
+			var p2:Unit = loadUnit(peer, Team.Right, 0);
+			#if debug trace(1); #end
+			models[enemy] = new Model([p1], [p2], rooms[peer]);
+			#if debug trace(1); #end
 			models[peer] = models[enemy];
-			var awaitingAnswer:Array<String> = [for (k in rooms[peer].clientMap.keys()) k];
+			var awaitingAnswer:Array<String> = [for (k in rooms[enemy].clientMap.keys()) k];
+			trace(rooms[enemy].clientMap);
 			server.events.on("InitialDataRecieved", function(data:Dynamic, sender:IConnection){
 				var l:String = loginManager.getLogin(sender);
 				if (l != null)
@@ -178,13 +204,19 @@ class Main
 	
 	private static function loadUnit(login:String, team:Team, pos:Int):Unit
 	{
-		return new Unit(ID.Player(login), team, pos, loadPlayer(login).toParams());
+		#if debug trace(2); #end
+		var i:ID = ID.Player(login);
+		#if debug trace(2); #end
+		var p:Player = loadPlayer(login);
+		#if debug trace(2); #end
+		var par:ParameterList = p.toParams();
+		#if debug trace(2); #end
+		return new Unit(i, team, pos, par);
 	}
 	
 	private static function loadPlayer(login:String):Player
 	{
 		var xml:Xml = Xml.parse(File.getContent(playersDir() + login + ".xml"));
-			
 		var name:String;
 		var element:Element;
 		var params:RoamUnitParameters = new RoamUnitParameters();
@@ -209,8 +241,11 @@ class Main
 				params.flow = Std.parseInt(n.firstChild().nodeValue);
 			for (n in p.elementsNamed("in"))
 				params.intellect = Std.parseInt(n.firstChild().nodeValue);
+			params.wheel = [];
+			for (n in p.elementsNamed("wheel"))
+				for (n in n.elementsNamed("ability"))
+					params.wheel.push(Type.createEnum(ID, n.firstChild().nodeValue));
 		}
-		
 		return new Player(login, element, params, name);
 	}
 	

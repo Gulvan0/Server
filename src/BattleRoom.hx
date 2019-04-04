@@ -15,7 +15,7 @@ class BattleRoom extends Room
 	
 	public function map(login:String, client:IConnection)
 	{
-		clientMap.remove(client.getContext().peerToString());
+		clientMap[login] = client;
 	}
 	
 	public function player(unit:Unit):IConnection

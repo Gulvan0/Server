@@ -37,7 +37,28 @@ class Main
 	private static var server:Server;
 	private static var loginManager:LoginManager;
 	
-	static function main() 
+	static function main()
+	{
+		init();
+	}
+	
+	public static function testJson()
+	{
+		server = new Server("localhost", 5000);
+		var model:Model = new Model([loadUnit("Gulvan", Team.Left, 0)], [loadUnit("kazvixx", Team.Right, 0)], new BattleRoom());
+		server.events.on("Login", function(data:LoginPair, sender:IConnection){
+			
+			sender.send("P", model.getPersonal("Gulvan"));
+			trace('a');
+			sender.send("P", model.getPersonal("kazvixx"));
+			trace('a');
+			sender.send("P", model.getInitialState());
+			trace('a');
+		});
+		server.start();
+	}
+	
+	private static function init() 
 	{
 		server = new Server("localhost", 5000);
 		loginManager = new LoginManager();
@@ -186,9 +207,10 @@ class Main
 							break;
 						}
 			});
-			rooms[peer].broadcast("BattleStarted", models[peer].getInitialState());
 			for (l in rooms[peer].clientMap.keys())
 				rooms[peer].clientMap[l].send("BattlePersonal", models[peer].getPersonal(l));
+			trace('a');
+			rooms[peer].broadcast("BattleStarted", models[peer].getInitialState());
 		}
 	}
 	

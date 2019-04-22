@@ -2,31 +2,36 @@ package;
 
 import battle.Unit;
 import hxassert.Assert;
-import mphx.server.room.Room;
 import mphx.connection.IConnection;
 
 /**
  * ...
  * @author gulvan
  */
-class BattleRoom extends Room 
+class BattleRoom
 {
-	public var clientMap:Map<String, IConnection> = new Map();
+	public var clients:Array<String> = new Array();
 	
-	public function map(login:String, client:IConnection)
+	public function add(login:String)
 	{
-		clientMap[login] = client;
+		clients.push(login);
+	}
+	
+	public function broadcast(event:String, ?data:Null<Dynamic>)
+	{
+		for (c in clients)
+			Main.loginManager.getConnection(c).send(event, data);
 	}
 	
 	public function player(unit:Unit):IConnection
 	{
 		Assert.assert(unit.isPlayer());
-		return clientMap[unit.id.getParameters()[0]];
+		return Main.loginManager.getConnection(unit.id.getParameters()[0]);
 	}
 	
 	public function new() 
 	{
-		super();
+		
 	}
 	
 }

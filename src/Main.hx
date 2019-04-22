@@ -35,7 +35,7 @@ class Main
 	private static var openRooms:Array<String> = [];
 	
 	private static var server:Server;
-	private static var loginManager:LoginManager;
+	public static var loginManager:LoginManager;
 	
 	static function main()
 	{
@@ -78,12 +78,6 @@ class Main
 						if (openRooms[i] == l)
 						{
 							openRooms.splice(i, 1);
-							break;
-						}
-					for (i in 0...server.rooms.length)
-						if (server.rooms[i] == rooms[l])
-						{
-							server.rooms.splice(i, 1);
 							break;
 						}
 					rooms.remove(l);
@@ -172,29 +166,31 @@ class Main
 		if (Lambda.empty(openRooms))
 		{
 			var room:BattleRoom = new BattleRoom();
-			sender.putInRoom(room); //Putting in room
-			room.map(peer, sender); //Allowing to access from it by login
+			trace(room);
+			room.add(peer); //Allowing to access from it by login
+			trace(room);
 			rooms[peer] = room; //Creating a link
-			server.rooms.push(room); //Adding the room to server
+			trace(rooms);
 			openRooms.push(peer); //Hey, I'm lfg
 			trace(openRooms);
 		}
 		else
 		{
 			var enemy:String = openRooms.splice(0, 1)[0];
-			sender.putInRoom(rooms[enemy]);
-			rooms[enemy].map(peer, sender);
+			rooms[enemy].add(peer);
 			rooms[peer] = rooms[enemy];
 			#if debug trace(1); #end
 			var p1:Unit = loadUnit(enemy, Team.Left, 0);
 			#if debug trace(1); #end
 			var p2:Unit = loadUnit(peer, Team.Right, 0);
-			#if debug trace(1); #end
+			#if debug trace(1, rooms); #end
 			models[enemy] = new Model([p1], [p2], rooms[peer]);
-			#if debug trace(1); #end
+			#if debug trace(1, enemy); #end
 			models[peer] = models[enemy];
-			var awaitingAnswer:Array<String> = [for (k in rooms[enemy].clientMap.keys()) k];
-			trace(rooms[enemy].clientMap);
+			#if debug trace(1, models); #end
+			#if debug trace(1, models[enemy]); #end
+			#if debug trace(1, rooms[enemy]); #end
+			var awaitingAnswer:Array<String> = rooms[enemy].clients.copy();
 			server.events.on("InitialDataRecieved", function(data:Dynamic, sender:IConnection){
 				var l:String = loginManager.getLogin(sender);
 				if (l != null)
@@ -207,9 +203,12 @@ class Main
 							break;
 						}
 			});
-			for (l in rooms[peer].clientMap.keys())
-				rooms[peer].clientMap[l].send("BattlePersonal", models[peer].getPersonal(l));
-			trace('a');
+			for (l in rooms[peer].clients)
+			{
+				var c:IConnection = loginManager.getConnection(l);
+				var d:String = models[peer].getPersonal(l);
+				c.send("BattlePersonal", d);
+			}
 			rooms[peer].broadcast("BattleStarted", models[peer].getInitialState());
 		}
 	}

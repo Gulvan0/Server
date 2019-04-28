@@ -7,10 +7,13 @@ import battle.data.Units;
 import battle.enums.AbilityType;
 import battle.enums.Source;
 import battle.enums.Team;
+import battle.struct.FloatPool;
+import battle.struct.Pool;
 import battle.struct.UPair;
 import battle.struct.UnitCoords;
 import battle.struct.Wheel;
 import haxe.Json;
+import json2object.JsonWriter;
 
 enum ChooseResult 
 {
@@ -28,6 +31,18 @@ enum TargetResult
 	Nonexistent;
 	Dead;
 } 
+
+typedef ModelState = {
+	var id:ID;
+	var name:String;
+	var element:Element;
+	var team:Team;
+	var pos:Int;
+	var hp:Pool;
+	var mana:Pool;
+	var alacrity:FloatPool;
+	var buffs:Array<Buff.LightweightBuff>;
+};
 
 /**
  * @author Gulvan
@@ -50,7 +65,8 @@ class Model implements IInteractiveModel implements IMutableModel
 	
 	public function getInitialState():String
 	{
-		return Json.stringify([for (u in units) {
+		var writer = new JsonWriter<Array<ModelState>>();
+		return writer.write([for (u in units) {
 		id: u.id,
 		name: u.name,
 		element: u.element,
@@ -65,7 +81,8 @@ class Model implements IInteractiveModel implements IMutableModel
 	
 	public function getPersonal(login:String):String
 	{
-		return Json.stringify(units.get(getUnit(login)).wheel.getlwArray());
+		var writer = new JsonWriter<Array<LightweightAbility>>();
+		return writer.write(units.get(getUnit(login)).wheel.getlwArray());
 	}
 	
 	private function getUnit(login:String):UnitCoords

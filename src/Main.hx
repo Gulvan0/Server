@@ -7,6 +7,7 @@ import battle.enums.Team;
 import battle.struct.UnitCoords;
 import haxe.Timer;
 import haxe.crypto.Md5;
+import json2object.JsonWriter;
 import mphx.connection.IConnection;
 import mphx.server.impl.Server;
 import mphx.server.room.Room;
@@ -69,20 +70,20 @@ class Main
 		});
 		
 		server.onConnectionClose = function(s:String, c:IConnection){
-			var l:Null<String> = getModel(true, s);
+			var l:String = loginManager.getLogin(c);
 			if (l != null)
 			{
-				models[l].quit(l);
-				models.remove(l);
-			}
-			else
-				l = loginManager.getLogin(c);
-			if (l != null)
-			{
+				if (models[l] != null)
+				{
+					rooms[l].clients.remove(l);
+					models[l].quit(l);
+					models.remove(l);
+				}
+				
 				rooms.remove(l);
 				openRooms.remove(l);
+				loginManager.logout(c);
 			}
-			loginManager.logout(c); 
 		};
 		
 		server.events.on("Register", function(data:LoginPair, sender:IConnection){
@@ -157,7 +158,8 @@ class Main
 		
 		var players:Array<String> = winners.concat(losers);
 		for (l in players) models.remove(l);
-		rooms[players[0]].broadcast("BattleEnded", winners);
+		var writer = new JsonWriter<Array<String>>();
+		rooms[players[0]].broadcast("BattleEnded", draw? "DRAW" : writer.write(winners));
 		for (l in players) rooms.remove(l);
 	}
 	

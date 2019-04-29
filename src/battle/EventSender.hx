@@ -4,10 +4,19 @@ import battle.Buff;
 import battle.struct.UnitCoords;
 import battle.enums.Source;
 import battle.Unit;
+import json2object.JsonWriter;
+
+typedef HPupdate = {target:UnitCoords, delta:Int, newV:Int, element:Element, crit:Bool, fromAbility:Bool}
+typedef ManaUpdate = {target:UnitCoords, delta:Int, newV:Int}
+typedef AlacUpdate = {target:UnitCoords, delta:Float, newV:Float}
+typedef MissDetails = {target:UnitCoords, element:Element}
+typedef DeathDetails = {target:UnitCoords}
+typedef ThrowDetails = {target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element}
+typedef BuffQueueUpdate = {target:UnitCoords, queue:Array<LightweightBuff>}
 
 /**
- * ...
- * @author ...
+ * Broadcasts battle events
+ * @author gulvan
  */
 class EventSender implements IModelObserver 
 {
@@ -24,22 +33,28 @@ class EventSender implements IModelObserver
 	
 	public function hpUpdate(target:Unit, caster:Unit, dhp:Int, element:Element, crit:Bool, source:Source):Void 
 	{
-		room.broadcast("HPUpdate", {target: UnitCoords.get(target), delta: dhp, newV: target.hpPool.value, element: element, crit: crit, fromAbility: source == Source.Ability});
+		var writer = new JsonWriter<HPupdate>();
+		room.broadcast("HPUpdate", writer.write({target: UnitCoords.get(target), delta: dhp, newV: target.hpPool.value, element: element, crit: crit, fromAbility: source == Source.Ability}));
 	}
 	
 	public function manaUpdate(target:Unit, dmana:Int, source:Source):Void 
 	{
-		room.broadcast("ManaUpdate", {target: UnitCoords.get(target), delta: dmana, newV: target.manaPool.value});
+		var writer = new JsonWriter<ManaUpdate>();
+		room.broadcast("ManaUpdate", writer.write({target: UnitCoords.get(target), delta: dmana, newV: target.manaPool.value}));
 	}
 	
 	public function alacUpdate(unit:Unit, dalac:Float, source:Source):Void 
 	{
-		room.broadcast("AlacrityUpdate", {target: UnitCoords.get(unit), delta: dalac, newV: unit.alacrityPool.value});
+		var writer = new JsonWriter<AlacUpdate>();
+		trace(writer.write({target: UnitCoords.get(unit), delta: dalac, newV: unit.alacrityPool.value}));
+		room.broadcast("AlacrityUpdate", writer.write({target: UnitCoords.get(unit), delta: dalac, newV: unit.alacrityPool.value}));
+		trace("ok");
 	}
 	
 	public function buffQueueUpdate(unit:UnitCoords, queue:Array<Buff>):Void 
 	{
-		room.broadcast("BuffQueueUpdate", {target: unit, queue: [for (b in queue) b.toLightweight()]});
+		var writer = new JsonWriter<BuffQueueUpdate>();
+		room.broadcast("BuffQueueUpdate", writer.write({target: unit, queue: [for (b in queue) b.toLightweight()]}));
 	}
 	
 	public function preTick(current:Unit):Void 
@@ -54,22 +69,26 @@ class EventSender implements IModelObserver
 	
 	public function miss(target:UnitCoords, element:Element):Void 
 	{
-		room.broadcast("Miss", {target: target, element: element});
+		var writer = new JsonWriter<MissDetails>();
+		room.broadcast("Miss", writer.write({target: target, element: element}));
 	}
 	
 	public function death(unit:UnitCoords):Void 
 	{
-		room.broadcast("Death", {target: unit});
+		var writer = new JsonWriter<DeathDetails>();
+		room.broadcast("Death", writer.write({target: unit}));
 	}
 	
 	public function abThrown(target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element):Void 
 	{
-		room.broadcast("Thrown", {target: target, caster: caster, id: id, type: type, element: element});
+		var writer = new JsonWriter<ThrowDetails>();
+		room.broadcast("Thrown", writer.write({target: target, caster: caster, id: id, type: type, element: element}));
 	}
 	
 	public function abStriked(target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element):Void 
 	{
-		room.broadcast("Strike", {target: target, caster: caster, id: id, type: type, element: element});
+		var writer = new JsonWriter<ThrowDetails>();
+		room.broadcast("Strike", writer.write({target: target, caster: caster, id: id, type: type, element: element}));
 	}
 	
 }

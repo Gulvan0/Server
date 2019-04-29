@@ -11,8 +11,6 @@ import battle.struct.FloatPool;
 import battle.struct.Pool;
 import battle.struct.UPair;
 import battle.struct.UnitCoords;
-import battle.struct.Wheel;
-import haxe.Json;
 import json2object.JsonWriter;
 
 enum ChooseResult 

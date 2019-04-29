@@ -13,6 +13,7 @@ import mphx.server.room.Room;
 import roaming.Unit.RoamUnitParameters;
 import roaming.Player;
 import sys.io.File;
+using Utils;
 
 typedef LoginPair = {
   var login:String;
@@ -68,20 +69,20 @@ class Main
 		});
 		
 		server.onConnectionClose = function(s:String, c:IConnection){
-			loginManager.logout(c); 
-			battleExecute(true, c, function(l:String){models[l].quit(l); models.remove(l); });
-			var l:String = loginManager.getLogin(c);
+			var l:Null<String> = getModel(true, s);
 			if (l != null)
-				if (rooms[l] != null)
-				{
-					for (i in 0...openRooms.length)
-						if (openRooms[i] == l)
-						{
-							openRooms.splice(i, 1);
-							break;
-						}
-					rooms.remove(l);
-				}
+			{
+				models[l].quit(l);
+				models.remove(l);
+			}
+			else
+				l = loginManager.getLogin(c);
+			if (l != null)
+			{
+				rooms.remove(l);
+				openRooms.remove(l);
+			}
+			loginManager.logout(c); 
 		};
 		
 		server.events.on("Register", function(data:LoginPair, sender:IConnection){
@@ -97,32 +98,39 @@ class Main
 		});
 		
 		server.events.on("UseRequest", function(focus:Focus, sender:IConnection){
-			battleExecute(false, sender, function(l:String, fcs:Focus){models[l].useRequest(l, fcs.abilityNum, fcs.target); }, focus);
+			var l:Null<String> = getModel(false, sender);
+			if (l != null)
+				models[l].useRequest(l, focus.abilityNum, focus.target);
 		});
 		
 		server.events.on("SkipTurn", function(data:Dynamic, sender:IConnection){
-			battleExecute(false, sender, function(l:String){models[l].skipTurn(l); });
+			var l:Null<String> = getModel(false, sender);
+			if (l != null)
+				models[l].skipTurn(l);
 		});
 		
 		server.events.on("QuitBattle", function(data:Dynamic, sender:IConnection){
-			battleExecute(false, sender, function(l:String){models[l].quit(l); });
+			var l:Null<String> = getModel(false, sender);
+			if (l != null)
+				models[l].quit(l);
 		});
 		
 		server.start();
 	}
 	
-	private static function battleExecute(silent:Bool, requester:IConnection, ?func:String->Void, ?hfunc:String->Focus->Void, ?hdata:Focus)
+	private static function getModel(silent:Bool, requester:IConnection):Null<String>
 	{
 		var l:String = loginManager.getLogin(requester);
 		if (l != null)
 		{
 			if (models[l] != null)
-				func != null? func(l) : hfunc(l, hdata);
+				return l;
 			else if (!silent)
 				requester.send("NotInBattle");
 		}
 		else if (!silent)
 			requester.send("LoginNeeded");
+		return null;
 	}
 	
 	public static function terminate(winners:Array<String>, losers:Array<String>, ?draw:Bool = false)
@@ -183,26 +191,14 @@ class Main
 			var p1:Unit = loadUnit(enemy, Team.Left, 0);
 			#if debug trace(1); #end
 			var p2:Unit = loadUnit(peer, Team.Right, 0);
-			#if debug trace(1, rooms); #end
 			models[enemy] = new Model([p1], [p2], rooms[peer]);
-			#if debug trace(1, enemy); #end
 			models[peer] = models[enemy];
-			#if debug trace(1, models); #end
-			#if debug trace(1, models[enemy]); #end
 			#if debug trace(1, rooms[enemy]); #end
+			
 			var awaitingAnswer:Array<String> = rooms[enemy].clients.copy();
-			server.events.on("InitialDataRecieved", function(data:Dynamic, sender:IConnection){
-				var l:String = loginManager.getLogin(sender);
-				if (l != null)
-					for (i in 0...awaitingAnswer.length)
-						if (awaitingAnswer[i] == l)
-						{
-							awaitingAnswer.splice(i, 1);
-							if (Lambda.empty(awaitingAnswer))
-								models[peer].start();
-							break;
-						}
-			});
+			#if debug trace("Waiting ", awaitingAnswer); #end
+			server.events.on("InitialDataRecieved", function(data:Dynamic, sender:IConnection){answerHandler(sender, awaitingAnswer, models[peer]); });
+			
 			for (l in rooms[peer].clients)
 			{
 				var c:IConnection = loginManager.getConnection(l);
@@ -210,6 +206,21 @@ class Main
 				c.send("BattlePersonal", d);
 			}
 			rooms[peer].broadcast("BattleStarted", models[peer].getInitialState());
+		}
+	}
+	
+	private static function answerHandler(sender:IConnection, array:Array<String>, model:IInteractiveModel)
+	{
+		var l:String = loginManager.getLogin(sender);
+		if (l != null)
+		{
+			array.remove(l);
+			trace(array);
+			if (Lambda.empty(array))
+			{
+				server.events.remove("InitialDataRecieved");
+				model.start();
+			}
 		}
 	}
 	

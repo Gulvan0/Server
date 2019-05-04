@@ -33,8 +33,8 @@ class EffectData
 class EffectHandler implements IModelObserver
 {
 	
-	private static var model:IMutableModel;
-	private static var flag:Bool = true;
+	private var model:IMutableModel;
+	private var flag:Bool = true;
 	
 	public function init(m:IMutableModel)
 	{
@@ -55,6 +55,7 @@ class EffectHandler implements IModelObserver
 	
 	private function procBuffs(e:BattleEvent, unit:Unit)
 	{
+		if (e == BattleEvent.Strike) trace(unit.buffQueue.getTriggering(e));
 		for (buff in unit.buffQueue.getTriggering(e))
 			Buffs.useBuff(model, buff.id, buff.owner, buff.caster, BuffMode.Proc);
 	}
@@ -122,7 +123,7 @@ class EffectHandler implements IModelObserver
 		var t:Unit = getUnit(target);
 		var c:Unit = getUnit(caster);
 		var data:EffectData = new EffectData(t, c, null, element, null);
-		
+		trace("proc");
 		procAbilities(BattleEvent.Strike, t, data);
 		procBuffs(BattleEvent.Strike, t);
 	}

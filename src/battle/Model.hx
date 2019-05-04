@@ -299,8 +299,10 @@ class Model implements IInteractiveModel implements IMutableModel
 		if (unit.isAlive())
 		{
 			for (o in observers) o.preTick(unit);
+			var haveBuffs:Array<Unit> = units.both.filter(function(u){return !Lambda.empty(u.buffQueue.queue); });
 			unit.tick();
 			for (o in observers) o.tick(unit);
+			for (o in observers) for (u in haveBuffs) o.buffQueueUpdate(UnitCoords.get(u), u.buffQueue.queue);
 		}
 			
 		if (!bothTeamsAlive()) 
@@ -433,13 +435,14 @@ class Model implements IInteractiveModel implements IMutableModel
 	public function checkTarget(targetCoords:UnitCoords, abilityPos:Int):TargetResult
 	{
 		var target:Unit = units.get(targetCoords);
+		var caster:Unit = units.get(currentUnit);
 		var ability:Active = units.get(currentUnit).wheel.getActive(abilityPos);
 		
 		if (target == null)
 			return TargetResult.Nonexistent;
 		if (target.hpPool.value == 0)
 			return TargetResult.Dead;
-		if (!ability.checkValidity(units.player().figureRelation(target)))
+		if (!ability.checkValidity(caster.figureRelation(target)))
 			return TargetResult.Invalid;
 			
 		return TargetResult.Ok;

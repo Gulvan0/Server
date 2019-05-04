@@ -169,7 +169,7 @@ class XMLUtils
 		return output;
 	}
 	
-	public static function parseBuff<T>(buff:ID, param:String, paramType:T):T
+	public static function parseBuff<T>(buff:ID, param:String, paramType:T):Dynamic
 	{
 		var xml:Xml = fromFile("data\\Buffs.xml");
 		xml = findNode(xml, "buff", "id", buff.getName());
@@ -275,7 +275,7 @@ class XMLUtils
 		else if (Std.is(type, Enum))
 			return Type.createEnum(cast type, value);
 			
-		throw "Node casting error: Unknown node type";
+		throw "Node casting error: Unknown node type: " + type;
 	}
 	
 	private static function findNode(xml:Xml, nodeName:String, ?keyAtt:String = "", ?keyAttValue:String = ""):Xml

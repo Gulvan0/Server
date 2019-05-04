@@ -100,6 +100,7 @@ class Main
 		
 		server.events.on("UseRequest", function(focus:Focus, sender:IConnection){
 			var l:Null<String> = getModel(false, sender);
+			trace("Use request: " + l + "; " + focus);
 			if (l != null)
 				models[l].useRequest(l, focus.abilityNum, focus.target);
 		});
@@ -168,6 +169,7 @@ class Main
 		var c:IConnection = loginManager.getConnection(login);
 		if (c != null)
 			c.send("BattleWarning", {message:message, state: models[login].getPersonal(login)});
+		trace(message);
 	}
 	
 	private static function findMatch(sender:IConnection)

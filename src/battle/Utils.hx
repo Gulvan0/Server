@@ -32,11 +32,12 @@ class Utils
 	
 	public static function flipMiss(target:Unit, caster:Unit, ability:Active):Bool
 	{
+		var baseChance:Float = 0.4 * target.intellect / (caster.intellect + target.intellect);
 		return switch (ability.strikeType)
 		{
-			case StrikeType.Bolt: caster.intellect / (caster.intellect + target.intellect) <= Math.random();
+			case StrikeType.Bolt: 0.75 * baseChance >= Math.random();
 			case StrikeType.Spell: false;
-			case StrikeType.Kick: 0.75 * caster.intellect / (caster.intellect + target.intellect) <= Math.random();
+			case StrikeType.Kick: baseChance >= Math.random();
 		}
 	}
 	

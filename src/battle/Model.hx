@@ -218,7 +218,7 @@ class Model implements IInteractiveModel implements IMutableModel
 				
 		for (o in observers) o.abThrown(target, caster, ability.id, ability.strikeType, ability.element);
 			
-		for (t in ability.aoe? units.allied(target) : [units.get(target)])
+		for (t in (ability.aoe? units.allied(target) : [units.get(target)]))
 		{	
 			if (Utils.flipMiss(t, units.get(caster), ability))
 			{
@@ -341,13 +341,13 @@ class Model implements IInteractiveModel implements IMutableModel
 		var losers:Array<String> = [];
 		var draw:Bool = winner == null;
 		
-		for (u in draw? units.both : units.getTeam(winner)) 
+		for (u in (draw? units.both : units.getTeam(winner))) 
 			switch (u.id)
 			{
 				case ID.Player(pid): winners.push(pid);
 				default:
 			}
-		for (u in draw? units.both : units.getTeam(winner == Team.Left? Team.Right : Team.Left)) 
+		for (u in (draw? units.both : units.getTeam(winner == Team.Left? Team.Right : Team.Left))) 
 			switch (u.id)
 			{
 				case ID.Player(pid): losers.push(pid);

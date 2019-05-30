@@ -1,0 +1,6 @@
+-cp src
+-main Main.hx
+-lib hxassert
+-lib json2object
+-lib mphx
+-hl bin/output.hl

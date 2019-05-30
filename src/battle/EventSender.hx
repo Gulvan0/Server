@@ -6,7 +6,7 @@ import battle.enums.Source;
 import battle.Unit;
 import json2object.JsonWriter;
 
-typedef HPupdate = {target:UnitCoords, delta:Int, newV:Int, element:Element, crit:Bool, fromAbility:Bool}
+typedef HPupdate = {target:UnitCoords, delta:Int, newV:Int, element:Element, crit:Bool, source:Source}
 typedef ManaUpdate = {target:UnitCoords, delta:Int, newV:Int}
 typedef AlacUpdate = {target:UnitCoords, delta:Float, newV:Float}
 typedef MissDetails = {target:UnitCoords, element:Element}
@@ -34,7 +34,7 @@ class EventSender implements IModelObserver
 	public function hpUpdate(target:Unit, caster:Unit, dhp:Int, element:Element, crit:Bool, source:Source):Void 
 	{
 		var writer = new JsonWriter<HPupdate>();
-		room.broadcast("HPUpdate", writer.write({target: UnitCoords.get(target), delta: dhp, newV: target.hpPool.value, element: element, crit: crit, fromAbility: source == Source.Ability}));
+		room.broadcast("HPUpdate", writer.write({target: UnitCoords.get(target), delta: dhp, newV: target.hpPool.value, element: element, crit: crit, source: source}));
 	}
 	
 	public function manaUpdate(target:Unit, dmana:Int, source:Source):Void 

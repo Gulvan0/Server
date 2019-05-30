@@ -62,7 +62,7 @@ class Main
 	
 	private static function init() 
 	{
-		server = new Server("ec2-18-224-7-170.us-east-2.compute.amazonaws.com", 5000);
+		server = new Server("localhost", 5000);
 		loginManager = new LoginManager();
 		
 		server.events.on("Login", function(data:LoginPair, sender:IConnection){
@@ -100,7 +100,6 @@ class Main
 		
 		server.events.on("UseRequest", function(focus:Focus, sender:IConnection){
 			var l:Null<String> = getModel(false, sender);
-			trace("Use request: " + l + "; " + focus);
 			if (l != null)
 				models[l].useRequest(l, focus.abilityNum, focus.target);
 		});

@@ -56,9 +56,21 @@ class BuffQueue
 		return [for (b in queue.slice(0, queue.length - newBuffs)) if (b.reactsTo(e)) b];
 	}
 	
-	public function dispellByID(id:ID)
+	public function dispellOneByID(id:ID)
 	{
-		dispellBuff(indexOfBuff(id));
+		var ind:Int = indexOfBuff(id);
+		if (ind >= 0)
+			dispellBuff(ind);
+	}
+
+	public function dispellAllByID(id:ID)
+	{
+		var ind:Int = indexOfBuff(id);
+		while (ind >= 0)
+		{
+			dispellBuff(ind);
+			ind = indexOfBuff(id);
+		}
 	}
 	
 	public function dispellByElement(?elements:Array<Element>, ?count:Int = -1)
@@ -120,9 +132,9 @@ class BuffQueue
 	//We need separate function because we compare only by id. indexOf() thinks that buffs with different current durations are different 
 	private function indexOfBuff(id:ID):Int
 	{
-		for (buff in queue)
-			if (buff.id == id)
-				return queue.indexOf(buff);
+		for (i in 0...queue.length)
+			if (queue[i].id == id)
+				return i;
 				
 		return -1;
 	}

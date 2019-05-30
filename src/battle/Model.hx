@@ -121,15 +121,11 @@ class Model implements IInteractiveModel implements IMutableModel
 				dhp = Utils.calcCrit(dhp, caster);
 			}
 		}
-		trace(caster.name + " deals " + -dhp + (crit? "!" : "") + " damage to " + target.name);
+
 		target.hpPool.value += dhp;	
-		trace(target.name + " is still alive: " + target.isAlive());
-		for (o in observers) 
-		{
-			o.hpUpdate(target, caster, dhp, element, crit, source);
-			if (!target.isAlive())
-				o.death(targetCoords);
-		}
+		for (o in observers) o.hpUpdate(target, caster, dhp, element, crit, source);
+		if (!target.isAlive())
+			for (o in observers) o.death(targetCoords);
 	}
 	
 	public function changeMana(targetCoords:UnitCoords, casterCoords:UnitCoords, dmana:Int, source:Source)
@@ -214,23 +210,17 @@ class Model implements IInteractiveModel implements IMutableModel
 	{
 		ability.putOnCooldown();
 		changeMana(caster, caster, -ability.manacost, Source.God);
-		trace(getUnits().get(caster).name + " now has " + getUnits().get(caster).manaPool.value + " mana");
 				
 		for (o in observers) o.abThrown(target, caster, ability.id, ability.strikeType, ability.element);
 			
 		for (t in (ability.aoe? units.allied(target) : [units.get(target)]))
-		{	
 			if (Utils.flipMiss(t, units.get(caster), ability))
-			{
-				trace(units.get(caster).name + " -> " + t.name + ": Miss!");
 				for (o in observers) o.miss(UnitCoords.get(t), ability.element);
-			}
 			else
 			{
 				Abilities.useAbility(this, ability.id, UnitCoords.get(t), caster, ability.element);
 				for (o in observers) o.abStriked(UnitCoords.get(t), caster, ability.id, ability.strikeType, ability.element);
 			}
-		}
 			
 		postTurnProcess();
 	}
@@ -426,7 +416,7 @@ class Model implements IInteractiveModel implements IMutableModel
 		
 		if (activeAbility.checkOnCooldown())
 			return ChooseResult.Cooldown;
-		if (!units.player().checkManacost(abilityPos))
+		if (!units.get(currentUnit).checkManacost(abilityPos))
 			return ChooseResult.Manacost;
 		
 		return ChooseResult.Ok;

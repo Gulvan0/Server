@@ -92,9 +92,9 @@ class Abilities
 	{
 		var delta:Int = switch (target.buffQueue.elementalCount(Element.Lightning))
 		{
-			case 0: 25 + 10 * caster.intellect;
-			case 1: -(20 + 10 * caster.intellect);
-			default: -(70 + 20 * caster.intellect);
+			case 0: 25 + 4 * caster.intellect;
+			case 1: -(20 + 4 * caster.intellect);
+			default: -(40 + 5 * caster.intellect);
 		}
 		
 		model.changeHP(UnitCoords.get(target), UnitCoords.get(caster), delta, element, Source.Ability);

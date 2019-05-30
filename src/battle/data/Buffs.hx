@@ -124,7 +124,7 @@ class Buffs
 			case BuffMode.End:
 				target.flow = target.flow * 2;
 			case BuffMode.Proc:
-				target.buffQueue.dispellByID(ID.BuffLgSnared);
+				target.buffQueue.dispellOneByID(ID.BuffLgSnared);
 			default:
 		}
 	}

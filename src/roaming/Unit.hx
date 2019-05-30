@@ -81,7 +81,7 @@ class Unit
 	public function new(id:ID, ?element:Null<Element>, ?name:Null<String>, ?params:Null<RoamUnitParameters>) 
 	{
 		this.id = id;
-		this.name = (name == null)? name : getDefaultName(element);
+		this.name = (name != null)? name : getDefaultName(element);
 		this.element = element;
 			
 		this.level = (params == null)? 1 : params.level;

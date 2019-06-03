@@ -316,12 +316,10 @@ class XMLUtils
 	
 	private static function fromFile(path:String):Xml
 	{
-		var srcPath:String = Sys.programPath().substring(0, Sys.programPath().indexOf("bin")) + "bin\\";
-		
-		if (FileSystem.exists(srcPath))
-			return Xml.parse(File.getContent(srcPath + path));
-		else
-			throw "Invalid path";
+		var dirpath:String = Sys.programPath();
+		dirpath = dirpath.substring(0, dirpath.lastIndexOf("\\"));
+
+		return Xml.parse(File.getContent(dirpath + "\\" + path));
 	}
 	
 }

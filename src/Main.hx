@@ -44,25 +44,9 @@ class Main
 		init();
 	}
 	
-	public static function testJson()
-	{
-		server = new Server("localhost", 5000);
-		var model:Model = new Model([loadUnit("Gulvan", Team.Left, 0)], [loadUnit("kazvixx", Team.Right, 0)], new BattleRoom());
-		server.events.on("Login", function(data:LoginPair, sender:IConnection){
-			
-			sender.send("P", model.getPersonal("Gulvan"));
-			trace('a');
-			sender.send("P", model.getPersonal("kazvixx"));
-			trace('a');
-			sender.send("P", model.getInitialState());
-			trace('a');
-		});
-		server.start();
-	}
-	
 	private static function init() 
 	{
-		server = new Server("localhost", 5000);
+		server = new Server("ec2-18-224-7-170.us-east-2.compute.amazonaws.com", 5000);
 		loginManager = new LoginManager();
 		
 		server.events.on("Login", function(data:LoginPair, sender:IConnection){

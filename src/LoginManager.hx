@@ -1,8 +1,11 @@
 package;
+import sys.io.FileOutput;
+import sys.FileSystem;
 import haxe.crypto.Md5;
 import mphx.connection.IConnection;
 import Main.LoginPair;
 import sys.io.File;
+using StringTools;
 
 /**
  * ...
@@ -85,6 +88,7 @@ class LoginManager
 		if (pair.login.length >= 2)
 		{
 			File.saveContent(loginPath(), content + "\n<player login=\"" + pair.login.toLowerCase() + "\">" + Md5.encode(pair.password) + "</player>");
+			createPlayer(pair.login);
 			Sys.println('(J/L) Registered ${pair.login}');
 			return true;
 		}
@@ -93,6 +97,15 @@ class LoginManager
 			c.send("SmallLogin");
 			return false;	
 		}
+	}
+
+	private function createPlayer(login:String)
+	{
+		var str:String = File.getContent(Main.playersDir() + "d.xml");
+		str = strReplace(str, "dname", login);
+		var fo:FileOutput = File.write(Main.playersDir() + login.toLowerCase() + ".xml");
+		fo.writeString(str);
+		fo.close();
 	}
 	
 	private function checkPassword(pair:LoginPair):Bool
@@ -111,6 +124,15 @@ class LoginManager
 	private static function loginPath():String
 	{
 		return Main.playersDir() + "playerslist.xml";
+	}
+
+	private static function strReplace(str:String, sub:String, by:String):String
+	{
+		var a:Array<String> = str.split(sub);
+		str = a[0];
+		for (i in 1...a.length)
+			str += by + a[i];
+		return str;
 	}
 	
 	public function new() 

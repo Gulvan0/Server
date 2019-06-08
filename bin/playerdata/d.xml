@@ -1,0 +1,25 @@
+<progress>
+	<zone id="NullSpace">1</zone>
+	<current>NullSpace</current>
+</progress>
+<player>
+	<name>dname</name>
+	<element>Lightning</element>
+	<xp>0</xp>
+	<level>1</level>
+	<abp>1</abp>
+	<attp>4</attp>
+	<st>10</st>
+	<fl>10</fl>
+	<in>10</in>
+	<wheel>
+		<ability>LgLightningBolt</ability>
+		<ability>LgVoltSnare</ability>
+		<ability>LgShockTherapy</ability>
+		<ability>LgArcFlash</ability>
+		<ability>LgDisrupt</ability>
+		<ability>LgEnergize</ability>
+		<ability>LgElectricalStorm</ability>
+		<ability>LgEMPBlast</ability>
+	</wheel>
+</player>

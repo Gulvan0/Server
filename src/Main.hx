@@ -32,6 +32,8 @@ typedef Focus = {
  */
 class Main 
 {
+	public static var version:String = "alpha2.4";
+
 	private static var models:Map<String, IInteractiveModel> = new Map(); // login -> Model
 	private static var rooms:Map<String, BattleRoom> = new Map(); // login -> Room
 	private static var openRooms:Array<String> = [];
@@ -98,6 +100,10 @@ class Main
 			var l:Null<String> = getModel(false, sender);
 			if (l != null)
 				models[l].quit(l);
+		});
+
+		server.events.on("GetVersion", function(data:Dynamic, sender:IConnection){
+			sender.send("Version", version);
 		});
 		
 		server.start();

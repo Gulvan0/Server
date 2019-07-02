@@ -135,28 +135,44 @@ class Main
 		for (player in l) deltaRating -= player.rating;
 		deltaRating = Math.round(Math.abs(deltaRating));
 
+		var xpRewards:Map<String, Int> = [];
+		var ratingRewards:Map<String, Null<Int>> = [];
 		for (player in w)
 			if (pvp)
 			{
-				player.gainXP(GameRules.xpRewardPVP(draw? BattleOutcome.Draw : BattleOutcome.Win));
-				player.rating += GameRules.ratingRewardPVP(draw? BattleOutcome.Draw : BattleOutcome.Win, deltaRating);
+				xpRewards[player.login] = GameRules.xpRewardPVP(draw? BattleOutcome.Draw : BattleOutcome.Win);
+				ratingRewards[player.login] = GameRules.ratingRewardPVP(draw? BattleOutcome.Draw : BattleOutcome.Win, deltaRating);
+				player.gainXP(xpRewards[player.login]);
+				player.rating += ratingRewards[player.login];
 			}
-			else 
-				player.gainXP(GameRules.xpRewardPVE(draw? BattleOutcome.Draw : BattleOutcome.Win, player.isAtBossStage()));
+			else
+			{
+				xpRewards[player.login] = GameRules.xpRewardPVE(draw? BattleOutcome.Draw : BattleOutcome.Win, player.isAtBossStage());
+				ratingRewards[player.login] = null;
+				player.gainXP(xpRewards[player.login]);
+			}
 		for (player in l)
 			if (pvp)
 			{
-				player.gainXP(GameRules.xpRewardPVP(draw? BattleOutcome.Draw : BattleOutcome.Loss));
-				player.rating += GameRules.ratingRewardPVP(draw? BattleOutcome.Draw : BattleOutcome.Loss, deltaRating);
+				xpRewards[player.login] = GameRules.xpRewardPVP(draw? BattleOutcome.Draw : BattleOutcome.Loss);
+				ratingRewards[player.login] = GameRules.ratingRewardPVP(draw? BattleOutcome.Draw : BattleOutcome.Loss, deltaRating);
+				player.gainXP(xpRewards[player.login]);
+				player.rating += ratingRewards[player.login];
 			}
-			else 
-				player.gainXP(GameRules.xpRewardPVE(draw? BattleOutcome.Draw : BattleOutcome.Loss, player.isAtBossStage()));
+			else
+			{
+				xpRewards[player.login] = GameRules.xpRewardPVE(draw? BattleOutcome.Draw : BattleOutcome.Loss, player.isAtBossStage());
+				ratingRewards[player.login] = null;
+				player.gainXP(xpRewards[player.login]);
+			}
 
-		var players:Array<String> = winners.concat(losers);
-		for (l in players) models.remove(l);
-		var writer = new JsonWriter<Array<String>>();
-		rooms[players[0]].broadcast("BattleEnded", draw? "DRAW" : writer.write(winners));
-		for (l in players) rooms.remove(l);
+		for (l in winners.concat(losers)) 
+		{
+			var resultString:String = draw? "DRAW" : Lambda.has(winners, l)? "WIN" : "LOSS";
+			rooms.remove(l);
+			models.remove(l);
+			loginManager.getConnection(l).send("BattleEnded", {outcome: resultString, xp: xpRewards[l], rating: ratingRewards[l]});
+		}
 	}
 	
 	public static function warn(login:String, message:String)

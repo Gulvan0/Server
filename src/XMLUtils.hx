@@ -32,16 +32,6 @@ class XMLUtils
 		return xml;
 	}
 	
-	public static function getGlobal<T>(node:String, attribute:String, typeObj:T):Null<T>
-	{
-		var xml:Xml = fromFile("data\\Globals.xml");
-		
-		for (n in xml.elementsNamed(node))
-			return castNode(n.get(attribute), typeObj);
-		
-		return null;
-	}
-	
 	public static function parseTree(element:Element):Array<Array<Ability>>
 	{
 		var xml:Xml = getTree(element);

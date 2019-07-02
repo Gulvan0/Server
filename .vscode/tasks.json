@@ -11,7 +11,7 @@
         {
             "label": "compile",
             "type": "shell",
-            "command": "cd src & haxe -hl ..\\bin\\output.hl -main Main.hx -lib hxassert -lib json2object -lib mphx",
+            "command": "cd src \"&\" haxe -hl ..\\bin\\output.hl -main Main.hx -lib hxassert -lib json2object -lib mphx",
             "group": {
                 "kind": "build",
                 "isDefault": true

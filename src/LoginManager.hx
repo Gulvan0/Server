@@ -103,6 +103,8 @@ class LoginManager
 	{
 		var str:String = File.getContent(Main.playersDir() + "d.xml");
 		str = strReplace(str, "dname", login);
+		str = strReplace(str, "dabp", "" + GameRules.initialAbilityPoints);
+		str = strReplace(str, "dattp", "" + GameRules.initialAttributePoints);
 		var fo:FileOutput = File.write(Main.playersDir() + login.toLowerCase() + ".xml");
 		fo.writeString(str);
 		fo.close();

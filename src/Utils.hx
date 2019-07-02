@@ -14,5 +14,12 @@ class Utils
 				return i;
 		return null;
 	}
+
+	public static function sumMaps<T>(map:Map<T, Int>, addend:Map<T, Int>):Map<T, Int>
+	{
+		for (k in map.keys())
+			map[k] += addend[k];
+		return map;
+	}
 	
 }

@@ -1,7 +1,6 @@
 package;
 import haxe.crypto.Md5;
 import roaming.Player;
-import roaming.Unit.RoamUnitParameters;
 import roaming.enums.Attribute;
 import sys.FileSystem;
 import sys.io.File;

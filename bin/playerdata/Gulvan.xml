@@ -1,6 +1,6 @@
 <progress>
 	<zone id="NullSpace">1</zone>
-	<current>NullSpace</current>
+	<currentZone>NullSpace</currentZone>
 </progress>
 <player>
 	<name>Gulvan</name>
@@ -23,3 +23,24 @@
 		<ability>LgEMPBlast</ability>
 	</wheel>
 </player>
+<rating>0</rating>
+<tree>
+	<row num="0">
+		<ability column="0">0</ability>
+		<ability column="1">0</ability>
+		<ability column="2">0</ability>
+		<ability column="3">0</ability>
+	</row>
+	<row num="1">
+		<ability column="0">0</ability>
+		<ability column="1">0</ability>
+		<ability column="2">0</ability>
+		<ability column="3">0</ability>
+	</row>
+	<row num="2">
+		<ability column="0">0</ability>
+		<ability column="1">0</ability>
+		<ability column="2">0</ability>
+		<ability column="3">0</ability>
+	</row>
+</tree>

@@ -331,13 +331,13 @@ class Model implements IInteractiveModel implements IMutableModel
 		var losers:Array<String> = [];
 		var draw:Bool = winner == null;
 		
-		for (u in (draw? units.both : units.getTeam(winner))) 
+		for (u in (units.getTeam(draw? Team.Left : winner))) 
 			switch (u.id)
 			{
 				case ID.Player(pid): winners.push(pid);
 				default:
 			}
-		for (u in (draw? units.both : units.getTeam(winner == Team.Left? Team.Right : Team.Left))) 
+		for (u in (units.getTeam((winner == Team.Left || draw)? Team.Right : Team.Left))) 
 			switch (u.id)
 			{
 				case ID.Player(pid): losers.push(pid);

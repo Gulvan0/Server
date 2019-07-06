@@ -106,6 +106,13 @@ class Main
 		server.events.on("GetVersion", function(data:Dynamic, sender:IConnection){
 			sender.send("Version", version);
 		});
+
+		server.events.on("GetPlPrData", function(data:Dynamic, sender:IConnection){
+			if (loginManager.getLogin(sender) != null)
+				loginManager.sendPlPrData(sender);
+			else
+				sender.send("LoginNeeded");
+		});
 		
 		server.start();
 	}

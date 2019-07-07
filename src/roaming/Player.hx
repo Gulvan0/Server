@@ -93,14 +93,14 @@ class Player
 	public function gainXP(count:Int)
 	{
 		var xpPool:Pool = xp;
-		if (xpPool.maxValue - xpPool.value > count)
-			setField("xp", "" + (xpPool.value + count));
-		else
+		while (xpPool.maxValue - xpPool.value <= count)
 		{
-			setField("xp", "" + (xpPool.value + count - xpPool.maxValue));
+			count -= xpPool.maxValue - xpPool.value;
+			xpPool.value = 0;
 			setField("level", "" + (level + 1));
 			lvlupReward();
 		}
+		setField("xp", "" + (xpPool.value + count));
 	}
 
 	private function lvlupReward()

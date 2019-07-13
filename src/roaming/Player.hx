@@ -150,25 +150,25 @@ class Player
 		return sum;
 	}
 
-	public function addToWheel(ability:ID):Bool
+	public function addToWheel(ability:ID, pos:Int):Bool
 	{
 		if (getWheelLength() >= GameRules.wheelSlotCount(level))
 			return false;
 		
 		var path:String = Main.playersDir() + login + ".xml";
         var s:String = File.getContent(path);
-       	var ereg:EReg = ~/<ability>EmptyAbility<\/ability>/;
-        s = ereg.replace(s, "<ability>" + ability.getName() + "</ability>");
+       	var ereg:EReg = new EReg("<ability pos=\"" + pos + "\">.+?</ability>", "");
+        s = ereg.replace(s, "<ability pos=\"" + pos + "\">" + ability.getName() + "</ability>");
         File.saveContent(path, s);
 		return true;
 	}
 
-	public function removeFromWheel(ability:ID)
+	public function removeFromWheel(pos:Int)
 	{
 		var path:String = Main.playersDir() + login + ".xml";
         var s:String = File.getContent(path);
-       	var ereg:EReg = new EReg("<ability>" + ability.getName() + "</ability>", "");
-        s = ereg.replace(s, "<ability>EmptyAbility</ability>");
+       	var ereg:EReg = new EReg("<ability pos=\"" + pos + "\">.+?</ability>", "");
+        s = ereg.replace(s, "<ability pos=\"" + pos + "\">EmptyAbility</ability>");
         File.saveContent(path, s);
 	}
 
@@ -176,9 +176,9 @@ class Player
 	{
 		var path:String = Main.playersDir() + login + ".xml";
         var s:String = File.getContent(path);
-       	var ereg:EReg = ~/<ability>(?!EmptyAbility<\/ability>).+?<\/ability>/;
+       	var ereg:EReg = new EReg("<ability pos=\"([0-7])\">(?!EmptyAbility</ability>).+?</ability>", "");
 		while (ereg.match(s))
-        	s = ereg.replace(s, "<ability>EmptyAbility</ability>");
+        	s = ereg.replace(s, "<ability pos=\""+ ereg.matched(1) + "\">EmptyAbility</ability>");
         File.saveContent(path, s);
 	}
 
@@ -258,8 +258,8 @@ class Player
 		Assert.assert(i.inRange(0, GameRules.treeHeight - 1));
 		Assert.assert(j.inRange(0, GameRules.treeWidth - 1));
 		
-		for (deltaJ in getAbilityRequirements(i, j))
-			if (getAbilityLvl(i - 1, j + deltaJ) == 0)
+		for (deltaI in getAbilityRequirements(i, j))
+			if (getAbilityLvl(i + deltaI, j - 1) == 0)
 				return false;
 
 		if (getAbilityLvl(i, j) == getAbilityMaxlvl(i, j))
@@ -271,7 +271,7 @@ class Player
 		abilityPoints--;
 		var path:String = Main.playersDir() + login + ".xml";
         var s:String = File.getContent(path);
-        var ereg:EReg = new EReg("(<row num=\"" + i + "\">[\\s\\S]+?<ability column=\"" + j + "\">)(.+?)(</ability>)", "");
+        var ereg:EReg = new EReg("(<row num=\"" + j + "\">[\\s\\S]+?<ability column=\"" + i + "\">)(.+?)(</ability>)", "");
 		ereg.match(s);
         s = ereg.replace(s, "$1" + (Std.parseInt(ereg.matched(2)) + 1) + "$3");
         File.saveContent(path, s);
@@ -293,12 +293,13 @@ class Player
 		Assert.assert(i.inRange(0, GameRules.treeHeight - 1));
 		Assert.assert(j.inRange(0, GameRules.treeWidth - 1));
 
-		for (e in Main.playerData(login).elementsNamed("tree"))
-            for (r in e.elementsNamed("row"))
-                if (Std.parseInt(r.get("num")) == i)
-					for (a in r.elementsNamed("ability"))
-						if (Std.parseInt(a.get("column")) == j)
-							return Std.parseInt((a.firstChild().nodeValue));
+		for (p in Main.playerData(login).elementsNamed("player"))
+			for (e in p.elementsNamed("tree"))
+				for (r in e.elementsNamed("row"))
+					if (Std.parseInt(r.get("num")) == i)
+						for (a in r.elementsNamed("ability"))
+							if (Std.parseInt(a.get("column")) == j)
+								return Std.parseInt((a.firstChild().nodeValue));
 		throw 'Error during a search for "lvl" field, coords: ($i, $j)';
 	}
 
@@ -322,9 +323,9 @@ class Player
 		var reqAr:Array<Int> = [];
 
 		for (r in getTreeInfo(element).elementsNamed("row"))
-			if (Std.parseInt(r.get("num")) == i)
+			if (Std.parseInt(r.get("num")) == j)
 				for (a in r.elementsNamed("ability"))
-					if (Std.parseInt(a.get("column")) == j)
+					if (Std.parseInt(a.get("column")) == i)
 						return resolveRequirements(a.get("requires"));
 		throw 'Error during a search for "requirements" field, coords: ($i, $j)';
 	}

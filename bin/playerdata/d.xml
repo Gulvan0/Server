@@ -13,34 +13,34 @@
 	<fl>10</fl>
 	<in>10</in>
 	<wheel>
-		<ability>EmptyAbility</ability>
-		<ability>EmptyAbility</ability>
-		<ability>EmptyAbility</ability>
-		<ability>EmptyAbility</ability>
-		<ability>EmptyAbility</ability>
-		<ability>EmptyAbility</ability>
-		<ability>EmptyAbility</ability>
-		<ability>EmptyAbility</ability>
+		<ability pos="1">EmptyAbility</ability>
+		<ability pos="2">EmptyAbility</ability>
+		<ability pos="3">EmptyAbility</ability>
+		<ability pos="4">EmptyAbility</ability>
+		<ability pos="5">EmptyAbility</ability>
+		<ability pos="6">EmptyAbility</ability>
+		<ability pos="7">EmptyAbility</ability>
+		<ability pos="8">EmptyAbility</ability>
 	</wheel>
+	<tree>
+		<row num="1">
+			<ability column="1">0</ability>
+			<ability column="2">0</ability>
+			<ability column="3">0</ability>
+			<ability column="4">0</ability>
+		<row>
+		<row num="2">
+			<ability column="1">0</ability>
+			<ability column="2">0</ability>
+			<ability column="3">0</ability>
+			<ability column="4">0</ability>
+		<row>
+		<row num="3">
+			<ability column="1">0</ability>
+			<ability column="2">0</ability>
+			<ability column="3">0</ability>
+			<ability column="4">0</ability>
+		<row>
+	</tree>
 </player>
 <rating>0</rating>
-<tree>
-	<row num="1">
-		<ability column="1">0</ability>
-		<ability column="2">0</ability>
-		<ability column="3">0</ability>
-		<ability column="4">0</ability>
-	<row>
-	<row num="2">
-		<ability column="1">0</ability>
-		<ability column="2">0</ability>
-		<ability column="3">0</ability>
-		<ability column="4">0</ability>
-	<row>
-	<row num="3">
-		<ability column="1">0</ability>
-		<ability column="2">0</ability>
-		<ability column="3">0</ability>
-		<ability column="4">0</ability>
-	<row>
-</tree>

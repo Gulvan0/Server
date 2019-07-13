@@ -84,6 +84,51 @@ class Main
 			else
 				sender.send("LoginNeeded");
 		});
+
+		server.events.on("LearnAbility", function(d:String, sender:IConnection){
+			var l:Null<String> = loginManager.getLogin(sender);
+			var data:Array<Null<Int>> = d.split("|").map(Std.parseInt);
+			if (l != null)
+				new Player(l).learnAbility(data[0], data[1]);
+			else
+				sender.send("LoginNeeded");
+		});
+
+		server.events.on("PutAbility", function(d:String, sender:IConnection){
+			var l:Null<String> = loginManager.getLogin(sender);
+			var data:Array<String> = d.split("|");
+			if (l != null)
+				new Player(l).addToWheel(ID.createByName(data[0]), Std.parseInt(data[1]));
+			else
+				sender.send("LoginNeeded");
+		});
+
+		server.events.on("RemoveAbility", function(d:String, sender:IConnection){
+			var l:Null<String> = loginManager.getLogin(sender);
+			if (l != null)
+				new Player(l).removeFromWheel(Std.parseInt(d));
+			else
+				sender.send("LoginNeeded");
+		});
+
+		server.events.on("IncrementAttribute", function(d:String, sender:IConnection){
+			var l:Null<String> = loginManager.getLogin(sender);
+			if (l != null)
+				new Player(l).incrementAtt(Attribute.createByName(d));
+			else
+				sender.send("LoginNeeded");
+		});
+
+		server.events.on("ReSpec", function(d:Dynamic, sender:IConnection){
+			var l:Null<String> = loginManager.getLogin(sender);
+			if (l != null)
+			{
+				new Player(l).reSpec();
+				loginManager.sendPlPrData(sender);
+			}
+			else
+				sender.send("LoginNeeded");
+		});
 		
 		server.events.on("UseRequest", function(focus:Focus, sender:IConnection){
 			var l:Null<String> = getModel(false, sender);

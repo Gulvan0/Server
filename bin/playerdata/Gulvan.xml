@@ -7,40 +7,40 @@
 	<element>Lightning</element>
 	<xp>0</xp>
 	<level>1</level>
-	<abp>1</abp>
+	<abp>6</abp>
 	<attp>4</attp>
 	<st>10</st>
 	<fl>10</fl>
 	<in>10</in>
 	<wheel>
-		<ability>LgLightningBolt</ability>
-		<ability>LgVoltSnare</ability>
-		<ability>LgShockTherapy</ability>
-		<ability>LgArcFlash</ability>
-		<ability>LgDisrupt</ability>
-		<ability>LgEnergize</ability>
-		<ability>LgElectricalStorm</ability>
-		<ability>LgEMPBlast</ability>
+		<ability pos="0">LgLightningBolt</ability>
+		<ability pos="1">LgVoltSnare</ability>
+		<ability pos="2">LgShockTherapy</ability>
+		<ability pos="3">LgArcFlash</ability>
+		<ability pos="4">LgDisrupt</ability>
+		<ability pos="5">LgEnergize</ability>
+		<ability pos="6">LgElectricalStorm</ability>
+		<ability pos="7">LgEMPBlast</ability>
 	</wheel>
+	<tree>
+		<row num="0">
+			<ability column="0">1</ability>
+			<ability column="1">1</ability>
+			<ability column="2">0</ability>
+			<ability column="3">0</ability>
+		</row>
+		<row num="1">
+			<ability column="0">0</ability>
+			<ability column="1">0</ability>
+			<ability column="2">0</ability>
+			<ability column="3">0</ability>
+		</row>
+		<row num="2">
+			<ability column="0">0</ability>
+			<ability column="1">0</ability>
+			<ability column="2">0</ability>
+			<ability column="3">0</ability>
+		</row>
+	</tree>
 </player>
 <rating>0</rating>
-<tree>
-	<row num="0">
-		<ability column="0">0</ability>
-		<ability column="1">0</ability>
-		<ability column="2">0</ability>
-		<ability column="3">0</ability>
-	</row>
-	<row num="1">
-		<ability column="0">0</ability>
-		<ability column="1">0</ability>
-		<ability column="2">0</ability>
-		<ability column="3">0</ability>
-	</row>
-	<row num="2">
-		<ability column="0">0</ability>
-		<ability column="1">0</ability>
-		<ability column="2">0</ability>
-		<ability column="3">0</ability>
-	</row>
-</tree>

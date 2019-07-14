@@ -7,7 +7,7 @@
 	<element>Lightning</element>
 	<xp>0</xp>
 	<level>1</level>
-	<abp>6</abp>
+	<abp>1</abp>
 	<attp>4</attp>
 	<st>10</st>
 	<fl>10</fl>
@@ -24,8 +24,8 @@
 	</wheel>
 	<tree>
 		<row num="0">
-			<ability column="0">1</ability>
-			<ability column="1">1</ability>
+			<ability column="0">0</ability>
+			<ability column="1">0</ability>
 			<ability column="2">0</ability>
 			<ability column="3">0</ability>
 		</row>

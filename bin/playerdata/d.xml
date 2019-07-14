@@ -13,6 +13,7 @@
 	<fl>10</fl>
 	<in>10</in>
 	<wheel>
+		<ability pos="0">EmptyAbility</ability>
 		<ability pos="1">EmptyAbility</ability>
 		<ability pos="2">EmptyAbility</ability>
 		<ability pos="3">EmptyAbility</ability>
@@ -20,7 +21,6 @@
 		<ability pos="5">EmptyAbility</ability>
 		<ability pos="6">EmptyAbility</ability>
 		<ability pos="7">EmptyAbility</ability>
-		<ability pos="8">EmptyAbility</ability>
 	</wheel>
 	<tree>
 		<row num="1">

@@ -4,3 +4,4 @@
 -lib json2object
 -lib mphx
 -hl bin/output.hl
+-D hl_ver=1.9.0

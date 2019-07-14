@@ -13,14 +13,14 @@
 	<fl>10</fl>
 	<in>10</in>
 	<wheel>
-		<ability pos="1">LgLightningBolt</ability>
-		<ability pos="2">LgVoltSnare</ability>
-		<ability pos="3">LgShockTherapy</ability>
-		<ability pos="4">LgArcFlash</ability>
-		<ability pos="5">LgDisrupt</ability>
-		<ability pos="6">LgEnergize</ability>
-		<ability pos="7">LgElectricalStorm</ability>
-		<ability pos="8">LgEMPBlast</ability>
+		<ability pos="0">LgLightningBolt</ability>
+		<ability pos="1">LgVoltSnare</ability>
+		<ability pos="2">LgShockTherapy</ability>
+		<ability pos="3">LgArcFlash</ability>
+		<ability pos="4">LgDisrupt</ability>
+		<ability pos="5">LgEnergize</ability>
+		<ability pos="6">LgElectricalStorm</ability>
+		<ability pos="7">LgEMPBlast</ability>
 	</wheel>
 	<tree>
 		<row num="0">

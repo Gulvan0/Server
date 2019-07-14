@@ -152,9 +152,11 @@ class Player
 
 	public function addToWheel(ability:ID, pos:Int):Bool
 	{
-		if (getWheelLength() >= GameRules.wheelSlotCount(level))
+		var abCoords = findAbility(ability);
+		if (abCoords == null || getAbilityLvl(cast abCoords.x, cast abCoords.y) == 0)
 			return false;
-		
+		removeFromWheelByID(ability);
+
 		var path:String = Main.playersDir() + login + ".xml";
         var s:String = File.getContent(path);
        	var ereg:EReg = new EReg("<ability pos=\"" + pos + "\">.+?</ability>", "");
@@ -170,6 +172,18 @@ class Player
        	var ereg:EReg = new EReg("<ability pos=\"" + pos + "\">.+?</ability>", "");
         s = ereg.replace(s, "<ability pos=\"" + pos + "\">EmptyAbility</ability>");
         File.saveContent(path, s);
+	}
+
+	private function removeFromWheelByID(id:ID)
+	{
+		var path:String = Main.playersDir() + login + ".xml";
+        var s:String = File.getContent(path);
+       	var ereg:EReg = new EReg("<ability pos=\"([0-9])\">" + id.getName() + "</ability>", "");
+		if (ereg.match(s))
+		{
+        	s = ereg.replace(s, "<ability pos=\"" + ereg.matched(1) + "\">EmptyAbility</ability>");
+        	File.saveContent(path, s);
+		}
 	}
 
 	public function clearWheel()
@@ -296,9 +310,9 @@ class Player
 		for (p in Main.playerData(login).elementsNamed("player"))
 			for (e in p.elementsNamed("tree"))
 				for (r in e.elementsNamed("row"))
-					if (Std.parseInt(r.get("num")) == i)
+					if (Std.parseInt(r.get("num")) == j)
 						for (a in r.elementsNamed("ability"))
-							if (Std.parseInt(a.get("column")) == j)
+							if (Std.parseInt(a.get("column")) == i)
 								return Std.parseInt((a.firstChild().nodeValue));
 		throw 'Error during a search for "lvl" field, coords: ($i, $j)';
 	}
@@ -309,9 +323,9 @@ class Player
 		Assert.assert(j.inRange(0, GameRules.treeWidth - 1));
 
 		for (r in getTreeInfo(element).elementsNamed("row"))
-			if (Std.parseInt(r.get("num")) == i)
+			if (Std.parseInt(r.get("num")) == j)
 				for (a in r.elementsNamed("ability"))
-					if (Std.parseInt(a.get("column")) == j)
+					if (Std.parseInt(a.get("column")) == i)
 						return Std.parseInt(a.get("maxlvl"));
 		throw 'Error during a search for "maxlvl" field, coords: ($i, $j)';
 	}
@@ -328,6 +342,15 @@ class Player
 					if (Std.parseInt(a.get("column")) == i)
 						return resolveRequirements(a.get("requires"));
 		throw 'Error during a search for "requirements" field, coords: ($i, $j)';
+	}
+
+	private function findAbility(id:ID):Null<Point>
+	{
+		for (r in getTreeInfo(element).elementsNamed("row"))
+			for (a in r.elementsNamed("ability"))
+					if (a.get("id") == id.getName())
+						return new Point(Std.parseInt(a.get("column")), Std.parseInt(r.get("num")));
+		return null;
 	}
 
 	private function getTreeInfo(element:Element):Xml

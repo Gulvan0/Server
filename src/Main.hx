@@ -33,7 +33,7 @@ typedef Focus = {
  */
 class Main 
 {
-	public static var version:String = "alpha2.4";
+	public static var version:String = "alpha2.5";
 
 	private static var models:Map<String, IInteractiveModel> = new Map(); // login -> Model
 	private static var rooms:Map<String, BattleRoom> = new Map(); // login -> Room
@@ -49,7 +49,7 @@ class Main
 	
 	private static function init() 
 	{
-		server = new Server("localhost", 5000);
+		server = new Server("ec2-18-224-7-170.us-east-2.compute.amazonaws.com", 5000);
 		loginManager = new LoginManager();
 		
 		server.events.on("Login", function(data:LoginPair, sender:IConnection){

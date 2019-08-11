@@ -1,4 +1,5 @@
 package battle;
+import battle.enums.StrikeType;
 import Element;
 import battle.Ability;
 import battle.IInteractiveModel;
@@ -218,12 +219,32 @@ class Model implements IInteractiveModel implements IMutableModel
 				for (o in observers) o.miss(UnitCoords.get(t), ability.element);
 			else
 			{
-				Abilities.useAbility(this, ability.id, UnitCoords.get(t), caster, ability.element);
+				if (ability.strikeType == StrikeType.Spell)
+					Abilities.useAbility(this, ability.id, UnitCoords.get(t), caster, ability.element);
 				for (o in observers) o.abStriked(UnitCoords.get(t), caster, ability.id, ability.strikeType, ability.element);
+				//save ability id, target, caster, ability element. Init boom counter
+				//Should save a set of data for each victim --------------------------------> ALPHA 3.3
 			}
-			
+		if (ability.strikeType == StrikeType.Spell)
+			postTurnProcess();
+	}
+
+	//================================================================================
+    // BH
+    //================================================================================
+
+	public function boom(login:String)
+	{
+		//Abilities.useAbility(this, ability.id, UnitCoords.get(t), caster, ability.element);
+	}
+
+	public function bhOver(login:String)
+	{
+		//Should pop a set of data and check if there are any left --------------------------> ALPHA 3.3
 		postTurnProcess();
 	}
+
+	//Maybe some validity checkers
 	
     //================================================================================
     // Game cycle

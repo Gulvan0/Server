@@ -148,6 +148,36 @@ class Main
 				models[l].quit(l);
 		});
 
+		server.events.on("BHTick", function(data:Dynamic, sender:IConnection){
+			var l:Null<String> = getModel(false, sender);
+			if (l != null)
+				models[l].
+		});
+
+		server.events.on("BHVanish", function(data:Dynamic, sender:IConnection){
+			var l:Null<String> = getModel(false, sender);
+			if (l != null)
+				models[l].
+		});
+
+		server.events.on("BHBoom", function(data:Dynamic, sender:IConnection){
+			var l:Null<String> = getModel(false, sender);
+			if (l != null)
+				models[l].boom(l);
+		});
+
+		server.events.on("BHFinished", function(data:Dynamic, sender:IConnection){
+			var l:Null<String> = getModel(false, sender);
+			if (l != null)
+				models[l].bhOver(l);
+		});
+
+		server.events.on("TrajectoryRequest", function(data:Dynamic, sender:IConnection){
+			var l:Null<String> = getModel(false, sender);
+			if (l != null)
+				models[l].
+		});
+
 		server.events.on("GetVersion", function(data:Dynamic, sender:IConnection){
 			sender.send("Version", version);
 		});

@@ -151,13 +151,13 @@ class Main
 		server.events.on("BHTick", function(data:Dynamic, sender:IConnection){
 			var l:Null<String> = getModel(false, sender);
 			if (l != null)
-				models[l].
+				rooms[l].share(l, "BHTick", data);
 		});
 
 		server.events.on("BHVanish", function(data:Dynamic, sender:IConnection){
 			var l:Null<String> = getModel(false, sender);
 			if (l != null)
-				models[l].
+				rooms[l].share(l, "BHVanish", data);
 		});
 
 		server.events.on("BHBoom", function(data:Dynamic, sender:IConnection){
@@ -169,13 +169,19 @@ class Main
 		server.events.on("BHFinished", function(data:Dynamic, sender:IConnection){
 			var l:Null<String> = getModel(false, sender);
 			if (l != null)
-				models[l].bhOver(l);
-		});
-
-		server.events.on("TrajectoryRequest", function(data:Dynamic, sender:IConnection){
-			var l:Null<String> = getModel(false, sender);
-			if (l != null)
-				models[l].
+			{
+				var responsesAwaited:Int = rooms[l].clients.length - 1;
+				server.events.on("DemoClosed", function (d:Dynamic, s:IConnection){
+					responsesAwaited--;
+					if (responsesAwaited == 0)
+					{
+						server.events.remove("DemoClosed");
+						sender.send("BHCloseGame");
+						models[l].bhOver(l);
+					}
+				});
+				rooms[l].share(l, "BHCloseDemo");
+			}
 		});
 
 		server.events.on("GetVersion", function(data:Dynamic, sender:IConnection){

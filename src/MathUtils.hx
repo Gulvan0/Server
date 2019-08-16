@@ -39,6 +39,11 @@ class MathUtils
 	{
 		return (v == 0)? 0 : (v > 0)? 1 : -1;
 	}
+
+	public static function iabs(v:Int):Int
+	{
+		return (v > 0)? v : -v;
+	}
 	
 	public static function inRange(number:Float, leftBorder:Float, rightBorder:Float, ?leftIncluded:Bool = true, ?rightIncluded:Bool = true):Bool 
 	{

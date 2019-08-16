@@ -83,56 +83,34 @@ class Unit
 		
 		if (params == null)
 			params = XMLUtils.parseUnit(id);
-		#if debug trace("seg1"); #end	
 		this.id = id;
-		#if debug trace("seg1"); #end	
 		this.name = params.name;
-		#if debug trace("seg1"); #end	
 		this.element = params.element;
-		#if debug trace("seg1"); #end	
 		this.team = team;
-		#if debug trace("seg1"); #end	
 		this.position = position;
-		#if debug trace("seg1"); #end	
 		
 		if (Lambda.empty(params.wheel))
 			wheel = new Wheel([ID.LgArcFlash, ID.LgCharge, ID.LgDisrupt, ID.LgElectricalStorm, ID.LgEMPBlast], 8);
 		else
-		{
-			#if debug trace("wheel's ready"); #end	
 			wheel = new Wheel(params.wheel, 8);
-		}
-		#if debug trace("seg2"); #end	
+
 		this.hpPool = new Pool(params.hp, params.hp);
-		#if debug trace("seg2"); #end	
 		this.manaPool = new Pool(params.mana, params.mana);
-		#if debug trace("seg2"); #end	
 		this.alacrityPool = new FloatPool(0, 100);
-		#if debug trace("seg2"); #end	
 		
 		this.strength = params.strength;
-		#if debug trace("seg4"); #end
 		this.flow = params.flow;
-		#if debug trace("seg4"); #end	
 		this.intellect = params.intellect;
-		#if debug trace("seg4"); #end
 		
 		this.buffQueue = subparams != null? subparams.buffQueue : new BuffQueue();
-		#if debug trace("seg4"); #end
 		
 		this.damageIn = subparams != null? subparams.damageIn : new Linear(1, 0);
-		#if debug trace("seg4"); #end	
 		this.damageOut = subparams != null? subparams.damageOut : new Linear(1, 0);
-		#if debug trace("seg4"); #end	
 		this.healIn = subparams != null? subparams.healIn : new Linear(1, 0);
-		#if debug trace("seg4"); #end	
 		this.healOut = subparams != null? subparams.healOut : new Linear(1, 0);
-		#if debug trace("seg4"); #end	
 		
 		this.critChance = subparams != null? subparams.critChance : new Linear(0, 0);
-		#if debug trace("seg5"); #end	
 		this.critDamage = subparams != null? subparams.critDamage : new Linear(1, 0);
-		#if debug trace(params); #end
 	}
 	
 	public function figureRelation(unit:Unit):UnitType
@@ -156,6 +134,15 @@ class Unit
 		{
 			case ID.Player(v): true;
 			default: false;
+		};
+	}
+
+	public inline function playerLogin():String
+	{
+		return switch (id)
+		{
+			case ID.Player(v): v;
+			default: "ERROR!";
 		};
 	}
 	

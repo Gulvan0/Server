@@ -5,7 +5,7 @@ import battle.enums.AbilityType;
 import battle.enums.Source;
 import battle.enums.StrikeType;
 import battle.struct.UnitCoords;
-
+import MathUtils.Point;
 /**
  * @author Gulvan
  */
@@ -23,5 +23,5 @@ interface IModelObserver
 	public function death(unit:UnitCoords):Void;
 	
 	public function abThrown(target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element):Void;
-	public function abStriked(target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element):Void;
+	public function abStriked(target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element, pattern:Array<Array<Point>>, trajectory:Array<Array<Point>>):Void;
 }

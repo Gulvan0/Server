@@ -1,4 +1,5 @@
 package battle;
+import MathUtils.Point;
 import battle.enums.StrikeType;
 import Element;
 import battle.Ability;
@@ -13,6 +14,7 @@ import battle.struct.Pool;
 import battle.struct.UPair;
 import battle.struct.UnitCoords;
 import json2object.JsonWriter;
+using Lambda;
 
 enum ChooseResult 
 {
@@ -43,6 +45,12 @@ typedef ModelState = {
 	var buffs:Array<Buff.LightweightBuff>;
 };
 
+typedef BHInfo = {
+	var ability:ID;
+	var caster:UnitCoords;
+	var element:Element;
+};
+
 /**
  * @author Gulvan
  */
@@ -56,6 +64,10 @@ class Model implements IInteractiveModel implements IMutableModel
 	public var currentUnit:UnitCoords;
 	
 	private var readyUnits:Array<Unit>;
+
+	private var bhInfo:Null<BHInfo> = null;
+	private var bhTargets:Map<String, UnitCoords> = [];
+	private var bhHitsTaken:Map<String, Int> = [];
 
 	public function getUnits():UPair<Unit>
 	{
@@ -219,13 +231,17 @@ class Model implements IInteractiveModel implements IMutableModel
 				for (o in observers) o.miss(UnitCoords.get(t), ability.element);
 			else
 			{
-				if (ability.strikeType == StrikeType.Spell)
-					Abilities.useAbility(this, ability.id, UnitCoords.get(t), caster, ability.element);
-				for (o in observers) o.abStriked(UnitCoords.get(t), caster, ability.id, ability.strikeType, ability.element);
-				//save ability id, target, caster, ability element. Init boom counter
-				//Should save a set of data for each victim --------------------------------> ALPHA 3.3
+				if (!ability.isBH())
+					Abilities.hit(this, ability.id, UnitCoords.get(t), caster, ability.element);
+				else
+				{
+					bhInfo = {ability:ability.id, caster: caster, element: ability.element};
+					if (t.isPlayer())
+						bhTargets.set(t.playerLogin(), UnitCoords.get(t));
+				}
+				for (o in observers) o.abStriked(UnitCoords.get(t), caster, ability.id, ability.strikeType, ability.element, [[new Point(400, 100), new Point(550, 200), new Point(600, 50), new Point(600, 200), new Point(800, 50), new Point(900, 200), new Point(1000, 50), new Point(1100, 200), new Point(1200, 50), new Point(1300, 200)]], [[for (t in 0...500) new Point(-6, 0)]]);
 			}
-		if (ability.strikeType == StrikeType.Spell)
+		if (!ability.isBH())
 			postTurnProcess();
 	}
 
@@ -235,13 +251,18 @@ class Model implements IInteractiveModel implements IMutableModel
 
 	public function boom(login:String)
 	{
-		//Abilities.useAbility(this, ability.id, UnitCoords.get(t), caster, ability.element);
+		Abilities.hit(this, bhInfo.ability, bhTargets[login], bhInfo.caster, bhInfo.element, ++bhHitsTaken[login]);
 	}
 
 	public function bhOver(login:String)
 	{
-		//Should pop a set of data and check if there are any left --------------------------> ALPHA 3.3
-		postTurnProcess();
+		bhHitsTaken[login] = 0;
+		bhTargets.remove(login);
+		if (bhTargets.empty())
+		{
+			bhInfo = null;
+			postTurnProcess();
+		}
 	}
 
 	//Maybe some validity checkers
@@ -471,7 +492,8 @@ class Model implements IInteractiveModel implements IMutableModel
 		this.room = room;
 		this.units = new UPair(allies, enemies);
 		this.readyUnits = [];
-		
+		this.bhHitsTaken = [for (u in allies.concat(enemies)) if (u.isPlayer()) u.playerLogin()=>0];
+
 		var effectHandler:EffectHandler = new EffectHandler();
 		this.observers = [effectHandler, new EventSender(room)];
 		effectHandler.init(this);

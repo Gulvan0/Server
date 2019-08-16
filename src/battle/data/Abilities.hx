@@ -26,7 +26,7 @@ class Abilities
 	private static var caster:Unit;
 	private static var element:Element;
 	
-	public static function useAbility(m:IMutableModel, id:ID, targetCoords:UnitCoords, casterCoords:UnitCoords, e:Element)
+	public static function hit(m:IMutableModel, id:ID, targetCoords:UnitCoords, casterCoords:UnitCoords, e:Element, ?hitNumber:Int)
 	{
 		model = m;
 		target = model.getUnits().get(targetCoords);
@@ -36,34 +36,30 @@ class Abilities
 		switch (id)
 		{
 			//Lg
-			case ID.LgShockTherapy:
-				shockTherapy();
-			case ID.LgHighVoltage:
-				highVoltage();
-			case ID.LgElectricalStorm:
-				electricalStorm();
-			case ID.LgCharge:
-				charge();
-			case ID.LgLightningBolt:
-				lightningBolt();
-			case ID.LgVoltSnare:
-				voltSnare();
-			case ID.LgEnergize:
-				energize();
-			case ID.LgDisrupt:
-				disrupt();
-			case ID.LgArcFlash:
-				arcFlash();
-			case ID.LgEMPBlast:
-				empBlast();
+			case ID.LgShockTherapy: shockTherapy();
+			case ID.LgHighVoltage: highVoltage(hitNumber);
+			case ID.LgElectricalStorm: electricalStorm(hitNumber);
+			case ID.LgCharge: charge();
+			case ID.LgLightningBolt: lightningBolt(hitNumber);
+			case ID.LgVoltSnare: voltSnare();
+			case ID.LgEnergize: energize();
+			case ID.LgDisrupt: disrupt();
+			case ID.LgArcFlash: arcFlash(hitNumber);
+			case ID.LgEMPBlast: empBlast();
 			//Other	
-			case ID.BoGhostStrike:
-				ghostStrike();
-			case ID.StubAbility:
-				stub();
+			case ID.BoGhostStrike: ghostStrike(hitNumber);
+			case ID.StubAbility: stub();
 			default:
 				throw "Abilities->useAbility() exception: Invalid ID: " + id.getName();
 		}
+	}
+
+	private static function defaultDistribution(hitNumber:Int, generalHits:Int, generalDamage:Int, ?a:Float = 1.2):Int
+	{
+		if (hitNumber > generalHits)
+			return generalDamage + Math.round((generalDamage + 1)*(1 - Math.pow(a, generalHits - hitNumber))/(generalHits * Math.log(a)));
+		else 
+			return Math.round(hitNumber * generalDamage / generalHits);
 	}
 	
 	//================================================================================
@@ -80,19 +76,18 @@ class Abilities
 		model.dispellBuffs(UnitCoords.get(target), [Element.Lightning]);
 	}
 	
-	private static function highVoltage()
+	private static function highVoltage(hitNumber:Int)
 	{
-		var damage:Int = caster.intellect * 3;
-		
-		model.changeHP(UnitCoords.get(target), UnitCoords.get(caster), -damage, element, Source.Ability);
-		model.castBuff(ID.BuffLgConductivity, UnitCoords.get(target), UnitCoords.get(caster), 2);
+		model.changeHP(UnitCoords.get(target), UnitCoords.get(caster), -defaultDistribution(hitNumber, 2, caster.intellect * 3), element, Source.Ability);
+		if (hitNumber == 1)
+			model.castBuff(ID.BuffLgConductivity, UnitCoords.get(target), UnitCoords.get(caster), 2);
 	} 
 	
-	private static function electricalStorm()
+	private static function electricalStorm(hitNumber:Int)
 	{
 		var delta:Int = Math.round(-1.5 * target.buffQueue.elementalCount(Element.Lightning) * caster.intellect);
 		
-		model.changeHP(UnitCoords.get(target), UnitCoords.get(caster), delta, element, Source.Ability);
+		model.changeHP(UnitCoords.get(target), UnitCoords.get(caster), MathUtils.sign(delta) * defaultDistribution(hitNumber, 2, MathUtils.iabs(delta)), element, Source.Ability);
 	} 
 	
 	private static function charge()
@@ -103,12 +98,12 @@ class Abilities
 		model.castBuff(ID.BuffLgCharged, UnitCoords.get(target), UnitCoords.get(caster), 3);
 	}
 	
-	private static function lightningBolt()
+	private static function lightningBolt(hitNumber:Int)
 	{
 		var damage:Int = Math.round(caster.intellect * 2.5);
 		
-		model.changeHP(UnitCoords.get(target), UnitCoords.get(caster), -damage, element, Source.Ability);
-		if (Math.random() <= 0.3)
+		model.changeHP(UnitCoords.get(target), UnitCoords.get(caster), -defaultDistribution(hitNumber, 2, damage), element, Source.Ability);
+		if (hitNumber == 1 && Math.random() <= 0.3)
 			model.castBuff(ID.BuffLgEnergized, UnitCoords.get(caster), UnitCoords.get(caster), 1);
 	}
 	
@@ -134,9 +129,9 @@ class Abilities
 		model.castBuff(ID.BuffLgClarity, UnitCoords.get(caster), UnitCoords.get(caster), 2);
 	}
 	
-	private static function arcFlash()
+	private static function arcFlash(hitNumber:Int)
 	{
-		var damage:Int = 3 * caster.intellect;
+		var damage:Int = Math.round(1.5 * caster.intellect);
 		var mod:Linear = new Linear(2.5, 0);
 		
 		if (caster.buffQueue.elementalCount(Element.Lightning) > 0)
@@ -161,9 +156,9 @@ class Abilities
     // Bots
     //================================================================================
 	
-	private static function ghostStrike()
+	private static function ghostStrike(hitNumber:Int)
 	{
-		var damage:Int = caster.strength * 2;
+		var damage:Int = caster.strength;
 		
 		model.changeHP(UnitCoords.get(target), UnitCoords.get(caster), -damage, element, Source.Ability);
 	}

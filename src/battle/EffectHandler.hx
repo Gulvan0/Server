@@ -1,4 +1,5 @@
 package battle;
+import MathUtils.Point;
 import battle.data.Buffs;
 import battle.data.Passives;
 import battle.enums.AbilityType;
@@ -117,12 +118,12 @@ class EffectHandler implements IModelObserver
 			procAbilities(BattleEvent.Death, u, data);
 	}
 	
-	public function abStriked(target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element):Void 
+	public function abStriked(target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element, pattern:Array<Array<Point>>, trajectory:Array<Array<Point>>):Void 
 	{
 		var t:Unit = getUnit(target);
 		var c:Unit = getUnit(caster);
 		var data:EffectData = new EffectData(t, c, null, element, null);
-		trace("proc");
+		
 		procAbilities(BattleEvent.Strike, t, data);
 		procBuffs(BattleEvent.Strike, t);
 	}

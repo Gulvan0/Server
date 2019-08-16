@@ -37,6 +37,11 @@ class Active extends Ability
 		
 		return la;
 	}
+
+	public function isBH():Bool
+	{
+		return strikeType == StrikeType.Bolt || strikeType == StrikeType.Kick;
+	}
 	
 	public function putOnCooldown()
 	{

@@ -12,4 +12,6 @@ interface IInteractiveModel
 	public function useRequest(login:String, abilityPos:Int, targetCoords:UnitCoords):Void;
 	public function skipTurn(login:String):Void;
 	public function quit(login:String):Void;
+	public function boom(login:String):Void;
+	public function bhOver(login:String):Void;
 }

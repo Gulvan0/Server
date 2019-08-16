@@ -1,4 +1,5 @@
 package battle;
+import MathUtils.Point;
 import battle.enums.StrikeType;
 import battle.Buff;
 import battle.struct.UnitCoords;
@@ -12,6 +13,7 @@ typedef AlacUpdate = {target:UnitCoords, delta:Float, newV:Float}
 typedef MissDetails = {target:UnitCoords, element:Element}
 typedef DeathDetails = {target:UnitCoords}
 typedef ThrowDetails = {target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element}
+typedef StrikeDetails = {target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element, pattern:Array<Array<String>>, trajectory:Array<Array<String>>}
 typedef BuffQueueUpdate = {target:UnitCoords, queue:Array<LightweightBuff>}
 
 /**
@@ -82,13 +84,15 @@ class EventSender implements IModelObserver
 	public function abThrown(target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element):Void 
 	{
 		var writer = new JsonWriter<ThrowDetails>();
-		room.broadcast("Thrown", writer.write({target: target, caster: caster, id: id, type: type, element: element}));
+		room.broadcast("Strike", writer.write({target: target, caster: caster, id: id, type: type, element: element}));
 	}
 	
-	public function abStriked(target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element):Void 
+	public function abStriked(target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element, pattern:Array<Array<Point>>, trajectory:Array<Array<Point>>):Void 
 	{
-		var writer = new JsonWriter<ThrowDetails>();
-		room.broadcast("Strike", writer.write({target: target, caster: caster, id: id, type: type, element: element}));
+		var writer = new JsonWriter<StrikeDetails>();
+		var sPattern:Array<Array<String>> = [for (g in pattern) [for (p in g) p.x + "|" + p.y]];
+		var sTrajectory:Array<Array<String>> = [for (g in trajectory) [for (p in g) p.x + "|" + p.y]];
+		room.broadcast("Strike", writer.write({target: target, caster: caster, id: id, type: type, element: element, pattern: sPattern, trajectory:sTrajectory}));
 	}
 	
 }

@@ -22,6 +22,13 @@ class BattleRoom
 		for (c in clients)
 			Main.loginManager.getConnection(c).send(event, data);
 	}
+
+	public function share(sourceLogin:String, event:String, ?data:Null<Dynamic>)
+	{
+		for (c in clients)
+			if (c != sourceLogin)
+				Main.loginManager.getConnection(c).send(event, data);
+	}
 	
 	public function player(unit:Unit):IConnection
 	{

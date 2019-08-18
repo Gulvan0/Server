@@ -84,7 +84,7 @@ class EventSender implements IModelObserver
 	public function abThrown(target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element):Void 
 	{
 		var writer = new JsonWriter<ThrowDetails>();
-		room.broadcast("Strike", writer.write({target: target, caster: caster, id: id, type: type, element: element}));
+		room.broadcast("Throw", writer.write({target: target, caster: caster, id: id, type: type, element: element}));
 	}
 	
 	public function abStriked(target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element, pattern:Array<Array<Point>>, trajectory:Array<Array<Point>>):Void 

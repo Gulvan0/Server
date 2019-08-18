@@ -231,15 +231,19 @@ class Model implements IInteractiveModel implements IMutableModel
 				for (o in observers) o.miss(UnitCoords.get(t), ability.element);
 			else
 			{
-				if (!ability.isBH())
+				var pattern:Array<Array<Point>> = [];
+				var traj:Array<Array<Point>> = [];
+				if (!ability.isBH() || !t.isPlayer())
 					Abilities.hit(this, ability.id, UnitCoords.get(t), caster, ability.element);
 				else
 				{
 					bhInfo = {ability:ability.id, caster: caster, element: ability.element};
 					if (t.isPlayer())
 						bhTargets.set(t.playerLogin(), UnitCoords.get(t));
+					pattern = [[new Point(400, 100), new Point(550, 200), new Point(600, 50), new Point(600, 200), new Point(800, 50), new Point(900, 200), new Point(1000, 50), new Point(1100, 200), new Point(1200, 50), new Point(1300, 200)]];
+					traj = [[for (t in 0...500) new Point(-6, 0)]];
 				}
-				for (o in observers) o.abStriked(UnitCoords.get(t), caster, ability.id, ability.strikeType, ability.element, [[new Point(400, 100), new Point(550, 200), new Point(600, 50), new Point(600, 200), new Point(800, 50), new Point(900, 200), new Point(1000, 50), new Point(1100, 200), new Point(1200, 50), new Point(1300, 200)]], [[for (t in 0...500) new Point(-6, 0)]]);
+				for (o in observers) o.abStriked(UnitCoords.get(t), caster, ability.id, ability.strikeType, ability.element, pattern, traj);
 			}
 		if (!ability.isBH())
 			postTurnProcess();

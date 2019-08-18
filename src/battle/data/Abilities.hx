@@ -76,14 +76,14 @@ class Abilities
 		model.dispellBuffs(UnitCoords.get(target), [Element.Lightning]);
 	}
 	
-	private static function highVoltage(hitNumber:Int)
+	private static function highVoltage(hitNumber:Int = 2)
 	{
 		model.changeHP(UnitCoords.get(target), UnitCoords.get(caster), -defaultDistribution(hitNumber, 2, caster.intellect * 3), element, Source.Ability);
 		if (hitNumber == 1)
 			model.castBuff(ID.BuffLgConductivity, UnitCoords.get(target), UnitCoords.get(caster), 2);
 	} 
 	
-	private static function electricalStorm(hitNumber:Int)
+	private static function electricalStorm(hitNumber:Int = 2)
 	{
 		var delta:Int = Math.round(-1.5 * target.buffQueue.elementalCount(Element.Lightning) * caster.intellect);
 		
@@ -98,7 +98,7 @@ class Abilities
 		model.castBuff(ID.BuffLgCharged, UnitCoords.get(target), UnitCoords.get(caster), 3);
 	}
 	
-	private static function lightningBolt(hitNumber:Int)
+	private static function lightningBolt(hitNumber:Int = 2)
 	{
 		var damage:Int = Math.round(caster.intellect * 2.5);
 		
@@ -129,7 +129,7 @@ class Abilities
 		model.castBuff(ID.BuffLgClarity, UnitCoords.get(caster), UnitCoords.get(caster), 2);
 	}
 	
-	private static function arcFlash(hitNumber:Int)
+	private static function arcFlash(hitNumber:Int = 2)
 	{
 		var damage:Int = Math.round(1.5 * caster.intellect);
 		var mod:Linear = new Linear(2.5, 0);
@@ -156,7 +156,7 @@ class Abilities
     // Bots
     //================================================================================
 	
-	private static function ghostStrike(hitNumber:Int)
+	private static function ghostStrike(hitNumber:Int = 1)
 	{
 		var damage:Int = caster.strength;
 		

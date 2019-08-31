@@ -228,7 +228,10 @@ class Model implements IInteractiveModel implements IMutableModel
 			
 		for (t in (ability.aoe? units.allied(target) : [units.get(target)]))
 			if (Utils.flipMiss(t, units.get(caster), ability))
+			{
 				for (o in observers) o.miss(UnitCoords.get(t), ability.element);
+				postTurnProcess();
+			}
 			else
 			{
 				var pattern:Array<Array<Point>> = [];
@@ -244,9 +247,9 @@ class Model implements IInteractiveModel implements IMutableModel
 					traj = [[for (t in 0...500) new Point(-6, 0)]];
 				}
 				for (o in observers) o.abStriked(UnitCoords.get(t), caster, ability.id, ability.strikeType, ability.element, pattern, traj);
+				if (!ability.isBH())
+					postTurnProcess();
 			}
-		if (!ability.isBH())
-			postTurnProcess();
 	}
 
 	//================================================================================

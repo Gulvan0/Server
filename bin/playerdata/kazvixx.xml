@@ -5,13 +5,13 @@
 <player>
 	<name>KazvixX</name>
 	<element>Lightning</element>
-	<xp>25</xp>
-	<level>4</level>
-	<abp>7</abp>
-	<attp>16</attp>
-	<st>13</st>
-	<fl>13</fl>
-	<in>28</in>
+	<xp>0</xp>
+	<level>1</level>
+	<abp>1</abp>
+	<attp>4</attp>
+	<st>10</st>
+	<fl>10</fl>
+	<in>10</in>
 	<wheel>
 		<ability pos="0">LgLightningBolt</ability>
 		<ability pos="1">LgVoltSnare</ability>
@@ -43,4 +43,4 @@
 		</row>
 	</tree>
 </player>
-<rating>75</rating>
+<rating>0</rating>

@@ -444,7 +444,7 @@ class Player
 		intellect: attribs[Attribute.Intellect],
 		wheel: wheel,
 		hp:  GameRules.basicHP + GameRules.hpStBonus(attribs[Attribute.Strength]),
-		mana: GameRules.basicMana
+		mana: GameRules.basicMana + GameRules.manaInBonus(attribs[Attribute.Intellect])
 		};
 	}
 

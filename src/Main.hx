@@ -294,16 +294,12 @@ class Main
 			var enemy:String = openRooms.splice(0, 1)[0];
 			rooms[enemy].add(peer);
 			rooms[peer] = rooms[enemy];
-			#if debug trace(1); #end
 			var p1:Unit = loadUnit(enemy, Team.Left, 0);
-			#if debug trace(1); #end
 			var p2:Unit = loadUnit(peer, Team.Right, 0);
 			models[enemy] = new Model([p1], [p2], rooms[peer]);
 			models[peer] = models[enemy];
-			#if debug trace(1, rooms[enemy]); #end
 			
 			var awaitingAnswer:Array<String> = rooms[enemy].clients.copy();
-			#if debug trace("Waiting ", awaitingAnswer); #end
 			server.events.on("InitialDataRecieved", function(data:Dynamic, sender:IConnection){answerHandler(sender, awaitingAnswer, models[peer]); });
 			
 			for (l in rooms[peer].clients)

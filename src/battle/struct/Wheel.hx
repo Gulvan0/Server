@@ -67,7 +67,9 @@ class Wheel
 		
 		this.wheel = new Array<Ability>();
 		for (id in pool)
-			if (XMLUtils.parseAbility(id, "type", AbilityType) == AbilityType.Active)
+			if (id == ID.EmptyAbility || id == ID.LockAbility)
+				this.wheel.push(new Ability(id));
+			else if (XMLUtils.parseAbility(id, "type", AbilityType) == AbilityType.Active)
 				this.wheel.push(new Active(id));
 			else
 				this.wheel.push(new Passive(id));

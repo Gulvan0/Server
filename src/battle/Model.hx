@@ -256,6 +256,8 @@ class Model implements IInteractiveModel implements IMutableModel
 	public function boom(login:String)
 	{
 		Abilities.hit(this, bhInfo.ability, bhTargets[login], bhInfo.caster, bhInfo.element, ++bhHitsTaken[login]);
+		if (!bothTeamsAlive())
+			end(defineWinner());
 	}
 
 	public function bhOver(login:String)

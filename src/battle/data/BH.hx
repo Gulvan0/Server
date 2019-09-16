@@ -2,27 +2,55 @@ package battle.data;
 
 import MathUtils.Point;
 
-enum BHParameterType
+enum BHParameterUnit
 {
     Number;
-    Angle;
+    Degree;
 }
 
-typedef BHParameterDetails = {name:String, type:BHParameterType, from:Float, to:Float};
+typedef BHParameterDetails = {name:String, unit:BHParameterUnit, from:Float, to:Float};
 
 class BH
 {
 
     public static function getParameterDetails(id:ID):Array<BHParameterDetails>
     {
-        //from XML
-        return null;
+        var result:Array<BHParameterDetails> = [];
+        var xml:Xml = XMLUtils.getBHParameters(id);
+        for (param in xml.elementsNamed("param"))
+            if (param.get("type") == "a")
+            {
+                var unit:BHParameterUnit;
+                for (u in param.elementsNamed("unit"))
+                {
+                    unit = BHParameterUnit.createByName(u.firstChild().nodeValue);
+                    break;
+                }
+                var from:Float;
+                for (f in param.elementsNamed("from"))
+                {
+                    from = Std.parseFloat(f.firstChild().nodeValue);
+                    break;
+                }
+                var to:Float;
+                for (t in param.elementsNamed("to"))
+                {
+                    to = Std.parseFloat(t.firstChild().nodeValue);
+                    break;
+                }
+                result.push({name: param.get("name"), unit: unit, from: from, to: to});
+            }
+        return result;
     }
 
     public static function builtInParameters(id:ID):Map<String, Float>
     {
-        //from XML
-        return null;
+        var result:Map<String, Float> = [];
+        var xml:Xml = XMLUtils.getBHParameters(id);
+        for (param in xml.elementsNamed("param"))
+            if (param.get("type") == "b")
+                result[param.get("name")] = Std.parseFloat(param.firstChild().nodeValue);
+        return result;
     }
 
     public static function convertToTrajectory(id:ID, params:Map<String, Float>):Array<Point>

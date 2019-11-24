@@ -193,10 +193,12 @@ class Main
 			sender.send("Version", version);
 		});
 
-		//Should be unused
 		server.events.on("GetBHParams", function(id:String, sender:IConnection){
 			var writer:JsonWriter<Array<BHParameterDetails>> = new JsonWriter<Array<BHParameterDetails>>();
-			sender.send("BHParams", writer.write(BH.getParameterDetails(ID.createByName(id))));
+			if (loginManager.getLogin(sender) != null)
+				sender.send("BHParams", writer.write(BH.getParameterDetails(ID.createByName(id))));
+			else
+				sender.send("LoginNeeded");
 		});
 
 		server.events.on("GetBHPattern", function(id:String, sender:IConnection){

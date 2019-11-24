@@ -69,7 +69,7 @@ class BH
 
     private static function linear(angle:Float) 
     {
-        return [for (t in 1...501) new Point(-Math.cos(angle * Math.PI / 180), Math.sin(angle * Math.PI / 180))];
+        return [for (t in 1...501) new Point(Math.cos(angle), Math.sin(angle))];
     }
 
     private static function polynominal(coefficients:Array<Float>):Array<Point> 

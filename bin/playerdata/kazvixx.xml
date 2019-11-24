@@ -24,58 +24,22 @@
 	</wheel>
 	<tree>
 		<row num="0">
-			<ability column="0">
-				<level>0</level>
-				<pattern></pattern>
-			</ability>
-			<ability column="1">
-				<level>0</level>
-				<pattern></pattern>
-			</ability>
-			<ability column="2">
-				<level>0</level>
-				<pattern></pattern>
-			</ability>
-			<ability column="3">
-				<level>0</level>
-				<pattern></pattern>
-			</ability>
+			<ability column="0">0</ability>
+			<ability column="1">0</ability>
+			<ability column="2">0</ability>
+			<ability column="3">0</ability>
 		</row>
 		<row num="1">
-			<ability column="0">
-				<level>0</level>
-				<pattern></pattern>
-			</ability>
-			<ability column="1">
-				<level>0</level>
-				<pattern></pattern>
-			</ability>
-			<ability column="2">
-				<level>0</level>
-				<pattern></pattern>
-			</ability>
-			<ability column="3">
-				<level>0</level>
-				<pattern></pattern>
-			</ability>
+			<ability column="0">0</ability>
+			<ability column="1">0</ability>
+			<ability column="2">0</ability>
+			<ability column="3">0</ability>
 		</row>
 		<row num="2">
-			<ability column="0">
-				<level>0</level>
-				<pattern></pattern>
-			</ability>
-			<ability column="1">
-				<level>0</level>
-				<pattern></pattern>
-			</ability>
-			<ability column="2">
-				<level>0</level>
-				<pattern></pattern>
-			</ability>
-			<ability column="3">
-				<level>0</level>
-				<pattern></pattern>
-			</ability>
+			<ability column="0">0</ability>
+			<ability column="1">0</ability>
+			<ability column="2">0</ability>
+			<ability column="3">0</ability>
 		</row>
 	</tree>
 </player>

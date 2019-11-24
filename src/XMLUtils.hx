@@ -1,5 +1,4 @@
 package;
-import MathUtils.Point;
 import battle.Unit.ParameterList;
 import battle.data.Passives.BattleEvent;
 import haxe.CallStack;
@@ -38,21 +37,23 @@ class XMLUtils
 		var xml:Xml = getTree(element);
 		var abilityGrid:Array<Array<Ability>> = [];
 		
-		if (xml != null)
-			for (row in xml.elementsNamed("row"))
+		if (xml == null)
+			return abilityGrid;
+		
+		for (row in xml.elementsNamed("row"))
+		{
+			var abilityRow:Array<Ability> = [];
+			
+			for (ability in row.elementsNamed("ability"))
 			{
-				var abilityRow:Array<Ability> = [];
+				var id:ID = ID.createByName(ability.get("id"));
+				var maxlvl:Int = Std.parseInt(ability.get("maxlvl"));
 				
-				for (ability in row.elementsNamed("ability"))
-				{
-					var id:ID = ID.createByName(ability.get("id"));
-					var maxlvl:Int = Std.parseInt(ability.get("maxlvl"));
-					
-					abilityRow.push(new Ability(id, maxlvl));
-				}
-				
-				abilityGrid.push(abilityRow);
-			}	
+				abilityRow.push(new Ability(id, maxlvl));
+			}
+			
+			abilityGrid.push(abilityRow);
+		}	
 		
 		return abilityGrid;
 	}
@@ -62,26 +63,28 @@ class XMLUtils
 		var xml:Null<Xml> = getTree(element);
 		var requirements:Array<Array<Array<Int>>> = [];
 		
-		if (xml != null)
-			for (row in xml.elementsNamed("row"))
+		if (xml == null)
+			return requirements;
+		
+		for (row in xml.elementsNamed("row"))
+		{
+			var a:Array<Array<Int>> = [];
+			for (ability in row.elementsNamed("ability"))
 			{
-				var a:Array<Array<Int>> = [];
-				for (ability in row.elementsNamed("ability"))
-				{
-					var reqStr:String = ability.get("requires");
-					var reqAr:Array<Int> = [];
-					
-					if (reqStr.charAt(0) == '1')
-						reqAr.push(-1);
-					if (reqStr.charAt(1) == '1')
-						reqAr.push(0);
-					if (reqStr.charAt(2) == '1')
-						reqAr.push(1);
-					
-					a.push(reqAr);
-				}
-				requirements.push(a);
+				var reqStr:String = ability.get("requires");
+				var reqAr:Array<Int> = [];
+				
+				if (reqStr.charAt(0) == '1')
+					reqAr.push(-1);
+				if (reqStr.charAt(1) == '1')
+					reqAr.push(0);
+				if (reqStr.charAt(2) == '1')
+					reqAr.push(1);
+				
+				a.push(reqAr);
 			}
+			requirements.push(a);
+		}
 		
 		return requirements;
 	}
@@ -140,27 +143,6 @@ class XMLUtils
 		xml = findNode(xml, "ability", "id", ability.getName());
 		xml = findNode(xml, "parameters");
 		return xml;
-	}
-
-	public static function getBHAbilitySettings(login:String, id:ID):Xml
-	{
-		var xml:Xml = fromFile("playerdata\\" + login + ".xml");
-		xml = findNode(xml, "player");
-		var pos:Point = getAbilityPosition(id, Element.createByName(findNode(xml, "element").firstChild().nodeValue));
-		xml = findNode(xml, "tree");
-		xml = findNode(xml, "row", "num", ""+pos.x);
-		xml = findNode(xml, "ability", "column", ""+pos.y);
-		xml = findNode(xml, "pattern");
-		return xml;
-	}
-
-	public static function getAbilityPosition(id:ID, element:Element):Point
-	{
-		for (row in getTree(element).elementsNamed("row"))
-			for (ability in row.elementsNamed("ability"))
-				if (ability.get("id") == id.getName())
-					return new Point(Std.parseInt(row.get("num")), Std.parseInt(ability.get("column")));
-		return null;
 	}
 	
 	public static function parseTriggers(object:ID):Array<BattleEvent>

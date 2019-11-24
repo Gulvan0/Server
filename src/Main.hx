@@ -1,6 +1,5 @@
 package;
 
-import battle.data.BH;
 import roaming.enums.Attribute;
 import GameRules.BattleOutcome;
 import battle.IInteractiveModel;
@@ -191,21 +190,6 @@ class Main
 
 		server.events.on("GetVersion", function(data:Dynamic, sender:IConnection){
 			sender.send("Version", version);
-		});
-
-		server.events.on("GetBHParams", function(id:String, sender:IConnection){
-			var writer:JsonWriter<Array<BHParameterDetails>> = new JsonWriter<Array<BHParameterDetails>>();
-			if (loginManager.getLogin(sender) != null)
-				sender.send("BHParams", writer.write(BH.getParameterDetails(ID.createByName(id))));
-			else
-				sender.send("LoginNeeded");
-		});
-
-		server.events.on("GetBHPattern", function(id:String, sender:IConnection){
-			if (loginManager.getLogin(sender) != null)
-				sender.send("BHPattern", XMLUtils.getBHAbilitySettings(loginManager.getLogin(sender), ID.createByName(id)).toString());
-			else
-				sender.send("LoginNeeded");
 		});
 
 		server.events.on("GetPlPrData", function(data:Dynamic, sender:IConnection){

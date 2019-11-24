@@ -52,7 +52,7 @@ class Main
 		#if local
 		server = new Server("localhost", 5000);
 		#else
-		server = new Server("ec2-18-224-7-170.us-east-2.compute.amazonaws.com", 5000);
+		server = new Server("ec2-18-222-25-127.us-east-2.compute.amazonaws.com", 5000);
 		#end
 		loginManager = new LoginManager();
 		

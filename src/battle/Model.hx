@@ -1,5 +1,4 @@
 package battle;
-import battle.data.BH;
 import MathUtils.Point;
 import battle.enums.StrikeType;
 import Element;
@@ -52,9 +51,6 @@ typedef BHInfo = {
 	var element:Element;
 };
 
-typedef Pattern = Array<Array<Point>>;
-typedef Trajectory = Array<Array<Point>>;
-
 /**
  * @author Gulvan
  */
@@ -72,9 +68,6 @@ class Model implements IInteractiveModel implements IMutableModel
 	private var bhInfo:Null<BHInfo> = null;
 	private var bhTargets:Map<String, UnitCoords> = [];
 	private var bhHitsTaken:Map<String, Int> = [];
-
-	private var patterns:UPair<Map<ID, Pattern>>;
-	private var trajectories:UPair<Map<ID, Trajectory>>;
 
 	public function getUnits():UPair<Unit>
 	{
@@ -228,57 +221,35 @@ class Model implements IInteractiveModel implements IMutableModel
 	
 	private function useAbility(target:UnitCoords, caster:UnitCoords, ability:Active)
 	{
-		var c:Unit = units.get(caster);
 		ability.putOnCooldown();
 		changeMana(caster, caster, -ability.manacost, Source.God);
 				
 		for (o in observers) o.abThrown(target, caster, ability.id, ability.strikeType, ability.element);
 			
 		for (t in (ability.aoe? units.allied(target) : [units.get(target)]))
-			if (Utils.flipMiss(t, c, ability))
+			if (Utils.flipMiss(t, units.get(caster), ability))
 			{
 				for (o in observers) o.miss(UnitCoords.get(t), ability.element);
 				postTurnProcess();
 			}
 			else
 			{
+				var pattern:Array<Array<Point>> = [];
+				var traj:Array<Array<Point>> = [];
 				if (!ability.isBH() || !t.isPlayer())
 					Abilities.hit(this, ability.id, UnitCoords.get(t), caster, ability.element);
 				else
 				{
 					bhInfo = {ability:ability.id, caster: caster, element: ability.element};
-					bhTargets.set(t.playerLogin(), UnitCoords.get(t));
+					if (t.isPlayer())
+						bhTargets.set(t.playerLogin(), UnitCoords.get(t));
+					pattern = [[new Point(400, 100), new Point(550, 200), new Point(600, 50), new Point(600, 200), new Point(800, 50), new Point(900, 200), new Point(1000, 50), new Point(1100, 200), new Point(1200, 50), new Point(1300, 200)]];
+					traj = [[for (t in 0...500) new Point(-6, 0)]];
 				}
-				for (o in observers) o.abStriked(UnitCoords.get(t), caster, ability.id, ability.strikeType, ability.element, patterns.get(caster)[ability.id], trajectories.get(caster)[ability.id]);
+				for (o in observers) o.abStriked(UnitCoords.get(t), caster, ability.id, ability.strikeType, ability.element, pattern, traj);
 				if (!ability.isBH())
 					postTurnProcess();
 			}
-	}
-
-	private function getPattern(xml:Xml):Pattern
-	{
-		var p:Pattern = [];
-		for (particle in xml.elementsNamed("particle"))
-		{
-			var group:Int = Std.parseInt(particle.get("group"));
-			if (p[group] == null)
-				p[group] = [];
-			p[group].push(new Point(Std.parseFloat(particle.get("x")), Std.parseFloat(particle.get("y"))));
-		}
-		return p;
-	}
-
-	private function getTraj(xml:Xml, ability:ID):Trajectory
-	{
-		var res:Trajectory = [];
-		for (group in xml.elementsNamed("group"))
-		{
-			var params:Map<String, Float> = BH.builtInParameters(ability);
-			for (p in group.elements())
-				params[p.nodeName] = Std.parseFloat(p.firstChild().nodeValue);
-			res[Std.parseInt(group.get("num"))] = BH.convertToTrajectory(ability, params);
-		} 
-		return res;
 	}
 
 	//================================================================================
@@ -531,28 +502,7 @@ class Model implements IInteractiveModel implements IMutableModel
 		this.units = new UPair(allies, enemies);
 		this.readyUnits = [];
 		this.bhHitsTaken = [for (u in allies.concat(enemies)) if (u.isPlayer()) u.playerLogin()=>0];
-		this.patterns = new UPair([for (a in allies) new Map<ID, Pattern>()], [for (e in enemies) new Map<ID, Trajectory>()]);
-		this.trajectories = new UPair([for (a in allies) new Map<ID, Pattern>()], [for (e in enemies) new Map<ID, Trajectory>()]);
-		for (u in units)
-			for (i in 0...u.wheel.numOfSlots)
-			{
-				var ab = u.wheel.get(i);
-				patterns.getByUnit(u)[ab.id] = [];
-				trajectories.getByUnit(u)[ab.id] = [];
-				if (ab.type == AbilityType.Active && u.wheel.getActive(i).isBH())
-					if (u.isPlayer())
-					{
-						var patternData:Xml = XMLUtils.getBHAbilitySettings(u.playerLogin(), ab.id);
-						patterns.getByUnit(u)[ab.id] = getPattern(patternData);
-						trajectories.getByUnit(u)[ab.id] = getTraj(patternData, ab.id);
-					}
-					else 
-					{
-						patterns.getByUnit(u)[ab.id] = Units.getPattern(u.id, ab.id);
-						trajectories.getByUnit(u)[ab.id] = [[for (t in 0...500) new Point(-6, 0)]];
-					}
-			}
-				
+
 		var effectHandler:EffectHandler = new EffectHandler();
 		this.observers = [effectHandler, new EventSender(room)];
 		effectHandler.init(this);

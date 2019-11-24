@@ -60,11 +60,6 @@ class Wheel
 			if (!ability.checkEmpty() && ability.type == AbilityType.Active)
 				cast(ability, Active).tick();
 	}
-
-	public function getList():Array<ID>
-	{
-		return wheel.map(a -> a.id);
-	}
 	
 	public function new(pool:Array<ID>, numOfSlots:Int) 
 	{

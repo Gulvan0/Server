@@ -1,5 +1,4 @@
 package battle.data;
-import MathUtils.Point;
 import battle.Unit;
 import battle.struct.UPair;
 import battle.struct.UnitCoords;
@@ -17,19 +16,6 @@ class Units
 {
 	private static var model:IMutableModel;	
 	
-	public static function getPattern(unit:ID, ability:ID):Array<Array<Point>>
-	{	
-		switch (unit)
-		{
-			case ID.UnitGhost, ID.UnitArchghost:
-				if (ability == ID.BoGhostStrike)
-					return [[new Point(200, 200), new Point(300, 200), new Point(400, 200), new Point(500, 200)]];
-			default:
-				return [[]];
-		}
-		return [[]];
-	}
-
 	public static function decide(m:IMutableModel, id:ID):BotDecision
 	{
 		model = m;

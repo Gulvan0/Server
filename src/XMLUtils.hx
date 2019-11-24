@@ -136,14 +136,6 @@ class XMLUtils
 		xml = xml.firstChild();
 		return castNode(xml.nodeValue, paramType);
 	}
-
-	public static function getBHParameters(ability:ID):Xml
-	{
-		var xml:Xml = fromFile("data\\Abilities.xml");
-		xml = findNode(xml, "ability", "id", ability.getName());
-		xml = findNode(xml, "parameters");
-		return xml;
-	}
 	
 	public static function parseTriggers(object:ID):Array<BattleEvent>
 	{

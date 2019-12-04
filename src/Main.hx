@@ -53,7 +53,7 @@ class Main
 		#if local
 		server = new Server("localhost", 5000);
 		#else
-		server = new Server("ec2-18-224-7-170.us-east-2.compute.amazonaws.com", 5000);
+		server = new Server("ec2-18-222-25-127.us-east-2.compute.amazonaws.com", 5000);
 		#end
 		loginManager = new LoginManager();
 		
@@ -193,15 +193,15 @@ class Main
 			sender.send("Version", version);
 		});
 
-		//Should be unused
+		//Should be unused because client should know the parameters
 		server.events.on("GetBHParams", function(id:String, sender:IConnection){
 			var writer:JsonWriter<Array<BHParameterDetails>> = new JsonWriter<Array<BHParameterDetails>>();
 			sender.send("BHParams", writer.write(BH.getParameterDetails(ID.createByName(id))));
 		});
 
-		server.events.on("GetBHPattern", function(id:String, sender:IConnection){
+		server.events.on("GetBHPattern", function(data:{id:String, num:Int}, sender:IConnection){
 			if (loginManager.getLogin(sender) != null)
-				sender.send("BHPattern", XMLUtils.getBHAbilitySettings(loginManager.getLogin(sender), ID.createByName(id)).toString());
+				sender.send("BHPattern", XMLUtils.getBHAbilitySettings(loginManager.getLogin(sender), ID.createByName(data.id), data.num).toString());
 			else
 				sender.send("LoginNeeded");
 		});

@@ -1,4 +1,5 @@
 package battle;
+import battle.Model.Pattern;
 import battle.Model.AbilityInfo;
 import battle.Model.UnitInfo;
 import battle.enums.AbilityType;
@@ -23,5 +24,5 @@ interface IModelObserver
 	public function death(unit:UnitCoords):Void;
 	
 	public function abThrown(target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element):Void;
-	public function abStriked(target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element, pattern:Array<Array<Point>>, trajectory:Array<Array<Point>>):Void;
+	public function abStriked(target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element, pattern:Pattern):Void;
 }

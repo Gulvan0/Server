@@ -52,8 +52,21 @@ typedef BHInfo = {
 	var element:Element;
 };
 
-typedef Pattern = Array<Array<Point>>;
-typedef Trajectory = Array<Array<Point>>;
+typedef Trajectory = Array<Point>;
+class Particle
+{
+	var x:Float;
+	var y:Float;
+	var traj:Trajectory;
+
+	public function new(x:Float, y:Float, traj:Trajectory)
+	{
+		this.x = x;
+		this.y = y;
+		this.traj = traj;
+	}
+}
+typedef Pattern = Array<Particle>;
 
 /**
  * @author Gulvan
@@ -73,8 +86,8 @@ class Model implements IInteractiveModel implements IMutableModel
 	private var bhTargets:Map<String, UnitCoords> = [];
 	private var bhHitsTaken:Map<String, Int> = [];
 
-	private var patterns:UPair<Map<ID, Pattern>>;
-	private var trajectories:UPair<Map<ID, Trajectory>>;
+	private var patterns:UPair<Map<ID, Array<Pattern>>>;
+	private var selectedPatterns:UPair<Map<ID, Int>>;
 
 	public function getUnits():UPair<Unit>
 	{
@@ -249,34 +262,20 @@ class Model implements IInteractiveModel implements IMutableModel
 					bhInfo = {ability:ability.id, caster: caster, element: ability.element};
 					bhTargets.set(t.playerLogin(), UnitCoords.get(t));
 				}
-				for (o in observers) o.abStriked(UnitCoords.get(t), caster, ability.id, ability.strikeType, ability.element, patterns.get(caster)[ability.id], trajectories.get(caster)[ability.id]);
+				var selectedPattern:Int = selectedPatterns.get(caster)[ability.id];
+				for (o in observers) o.abStriked(UnitCoords.get(t), caster, ability.id, ability.strikeType, ability.element, patterns.get(caster)[ability.id][selectedPattern]);
 				if (!ability.isBH())
 					postTurnProcess();
 			}
 	}
 
-	private function getPattern(xml:Xml):Pattern
+	private function getPattern(xml:Xml, abilityID:ID):Pattern
 	{
-		var p:Pattern = [];
+		var res:Pattern = [];
 		for (particle in xml.elementsNamed("particle"))
 		{
-			var group:Int = Std.parseInt(particle.get("group"));
-			if (p[group] == null)
-				p[group] = [];
-			p[group].push(new Point(Std.parseFloat(particle.get("x")), Std.parseFloat(particle.get("y"))));
-		}
-		return p;
-	}
-
-	private function getTraj(xml:Xml, ability:ID):Trajectory
-	{
-		var res:Trajectory = [];
-		for (group in xml.elementsNamed("group"))
-		{
-			var params:Map<String, Float> = BH.builtInParameters(ability);
-			for (p in group.elements())
-				params[p.nodeName] = Std.parseFloat(p.firstChild().nodeValue);
-			res[Std.parseInt(group.get("num"))] = BH.convertToTrajectory(ability, params);
+			var params:Map<String, Float> = [for (param in particle.elementsNamed("param")) param.get("name") => Std.parseFloat(param.firstChild().nodeValue)];
+			res.push(new Particle(Std.parseFloat(particle.get("x")), Std.parseFloat(particle.get("y")), BH.convertToTrajectory(abilityID, params)));
 		} 
 		return res;
 	}
@@ -531,26 +530,25 @@ class Model implements IInteractiveModel implements IMutableModel
 		this.units = new UPair(allies, enemies);
 		this.readyUnits = [];
 		this.bhHitsTaken = [for (u in allies.concat(enemies)) if (u.isPlayer()) u.playerLogin()=>0];
-		this.patterns = new UPair([for (a in allies) new Map<ID, Pattern>()], [for (e in enemies) new Map<ID, Trajectory>()]);
-		this.trajectories = new UPair([for (a in allies) new Map<ID, Pattern>()], [for (e in enemies) new Map<ID, Trajectory>()]);
+		this.patterns = new UPair([for (a in allies) new Map<ID, Array<Pattern>>()], [for (e in enemies) new Map<ID, Array<Pattern>>()]);
+		this.selectedPatterns = new UPair([for (a in allies) new Map<ID, Int>()], [for (e in enemies) new Map<ID, Int>()]);
 		for (u in units)
 			for (i in 0...u.wheel.numOfSlots)
 			{
 				var ab = u.wheel.get(i);
 				patterns.getByUnit(u)[ab.id] = [];
-				trajectories.getByUnit(u)[ab.id] = [];
 				if (ab.type == AbilityType.Active && u.wheel.getActive(i).isBH())
+				{
 					if (u.isPlayer())
-					{
-						var patternData:Xml = XMLUtils.getBHAbilitySettings(u.playerLogin(), ab.id);
-						patterns.getByUnit(u)[ab.id] = getPattern(patternData);
-						trajectories.getByUnit(u)[ab.id] = getTraj(patternData, ab.id);
-					}
-					else 
-					{
-						patterns.getByUnit(u)[ab.id] = Units.getPattern(u.id, ab.id);
-						trajectories.getByUnit(u)[ab.id] = [[for (t in 0...500) new Point(-6, 0)]];
-					}
+						for (patternI in 0...3)
+						{
+							var patternData:Xml = XMLUtils.getBHAbilitySettings(u.playerLogin(), ab.id, patternI);
+							patterns.getByUnit(u)[ab.id][patternI] = getPattern(patternData, ab.id);
+						}
+					else
+						patterns.getByUnit(u)[ab.id] = [Units.getPattern(u.id, ab.id)];
+					selectedPatterns.getByUnit(u)[ab.id] = 0;
+				}
 			}
 				
 		var effectHandler:EffectHandler = new EffectHandler();

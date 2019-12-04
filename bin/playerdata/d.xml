@@ -26,55 +26,79 @@
 		<row num="0">
 			<ability column="0">
 				<level>0</level>
-				<pattern></pattern>
+				<pattern num="0"></pattern>
+				<pattern num="1"></pattern>
+				<pattern num="2"></pattern>
 			</ability>
 			<ability column="1">
 				<level>0</level>
-				<pattern></pattern>
+				<pattern num="0"></pattern>
+				<pattern num="1"></pattern>
+				<pattern num="2"></pattern>
 			</ability>
 			<ability column="2">
 				<level>0</level>
-				<pattern></pattern>
+				<pattern num="0"></pattern>
+				<pattern num="1"></pattern>
+				<pattern num="2"></pattern>
 			</ability>
 			<ability column="3">
 				<level>0</level>
-				<pattern></pattern>
+				<pattern num="0"></pattern>
+				<pattern num="1"></pattern>
+				<pattern num="2"></pattern>
 			</ability>
 		</row>
 		<row num="1">
 			<ability column="0">
 				<level>0</level>
-				<pattern></pattern>
+				<pattern num="0"></pattern>
+				<pattern num="1"></pattern>
+				<pattern num="2"></pattern>
 			</ability>
 			<ability column="1">
 				<level>0</level>
-				<pattern></pattern>
+				<pattern num="0"></pattern>
+				<pattern num="1"></pattern>
+				<pattern num="2"></pattern>
 			</ability>
 			<ability column="2">
 				<level>0</level>
-				<pattern></pattern>
+				<pattern num="0"></pattern>
+				<pattern num="1"></pattern>
+				<pattern num="2"></pattern>
 			</ability>
 			<ability column="3">
 				<level>0</level>
-				<pattern></pattern>
+				<pattern num="0"></pattern>
+				<pattern num="1"></pattern>
+				<pattern num="2"></pattern>
 			</ability>
 		</row>
 		<row num="2">
 			<ability column="0">
 				<level>0</level>
-				<pattern></pattern>
+				<pattern num="0"></pattern>
+				<pattern num="1"></pattern>
+				<pattern num="2"></pattern>
 			</ability>
 			<ability column="1">
 				<level>0</level>
-				<pattern></pattern>
+				<pattern num="0"></pattern>
+				<pattern num="1"></pattern>
+				<pattern num="2"></pattern>
 			</ability>
 			<ability column="2">
 				<level>0</level>
-				<pattern></pattern>
+				<pattern num="0"></pattern>
+				<pattern num="1"></pattern>
+				<pattern num="2"></pattern>
 			</ability>
 			<ability column="3">
 				<level>0</level>
-				<pattern></pattern>
+				<pattern num="0"></pattern>
+				<pattern num="1"></pattern>
+				<pattern num="2"></pattern>
 			</ability>
 		</row>
 	</tree>

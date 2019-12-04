@@ -1,5 +1,6 @@
 package battle.data;
 
+import battle.Model.Trajectory;
 import MathUtils.Point;
 
 enum BHParameterUnit
@@ -42,7 +43,7 @@ class BH
         return result;
     }
 
-    public static function convertToTrajectory(id:ID, params:Map<String, Float>):Array<Point>
+    public static function convertToTrajectory(id:ID, params:Map<String, Float>):Trajectory
     {
         return switch (id)
         {
@@ -54,17 +55,17 @@ class BH
         }
     }
 
-    private static function accelerate(traj:Array<Point>, speed:Float):Array<Point>
+    public static function accelerate(traj:Trajectory, speed:Float):Trajectory
     {
         return traj.map((p:Point) -> new Point(speed * p.x, speed * p.y));
     }
 
-    private static function linear(?angle:Float = 0) 
+    public static function linear(?angle:Float = 0):Trajectory
     {
         return [for (t in 1...501) new Point(-Math.cos(angle * Math.PI / 180), Math.sin(angle * Math.PI / 180))];
     }
 
-    private static function polynominal(coefficients:Array<Float>):Array<Point> 
+    public static function polynominal(coefficients:Array<Float>):Trajectory 
     {
         var traj:Array<Point> = [];
         for (t in 1...501)

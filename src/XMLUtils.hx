@@ -134,11 +134,20 @@ class XMLUtils
 		return castNode(xml.nodeValue, paramType);
 	}
 
+	public static function getParticleCount(bhAbility:ID):Int
+	{
+		var xml:Xml = fromFile("data\\Abilities.xml");
+		xml = findNode(xml, "ability", "id", bhAbility.getName());
+		xml = findNode(xml, "bh");
+		xml = findNode(xml, "count");
+		return Std.parseInt(xml.firstChild().nodeValue);
+	}
+
 	public static function getBHParameters(ability:ID):Xml
 	{
 		var xml:Xml = fromFile("data\\Abilities.xml");
 		xml = findNode(xml, "ability", "id", ability.getName());
-		xml = findNode(xml, "parameters");
+		xml = findNode(xml, "bh");
 		return xml;
 	}
 

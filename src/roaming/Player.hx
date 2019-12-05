@@ -152,8 +152,8 @@ class Player
 
 	public function addToWheel(ability:ID, pos:Int):Bool
 	{
-		var abCoords = findAbility(ability);
-		if (abCoords == null || getAbilityLvl(cast abCoords.x, cast abCoords.y) == 0)
+		var abCoords:Null<IntPoint> = findAbility(ability);
+		if (abCoords == null || getAbilityLvl(abCoords.i, abCoords.j) == 0)
 			return false;
 		removeFromWheelByID(ability);
 
@@ -219,6 +219,26 @@ class Player
 		attribs = [for (k in attribs.keys()) k => attribs[k] + (a == k? 1 : 0)];
 		attributePoints--;
 		return true;
+	}
+
+	public function setPattern(i:Int, j:Int, num:Int, xml:String):Bool
+	{
+		var path:String = Main.playersDir() + login + ".xml";
+        var s:String = File.getContent(path);
+        var ereg:EReg = new EReg("(<row num=\"" + j + "\">[\\s\\S]+?<ability column=\"" + i + "\">.+?)(<pattern num=\"" + num + "\">.+?</pattern>)(.+?</ability>)", "");
+		ereg.match(s);
+        s = ereg.replace(s, "$1" + xml + "$3");
+        File.saveContent(path, s);
+		return true; 
+	}
+
+	public function getPattern(i:Int, j:Int, num:Int):String
+	{
+		var path:String = Main.playersDir() + login + ".xml";
+        var s:String = File.getContent(path);
+        var ereg:EReg = new EReg("(<row num=\"" + j + "\">[\\s\\S]+?<ability column=\"" + i + "\">.+?)(<pattern num=\"" + num + "\">.+?</pattern>)(.+?</ability>)", "");
+		ereg.match(s);
+        return ereg.matched(2);
 	}
 
 	//================================================================================================================
@@ -344,12 +364,12 @@ class Player
 		throw 'Error during a search for "requirements" field, coords: ($i, $j)';
 	}
 
-	private function findAbility(id:ID):Null<Point>
+	public function findAbility(id:ID):Null<IntPoint>
 	{
 		for (r in getTreeInfo(element).elementsNamed("row"))
 			for (a in r.elementsNamed("ability"))
 					if (a.get("id") == id.getName())
-						return new Point(Std.parseInt(a.get("column")), Std.parseInt(r.get("num")));
+						return new IntPoint(Std.parseInt(a.get("column")), Std.parseInt(r.get("num")));
 		return null;
 	}
 

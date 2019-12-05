@@ -151,18 +151,6 @@ class XMLUtils
 		return xml;
 	}
 
-	public static function getBHAbilitySettings(login:String, id:ID, patternNum:Int):Xml
-	{
-		var xml:Xml = fromFile("playerdata\\" + login + ".xml");
-		xml = findNode(xml, "player");
-		var pos:Point = getAbilityPosition(id, Element.createByName(findNode(xml, "element").firstChild().nodeValue));
-		xml = findNode(xml, "tree");
-		xml = findNode(xml, "row", "num", ""+pos.x);
-		xml = findNode(xml, "ability", "column", ""+pos.y);
-		xml = findNode(xml, "pattern", "num", "" + patternNum);
-		return xml;
-	}
-
 	public static function getAbilityPosition(id:ID, element:Element):Point
 	{
 		for (row in getTree(element).elementsNamed("row"))

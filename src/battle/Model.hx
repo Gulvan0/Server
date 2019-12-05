@@ -1,4 +1,6 @@
 package battle;
+import MathUtils.IntPoint;
+import roaming.Player;
 import battle.data.BH;
 import MathUtils.Point;
 import battle.enums.StrikeType;
@@ -542,7 +544,9 @@ class Model implements IInteractiveModel implements IMutableModel
 					if (u.isPlayer())
 						for (patternI in 0...3)
 						{
-							var patternData:Xml = XMLUtils.getBHAbilitySettings(u.playerLogin(), ab.id, patternI);
+							var pl:Player = new Player(u.playerLogin());
+							var abij:IntPoint = pl.findAbility(ab.id);
+							var patternData:Xml = Xml.parse(pl.getPattern(abij.i, abij.j, patternI));
 							patterns.getByUnit(u)[ab.id][patternI] = getPattern(patternData, ab.id);
 						}
 					else

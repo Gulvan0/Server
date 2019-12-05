@@ -1,5 +1,6 @@
 package;
 
+import MathUtils.IntPoint;
 import battle.data.BH;
 import roaming.enums.Attribute;
 import GameRules.BattleOutcome;
@@ -189,6 +190,14 @@ class Main
 			}
 		});
 
+		server.events.on("ChangePattern", function(d:{abI:Int, abJ:Int, num:Int, pattern:String}, sender:IConnection){
+			var l:Null<String> = loginManager.getLogin(sender);
+			if (l != null)
+				new Player(l).setPattern(d.abI, d.abJ, d.num, d.pattern);
+			else
+				sender.send("LoginNeeded");
+		});
+
 		server.events.on("GetVersion", function(data:Dynamic, sender:IConnection){
 			sender.send("Version", version);
 		});
@@ -199,9 +208,20 @@ class Main
 			sender.send("BHParams", writer.write(BH.getParameterDetails(ID.createByName(id))));
 		});
 
-		server.events.on("GetBHPattern", function(data:{id:String, num:Int}, sender:IConnection){
+		server.events.on("GetBHPatternByPos", function(data:{i:Int, j:Int, num:Int}, sender:IConnection){
 			if (loginManager.getLogin(sender) != null)
-				sender.send("BHPattern", XMLUtils.getBHAbilitySettings(loginManager.getLogin(sender), ID.createByName(data.id), data.num).toString());
+				sender.send("BHPattern", new Player(loginManager.getLogin(sender)).getPattern(data.i, data.j, data.num));
+			else
+				sender.send("LoginNeeded");
+		});
+
+		server.events.on("GetBHPatternByID", function(data:{id:String, num:Int}, sender:IConnection){
+			if (loginManager.getLogin(sender) != null)
+			{
+				var pl:Player = new Player(loginManager.getLogin(sender));
+				var pos:IntPoint = pl.findAbility(ID.createByName(data.id));
+				sender.send("BHPattern", pl.getPattern(pos.i, pos.j, data.num));
+			}
 			else
 				sender.send("LoginNeeded");
 		});

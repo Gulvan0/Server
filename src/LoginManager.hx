@@ -36,7 +36,15 @@ class LoginManager
 	{
 		var sl:SaveLoad = new SaveLoad();
 		sl.open("playerdata\\" + getLogin(c).toLowerCase() + ".xml");
-		c.send("PlayerProgressData", sl.xml.toString());
+		var allData:String = sl.xml.toString();
+		var ereg:EReg = new EReg("<pattern.+?</pattern>", "");
+		var eregBlank:EReg = new EReg("[\\f\\n\\r\\t\\v]+", "");
+		var valuableData:String = allData;
+		while (eregBlank.match(valuableData))
+			valuableData = eregBlank.replace(valuableData, "");
+		while (ereg.match(valuableData))
+			valuableData = ereg.replace(valuableData, "");
+		c.send("PlayerProgressData", valuableData);
 		sl.close();
 	}
 	
@@ -47,7 +55,7 @@ class LoginManager
 			{
 				logins[c.getContext().peerToString()] = data.login;
 				connections[data.login] = c;
-				c.send("LoggedIn", data.login);
+				c.send("LoggedIn");
 				Sys.println('(J/L) ${data.login} logged in');
 				sendPlPrData(c);
 			}

@@ -225,7 +225,7 @@ class Player
 	{
 		var path:String = Main.playersDir() + login + ".xml";
         var s:String = File.getContent(path);
-        var ereg:EReg = new EReg("(<row num=\"" + j + "\">[\\s\\S]+?<ability column=\"" + i + "\">.+?<pattern num=\"" + num + "\">)(.+?)(</pattern>.+?</ability>)", "");
+        var ereg:EReg = new EReg("(<row num=\"" + j + "\">[\\s\\S]*?<ability column=\"" + i + "\">[\\s\\S]*?<pattern num=\"" + num + "\">)([\\s\\S]*?)(</pattern>)", "");
 		ereg.match(s);
         s = ereg.replace(s, "$1" + xml + "$3");
         File.saveContent(path, s);
@@ -236,7 +236,7 @@ class Player
 	{
 		var path:String = Main.playersDir() + login + ".xml";
         var s:String = File.getContent(path);
-        var ereg:EReg = new EReg("(<row num=\"" + j + "\">[\\s\\S]+?<ability column=\"" + i + "\">.+?<pattern num=\"" + num + "\">)(.+?)(</pattern>.+?</ability>)", "");
+        var ereg:EReg = new EReg("(<row num=\"" + j + "\">[\\s\\S]*?<ability column=\"" + i + "\">[\\s\\S]*?<pattern num=\"" + num + "\">)([\\s\\S]*?)(</pattern>)", "");
 		ereg.match(s);
         return ereg.matched(2);
 	}

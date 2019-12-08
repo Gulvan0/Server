@@ -62,9 +62,29 @@
 			</ability>
 			<ability column="1">
 				<level>0</level>
-				<pattern num="0"></pattern>
-				<pattern num="1"></pattern>
-				<pattern num="2"></pattern>
+				<pattern num="0">
+					<particle x="200" y="200"></particle>
+					<particle x="300" y="444"></particle>
+					<particle x="410" y="20"></particle>
+					<particle x="700" y="91"></particle>
+					<particle x="550" y="567"></particle>
+				</pattern>
+				<pattern num="1">
+					<particle x="200" y="200"></particle>
+					<particle x="214" y="444"></particle>
+					<particle x="333" y="525"></particle>
+					<particle x="800" y="600"></particle>
+				</pattern>
+				<pattern num="2">
+					<particle x="300" y="350"></particle>
+					<particle x="350" y="350"></particle>
+					<particle x="400" y="350"></particle>
+					<particle x="500" y="350"></particle>
+					<particle x="325" y="500"></particle>
+					<particle x="375" y="500"></particle>
+					<particle x="425" y="500"></particle>
+					<particle x="525" y="500"></particle>
+				</pattern>
 			</ability>
 			<ability column="2">
 				<level>0</level>

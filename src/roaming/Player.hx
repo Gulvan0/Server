@@ -232,6 +232,17 @@ class Player
 		return true; 
 	}
 
+	public function setPatterns(i:Int, j:Int, xml:String):Bool
+	{
+		var path:String = Main.playersDir() + login + ".xml";
+        var s:String = File.getContent(path);
+        var ereg:EReg = new EReg("(<row num=\"" + j + "\">[\\s\\S]*?<ability column=\"" + i + "\">[\\s\\S]*?)(<pattern num=\"0\">[\\s\\S]*?<pattern num=\"2\">[\\s\\S]*?</pattern>)", "");
+		ereg.match(s);
+        s = ereg.replace(s, "$1" + xml);
+        File.saveContent(path, s);
+		return true; 
+	}
+
 	public function getPattern(i:Int, j:Int, num:Int):String
 	{
 		var path:String = Main.playersDir() + login + ".xml";

@@ -190,10 +190,37 @@ class Main
 			}
 		});
 
-		server.events.on("ChangePattern", function(d:{abI:Int, abJ:Int, num:Int, pattern:String}, sender:IConnection){
+		server.events.on("SetPatternByPos", function(d:{abI:Int, abJ:Int, num:Int, pattern:String}, sender:IConnection){
 			var l:Null<String> = loginManager.getLogin(sender);
 			if (l != null)
+			{
 				new Player(l).setPattern(d.abI, d.abJ, d.num, d.pattern);
+				sender.send("PatternSet");
+			}
+			else
+				sender.send("LoginNeeded");
+		});
+
+		server.events.on("SetPatternByID", function(data:{id:String, num:Int, pattern:String}, sender:IConnection){
+			if (loginManager.getLogin(sender) != null)
+			{
+				var pl:Player = new Player(loginManager.getLogin(sender));
+				var pos:IntPoint = pl.findAbility(ID.createByName(data.id));
+				pl.setPattern(pos.i, pos.j, data.num, data.pattern);
+				sender.send("PatternSet");
+			}
+			else
+				sender.send("LoginNeeded");
+		});
+
+		server.events.on("SetPatternsByID", function(data:{id:String, patterns:String}, sender:IConnection){
+			if (loginManager.getLogin(sender) != null)
+			{
+				var pl:Player = new Player(loginManager.getLogin(sender));
+				var pos:IntPoint = pl.findAbility(ID.createByName(data.id));
+				pl.setPatterns(pos.i, pos.j, data.patterns);
+				sender.send("PatternSet");
+			}
 			else
 				sender.send("LoginNeeded");
 		});

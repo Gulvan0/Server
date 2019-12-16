@@ -253,6 +253,17 @@ class Main
 				sender.send("LoginNeeded");
 		});
 
+		server.events.on("GetBHPatternsByID", function(data:{id:String}, sender:IConnection){
+			if (loginManager.getLogin(sender) != null)
+			{
+				var pl:Player = new Player(loginManager.getLogin(sender));
+				var pos:IntPoint = pl.findAbility(ID.createByName(data.id));
+				sender.send("BHPatterns", pl.getPatterns(pos.i, pos.j));
+			}
+			else
+				sender.send("LoginNeeded");
+		});
+
 		server.events.on("GetPlPrData", function(data:Dynamic, sender:IConnection){
 			if (loginManager.getLogin(sender) != null)
 				loginManager.sendPlPrData(sender);

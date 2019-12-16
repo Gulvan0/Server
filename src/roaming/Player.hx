@@ -252,6 +252,15 @@ class Player
         return ereg.matched(2);
 	}
 
+	public function getPatterns(i:Int, j:Int):String
+	{
+		var path:String = Main.playersDir() + login + ".xml";
+        var s:String = File.getContent(path);
+        var ereg:EReg = new EReg("(<row num=\"" + j + "\">[\\s\\S]*?<ability column=\"" + i + "\">[\\s\\S]*?)(<pattern num=\"0\">[\\s\\S]*?<pattern num=\"2\">[\\s\\S]*?</pattern>)", "");
+		ereg.match(s);
+		return ereg.matched(2); 
+	}
+
 	//================================================================================================================
 
 	private function get_abilityPoints():Int

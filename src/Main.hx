@@ -213,7 +213,7 @@ class Main
 				sender.send("LoginNeeded");
 		});
 
-		server.events.on("SetPatternsByID", function(data:{id:String, patterns:String}, sender:IConnection){
+		server.events.on("SetBHPatternsByID", function(data:{id:String, patterns:String}, sender:IConnection){
 			if (loginManager.getLogin(sender) != null)
 			{
 				var pl:Player = new Player(loginManager.getLogin(sender));

@@ -5,13 +5,13 @@
 <player>
 	<name>Gulvan</name>
 	<element>Lightning</element>
-	<xp>0</xp>
-	<level>1</level>
-	<abp>1</abp>
-	<attp>4</attp>
-	<st>10</st>
-	<fl>10</fl>
-	<in>10</in>
+	<xp>10</xp>
+	<level>3</level>
+	<abp>3</abp>
+	<attp>10</attp>
+	<st>12</st>
+	<fl>12</fl>
+	<in>22</in>
 	<wheel>
 		<ability pos="0">LgLightningBolt</ability>
 		<ability pos="1">LgVoltSnare</ability>
@@ -33,12 +33,32 @@
 			<ability column="1">
 				<level>0</level>
 				<pattern num="0">
-					<particle x="200" y="200">
-						<param name="angle">0</param>
-					</particle>
-				</pattern>
-				<pattern num="1"></pattern>
-				<pattern num="2"></pattern>
+<particle x="200" y="200">
+<param name="Angle">0</param>
+</particle>
+<particle x="282" y="83">
+<param name="Angle">36</param>
+</particle>
+<particle x="413" y="165">
+<param name="Angle">36</param>
+</particle>
+<particle x="576" y="135">
+<param name="Angle">36</param>
+</particle>
+<particle x="506" y="54">
+<param name="Angle">36</param>
+</particle>
+<particle x="377" y="86">
+<param name="Angle">36</param>
+</particle>
+<particle x="661" y="194">
+<param name="Angle">36</param>
+</particle>
+</pattern>
+<pattern num="1">
+</pattern>
+<pattern num="2">
+</pattern>
 			</ability>
 			<ability column="2">
 				<level>0</level>
@@ -127,4 +147,4 @@
 		</row>
 	</tree>
 </player>
-<rating>0</rating>
+<rating>25</rating>

@@ -1,5 +1,7 @@
 package;
 
+import MathUtils.IntPoint;
+import battle.data.BH;
 import roaming.enums.Attribute;
 import GameRules.BattleOutcome;
 import battle.IInteractiveModel;
@@ -33,7 +35,7 @@ typedef Focus = {
  */
 class Main 
 {
-	public static var version:String = "alpha2.5";
+	public static var version:String = "alpha3.1";
 
 	private static var models:Map<String, IInteractiveModel> = new Map(); // login -> Model
 	private static var rooms:Map<String, BattleRoom> = new Map(); // login -> Room
@@ -188,8 +190,78 @@ class Main
 			}
 		});
 
+		server.events.on("SetPatternByPos", function(d:{abI:Int, abJ:Int, num:Int, pattern:String}, sender:IConnection){
+			var l:Null<String> = loginManager.getLogin(sender);
+			if (l != null)
+			{
+				new Player(l).setPattern(d.abI, d.abJ, d.num, d.pattern);
+				sender.send("PatternSet");
+			}
+			else
+				sender.send("LoginNeeded");
+		});
+
+		server.events.on("SetPatternByID", function(data:{id:String, num:Int, pattern:String}, sender:IConnection){
+			if (loginManager.getLogin(sender) != null)
+			{
+				var pl:Player = new Player(loginManager.getLogin(sender));
+				var pos:IntPoint = pl.findAbility(ID.createByName(data.id));
+				pl.setPattern(pos.i, pos.j, data.num, data.pattern);
+				sender.send("PatternSet");
+			}
+			else
+				sender.send("LoginNeeded");
+		});
+
+		server.events.on("SetBHPatternsByID", function(data:{id:String, patterns:String}, sender:IConnection){
+			if (loginManager.getLogin(sender) != null)
+			{
+				var pl:Player = new Player(loginManager.getLogin(sender));
+				var pos:IntPoint = pl.findAbility(ID.createByName(data.id));
+				pl.setPatterns(pos.i, pos.j, data.patterns);
+				sender.send("PatternSet");
+			}
+			else
+				sender.send("LoginNeeded");
+		});
+
 		server.events.on("GetVersion", function(data:Dynamic, sender:IConnection){
 			sender.send("Version", version);
+		});
+
+		//Should be unused because client should know the parameters
+		server.events.on("GetBHParams", function(id:String, sender:IConnection){
+			var writer:JsonWriter<Array<BHParameterDetails>> = new JsonWriter<Array<BHParameterDetails>>();
+			sender.send("BHParams", writer.write(BH.getParameterDetails(ID.createByName(id))));
+		});
+
+		server.events.on("GetBHPatternByPos", function(data:{i:Int, j:Int, num:Int}, sender:IConnection){
+			if (loginManager.getLogin(sender) != null)
+				sender.send("BHPattern", new Player(loginManager.getLogin(sender)).getPattern(data.i, data.j, data.num));
+			else
+				sender.send("LoginNeeded");
+		});
+
+		server.events.on("GetBHPatternByID", function(data:{id:String, num:Int}, sender:IConnection){
+			if (loginManager.getLogin(sender) != null)
+			{
+				var pl:Player = new Player(loginManager.getLogin(sender));
+				var pos:IntPoint = pl.findAbility(ID.createByName(data.id));
+				sender.send("BHPattern", pl.getPattern(pos.i, pos.j, data.num));
+			}
+			else
+				sender.send("LoginNeeded");
+		});
+
+		server.events.on("GetBHPatternsByID", function(data:{id:String}, sender:IConnection){
+			if (loginManager.getLogin(sender) != null)
+			{
+				var pl:Player = new Player(loginManager.getLogin(sender));
+				var pos:IntPoint = pl.findAbility(ID.createByName(data.id));
+				sender.send("BHPatterns", pl.getPatterns(pos.i, pos.j));
+			}
+			else
+				sender.send("LoginNeeded");
 		});
 
 		server.events.on("GetPlPrData", function(data:Dynamic, sender:IConnection){

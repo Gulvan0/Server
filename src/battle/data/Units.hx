@@ -1,4 +1,8 @@
 package battle.data;
+import battle.Model.Particle;
+import battle.Model.Trajectory;
+import battle.Model.Pattern;
+import MathUtils.Point;
 import battle.Unit;
 import battle.struct.UPair;
 import battle.struct.UnitCoords;
@@ -16,6 +20,33 @@ class Units
 {
 	private static var model:IMutableModel;	
 	
+	public static function getPattern(unit:ID, ability:ID):Pattern
+	{	
+		var trajs:Array<Trajectory> = getTrajectories(unit, ability);
+		switch (unit)
+		{
+			case ID.UnitGhost, ID.UnitArchghost:
+				if (ability == ID.BoGhostStrike)
+					return [new Particle(200, 200, trajs[0]), new Particle(300, 200, trajs[0]), new Particle(400, 200, trajs[0]), new Particle(500, 200, trajs[0])];
+			default:
+				return [];
+		}
+		return [];
+	}
+
+	public static function getTrajectories(unit:ID, ability:ID):Array<Trajectory>
+	{
+		switch (unit)
+		{
+			case ID.UnitGhost, ID.UnitArchghost:
+				if (ability == ID.BoGhostStrike)
+					return [BH.linear()];
+			default:
+				return [];
+		}
+		return [];
+	}
+
 	public static function decide(m:IMutableModel, id:ID):BotDecision
 	{
 		model = m;

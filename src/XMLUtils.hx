@@ -136,6 +136,32 @@ class XMLUtils
 		xml = xml.firstChild();
 		return castNode(xml.nodeValue, paramType);
 	}
+
+	public static function getParticleCount(bhAbility:ID):Int
+	{
+		var xml:Xml = fromFile("data\\Abilities.xml");
+		xml = findNode(xml, "ability", "id", bhAbility.getName());
+		xml = findNode(xml, "bh");
+		xml = findNode(xml, "count");
+		return Std.parseInt(xml.firstChild().nodeValue);
+	}
+
+	public static function getBHParameters(ability:ID):Xml
+	{
+		var xml:Xml = fromFile("data\\Abilities.xml");
+		xml = findNode(xml, "ability", "id", ability.getName());
+		xml = findNode(xml, "bh");
+		return xml;
+	}
+
+	public static function getAbilityPosition(id:ID, element:Element):Point
+	{
+		for (row in getTree(element).elementsNamed("row"))
+			for (ability in row.elementsNamed("ability"))
+				if (ability.get("id") == id.getName())
+					return new Point(Std.parseInt(row.get("num")), Std.parseInt(ability.get("column")));
+		return null;
+	}
 	
 	public static function parseTriggers(object:ID):Array<BattleEvent>
 	{

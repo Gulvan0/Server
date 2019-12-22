@@ -1,4 +1,5 @@
 package battle;
+import battle.Model.Pattern;
 import MathUtils.Point;
 import battle.data.Buffs;
 import battle.data.Passives;
@@ -118,7 +119,7 @@ class EffectHandler implements IModelObserver
 			procAbilities(BattleEvent.Death, u, data);
 	}
 	
-	public function abStriked(target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element, pattern:Array<Array<Point>>, trajectory:Array<Array<Point>>):Void 
+	public function abStriked(target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element, pattern:Pattern):Void 
 	{
 		var t:Unit = getUnit(target);
 		var c:Unit = getUnit(caster);

@@ -54,12 +54,27 @@ class Abilities
 		}
 	}
 
-	private static function defaultDistribution(hitNumber:Int, generalHits:Int, generalDamage:Int, ?a:Float = 1.2):Int
+	private static function defaultDistribution(hitNumber:Int, expectedHits:Int, expectedDamage:Int, id:ID):Int
 	{
-		if (hitNumber > generalHits)
-			return generalDamage + Math.round((generalDamage + 1)*(1 - Math.pow(a, generalHits - hitNumber))/(generalHits * Math.log(a)));
-		else 
-			return Math.round(hitNumber * generalDamage / generalHits);
+		var totalParticles:Int = XMLUtils.getParticleCount(id);
+		var floatDamage:Float;
+		if (hitNumber <= expectedHits)
+		{
+			var xs:Float = hitNumber / expectedHits + 1;
+			floatDamage = (4 * expectedDamage * (Math.asin(xs - 2) + Math.PI / 2)) / (Math.PI * xs);
+		}
+		else
+		{
+			var xs:Float = -(hitNumber - expectedHits) / (totalParticles - expectedHits);
+			var shift:Float = totalParticles * expectedDamage / expectedHits;
+			floatDamage = shift - (4 * (shift - expectedDamage) * (Math.asin(xs) + Math.PI / 2)) / (Math.PI * (2 + xs));
+		}
+		return Math.round(floatDamage);
+	}
+
+	private static function calculateParticleDamage(hitNumber:Int, expectedHits:Int, expectedDamage:Int, id:ID):Int
+	{
+		return defaultDistribution(hitNumber, expectedHits, expectedDamage, id) - (hitNumber > 1? defaultDistribution(hitNumber-1, expectedHits, expectedDamage, id) : 0);
 	}
 	
 	//================================================================================
@@ -78,7 +93,7 @@ class Abilities
 	
 	private static function highVoltage(hitNumber:Int = 2)
 	{
-		model.changeHP(UnitCoords.get(target), UnitCoords.get(caster), -defaultDistribution(hitNumber, 2, caster.intellect * 3), element, Source.Ability);
+		model.changeHP(UnitCoords.get(target), UnitCoords.get(caster), -calculateParticleDamage(hitNumber, 2, caster.intellect * 3, ID.LgHighVoltage), element, Source.Ability);
 		if (hitNumber == 1)
 			model.castBuff(ID.BuffLgConductivity, UnitCoords.get(target), UnitCoords.get(caster), 2);
 	} 
@@ -87,7 +102,7 @@ class Abilities
 	{
 		var delta:Int = Math.round(-1.5 * target.buffQueue.elementalCount(Element.Lightning) * caster.intellect);
 		
-		model.changeHP(UnitCoords.get(target), UnitCoords.get(caster), MathUtils.sign(delta) * defaultDistribution(hitNumber, 2, MathUtils.iabs(delta)), element, Source.Ability);
+		model.changeHP(UnitCoords.get(target), UnitCoords.get(caster), MathUtils.sign(delta) * calculateParticleDamage(hitNumber, 2, MathUtils.iabs(delta), ID.LgElectricalStorm), element, Source.Ability);
 	} 
 	
 	private static function charge()
@@ -102,7 +117,7 @@ class Abilities
 	{
 		var damage:Int = Math.round(caster.intellect * 2.5);
 		
-		model.changeHP(UnitCoords.get(target), UnitCoords.get(caster), -defaultDistribution(hitNumber, 2, damage), element, Source.Ability);
+		model.changeHP(UnitCoords.get(target), UnitCoords.get(caster), -calculateParticleDamage(hitNumber, 2, damage, ID.LgLightningBolt), element, Source.Ability);
 		if (hitNumber == 1 && Math.random() <= 0.3)
 			model.castBuff(ID.BuffLgEnergized, UnitCoords.get(caster), UnitCoords.get(caster), 1);
 	}
@@ -131,17 +146,17 @@ class Abilities
 	
 	private static function arcFlash(hitNumber:Int = 2)
 	{
-		var damage:Int = Math.round(1.5 * caster.intellect);
+		var particleDamage:Int = Math.round(1.5 * caster.intellect);
 		var mod:Linear = new Linear(2.5, 0);
 		
 		if (caster.buffQueue.elementalCount(Element.Lightning) > 0)
 		{
 			caster.critDamage.combine(mod);
-			model.changeHP(UnitCoords.get(target), UnitCoords.get(caster), -damage, element, Source.Ability);
+			model.changeHP(UnitCoords.get(target), UnitCoords.get(caster), -particleDamage, element, Source.Ability);
 			caster.critDamage.detach(mod);
 		}
 		else
-			model.changeHP(UnitCoords.get(target), UnitCoords.get(caster), -damage, element, Source.Ability);
+			model.changeHP(UnitCoords.get(target), UnitCoords.get(caster), -particleDamage, element, Source.Ability);
 	}
 	
 	private static function empBlast()

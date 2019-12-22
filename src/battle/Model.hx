@@ -1,4 +1,7 @@
 package battle;
+import MathUtils.IntPoint;
+import roaming.Player;
+import battle.data.BH;
 import MathUtils.Point;
 import battle.enums.StrikeType;
 import Element;
@@ -51,6 +54,22 @@ typedef BHInfo = {
 	var element:Element;
 };
 
+typedef Trajectory = Array<Point>;
+class Particle
+{
+	public var x:Float;
+	public var y:Float;
+	public var traj:Trajectory;
+
+	public function new(x:Float, y:Float, traj:Trajectory)
+	{
+		this.x = x;
+		this.y = y;
+		this.traj = traj;
+	}
+}
+typedef Pattern = Array<Particle>;
+
 /**
  * @author Gulvan
  */
@@ -68,6 +87,9 @@ class Model implements IInteractiveModel implements IMutableModel
 	private var bhInfo:Null<BHInfo> = null;
 	private var bhTargets:Map<String, UnitCoords> = [];
 	private var bhHitsTaken:Map<String, Int> = [];
+
+	private var patterns:UPair<Map<ID, Array<Pattern>>>;
+	private var selectedPatterns:UPair<Map<ID, Int>>;
 
 	public function getUnits():UPair<Unit>
 	{
@@ -246,10 +268,22 @@ class Model implements IInteractiveModel implements IMutableModel
 					pattern = [[new Point(400, 100), new Point(550, 200), new Point(600, 50), new Point(600, 200), new Point(800, 50), new Point(900, 200), new Point(1000, 50), new Point(1100, 200), new Point(1200, 50), new Point(1300, 200)]];
 					traj = [[for (t in 0...500) new Point(-6, 0)]];
 				}
-				for (o in observers) o.abStriked(UnitCoords.get(t), caster, ability.id, ability.strikeType, ability.element, pattern, traj);
+				var selectedPattern:Int = selectedPatterns.get(caster)[ability.id];
+				for (o in observers) o.abStriked(UnitCoords.get(t), caster, ability.id, ability.strikeType, ability.element, patterns.get(caster)[ability.id][selectedPattern]);
 				if (!ability.isBH())
 					postTurnProcess();
 			}
+	}
+
+	private function getPattern(xml:Xml, abilityID:ID):Pattern
+	{
+		var res:Pattern = [];
+		for (particle in xml.elementsNamed("particle"))
+		{
+			var params:Map<String, Float> = [for (param in particle.elementsNamed("param")) param.get("name") => Std.parseFloat(param.firstChild().nodeValue)];
+			res.push(new Particle(Std.parseFloat(particle.get("x")), Std.parseFloat(particle.get("y")), BH.convertToTrajectory(abilityID, params)));
+		} 
+		return res;
 	}
 
 	//================================================================================
@@ -502,7 +536,29 @@ class Model implements IInteractiveModel implements IMutableModel
 		this.units = new UPair(allies, enemies);
 		this.readyUnits = [];
 		this.bhHitsTaken = [for (u in allies.concat(enemies)) if (u.isPlayer()) u.playerLogin()=>0];
-
+		this.patterns = new UPair([for (a in allies) new Map<ID, Array<Pattern>>()], [for (e in enemies) new Map<ID, Array<Pattern>>()]);
+		this.selectedPatterns = new UPair([for (a in allies) new Map<ID, Int>()], [for (e in enemies) new Map<ID, Int>()]);
+		for (u in units)
+			for (i in 0...u.wheel.numOfSlots)
+			{
+				var ab = u.wheel.get(i);
+				patterns.getByUnit(u)[ab.id] = [];
+				if (ab.type == AbilityType.Active && u.wheel.getActive(i).isBH())
+				{
+					if (u.isPlayer())
+						for (patternI in 0...3)
+						{
+							var pl:Player = new Player(u.playerLogin());
+							var abij:IntPoint = pl.findAbility(ab.id);
+							var patternData:Xml = Xml.parse(pl.getPattern(abij.i, abij.j, patternI));
+							patterns.getByUnit(u)[ab.id][patternI] = getPattern(patternData, ab.id);
+						}
+					else
+						patterns.getByUnit(u)[ab.id] = [Units.getPattern(u.id, ab.id)];
+					selectedPatterns.getByUnit(u)[ab.id] = 0;
+				}
+			}
+				
 		var effectHandler:EffectHandler = new EffectHandler();
 		this.observers = [effectHandler, new EventSender(room)];
 		effectHandler.init(this);

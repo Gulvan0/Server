@@ -35,7 +35,7 @@ typedef Focus = {
  */
 class Main 
 {
-	public static var version:String = "alpha2.5";
+	public static var version:String = "alpha3.1";
 
 	private static var models:Map<String, IInteractiveModel> = new Map(); // login -> Model
 	private static var rooms:Map<String, BattleRoom> = new Map(); // login -> Room

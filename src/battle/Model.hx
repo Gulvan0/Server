@@ -57,9 +57,9 @@ typedef BHInfo = {
 typedef Trajectory = Array<Point>;
 class Particle
 {
-	var x:Float;
-	var y:Float;
-	var traj:Trajectory;
+	public var x:Float;
+	public var y:Float;
+	public var traj:Trajectory;
 
 	public function new(x:Float, y:Float, traj:Trajectory)
 	{

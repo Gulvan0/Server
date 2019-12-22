@@ -47,10 +47,10 @@ class BH
     {
         return switch (id)
         {
-            case ID.LgLightningBolt: accelerate(linear(params["angle"]), 2);
-            case ID.LgHighVoltage: accelerate(linear(), 2);
-            case ID.LgElectricalStorm: accelerate(linear(), 3);
-            case ID.LgArcFlash: accelerate(linear(), 4);
+            case ID.LgLightningBolt: accelerate(linear(params["Angle"]), 6);
+            case ID.LgHighVoltage: accelerate(linear(), 6);
+            case ID.LgElectricalStorm: accelerate(linear(), 8);
+            case ID.LgArcFlash: accelerate(linear(), 10);
             default: null;
         }
     }
@@ -62,7 +62,7 @@ class BH
 
     public static function linear(?angle:Float = 0):Trajectory
     {
-        return [for (t in 1...501) new Point(-Math.cos(angle * Math.PI / 180), Math.sin(angle * Math.PI / 180))];
+        return [new Point(-Math.cos(angle * Math.PI / 180), -Math.sin(angle * Math.PI / 180))];
     }
 
     public static function polynominal(coefficients:Array<Float>):Trajectory 

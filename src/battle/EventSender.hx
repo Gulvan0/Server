@@ -1,4 +1,5 @@
 package battle;
+import battle.Model.Particle;
 import MathUtils.Point;
 import battle.enums.StrikeType;
 import battle.Buff;
@@ -14,8 +15,26 @@ typedef AlacUpdate = {target:UnitCoords, delta:Float, newV:Float}
 typedef MissDetails = {target:UnitCoords, element:Element}
 typedef DeathDetails = {target:UnitCoords}
 typedef ThrowDetails = {target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element}
-typedef StrikeDetails = {target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element, pattern:Pattern}
+typedef StrikeDetails = {target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element, pattern:PseudoPattern}
 typedef BuffQueueUpdate = {target:UnitCoords, queue:Array<LightweightBuff>}
+
+class PseudoParticle
+{
+	var x:Float;
+	var y:Float;
+	var traj:String;
+
+	public function new(p:Particle)
+	{
+		this.x = p.x;
+		this.y = p.y;
+		this.traj = "";
+		for (t in p.traj)
+			this.traj += '${t.x};${t.y}|';
+		this.traj = this.traj.substr(0, this.traj.length - 1);
+	}
+}
+typedef PseudoPattern = Array<PseudoParticle>;
 
 /**
  * Broadcasts battle events
@@ -91,7 +110,7 @@ class EventSender implements IModelObserver
 	public function abStriked(target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element, pattern:Pattern):Void 
 	{
 		var writer = new JsonWriter<StrikeDetails>();
-		room.broadcast("Strike", writer.write({target: target, caster: caster, id: id, type: type, element: element, pattern: pattern}));
+		room.broadcast("Strike", writer.write({target: target, caster: caster, id: id, type: type, element: element, pattern: pattern.map(p -> new PseudoParticle(p))}));
 	}
 	
 }

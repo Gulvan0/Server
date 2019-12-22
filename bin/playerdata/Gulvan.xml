@@ -5,13 +5,13 @@
 <player>
 	<name>Gulvan</name>
 	<element>Lightning</element>
-	<xp>10</xp>
-	<level>3</level>
-	<abp>3</abp>
-	<attp>10</attp>
-	<st>12</st>
-	<fl>12</fl>
-	<in>22</in>
+	<xp>75</xp>
+	<level>10</level>
+	<abp>10</abp>
+	<attp>0</attp>
+	<st>19</st>
+	<fl>50</fl>
+	<in>64</in>
 	<wheel>
 		<ability pos="0">LgLightningBolt</ability>
 		<ability pos="1">LgVoltSnare</ability>
@@ -43,16 +43,16 @@
 <param name="Angle">36</param>
 </particle>
 <particle x="576" y="135">
-<param name="Angle">36</param>
+<param name="Angle">0</param>
 </particle>
 <particle x="506" y="54">
-<param name="Angle">36</param>
+<param name="Angle">0</param>
 </particle>
 <particle x="377" y="86">
 <param name="Angle">36</param>
 </particle>
 <particle x="661" y="194">
-<param name="Angle">36</param>
+<param name="Angle">0</param>
 </particle>
 </pattern>
 <pattern num="1">
@@ -83,28 +83,39 @@
 			<ability column="1">
 				<level>0</level>
 				<pattern num="0">
-					<particle x="200" y="200"></particle>
-					<particle x="300" y="444"></particle>
-					<particle x="410" y="20"></particle>
-					<particle x="700" y="91"></particle>
-					<particle x="550" y="567"></particle>
-				</pattern>
-				<pattern num="1">
-					<particle x="200" y="200"></particle>
-					<particle x="214" y="444"></particle>
-					<particle x="333" y="525"></particle>
-					<particle x="800" y="600"></particle>
-				</pattern>
-				<pattern num="2">
-					<particle x="300" y="350"></particle>
-					<particle x="350" y="350"></particle>
-					<particle x="400" y="350"></particle>
-					<particle x="500" y="350"></particle>
-					<particle x="325" y="500"></particle>
-					<particle x="375" y="500"></particle>
-					<particle x="425" y="500"></particle>
-					<particle x="525" y="500"></particle>
-				</pattern>
+<particle x="200" y="200">
+</particle>
+<particle x="300" y="444">
+</particle>
+<particle x="410" y="20">
+</particle>
+<particle x="700" y="91">
+</particle>
+<particle x="550" y="567">
+</particle>
+</pattern>
+<pattern num="1">
+<particle x="200" y="200">
+</particle>
+<particle x="214" y="444">
+</particle>
+<particle x="333" y="525">
+</particle>
+<particle x="800" y="600">
+</particle>
+</pattern>
+<pattern num="2">
+<particle x="344" y="165">
+</particle>
+<particle x="430" y="96">
+</particle>
+<particle x="432" y="176">
+</particle>
+<particle x="558" y="43">
+</particle>
+<particle x="574" y="152">
+</particle>
+</pattern>
 			</ability>
 			<ability column="2">
 				<level>0</level>
@@ -147,4 +158,4 @@
 		</row>
 	</tree>
 </player>
-<rating>25</rating>
+<rating>-48</rating>

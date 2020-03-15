@@ -47,8 +47,8 @@ class BH
     {
         return switch (id)
         {
-            case ID.LgLightningBolt: accelerate(linear(params["Angle"]), 6);
-            case ID.LgHighVoltage: accelerate(linear(), 6);
+            case ID.LgLightningBolt: accelerate(linear(), 6);
+            case ID.LgHighVoltage: accelerate(linear(params["Angle"]), 6);
             case ID.LgElectricalStorm: accelerate(linear(), 8);
             case ID.LgArcFlash: accelerate(linear(), 10);
             default: null;

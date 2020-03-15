@@ -48,7 +48,7 @@ class Buffs
 	
 	private static function conductivity()
 	{
-		var modifier:Linear = new Linear(3, 0);
+		var modifier:Linear = new Linear(1.5, 0);
 		switch (mode)
 		{
 			case BuffMode.Cast:

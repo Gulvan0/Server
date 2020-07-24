@@ -15,6 +15,7 @@ typedef ParameterList = {
 	var hp:Int;
 	var mana:Int;
 	var wheel:Array<AbilityID>;
+	var abilityLevels:Map<AbilityID, Int>;
 	
 	var strength:Int;
 	var flow:Int;
@@ -91,10 +92,7 @@ class Unit
 		this.team = team;
 		this.position = position;
 		
-		if (Lambda.empty(params.wheel))
-			wheel = new Wheel([AbilityID.LgArcFlash, AbilityID.LgCharge, AbilityID.LgDisrupt, AbilityID.LgElectricalStorm, AbilityID.LgEMPBlast], 8);
-		else
-			wheel = new Wheel(params.wheel, 8);
+		this.wheel = new Wheel(params.wheel, params.abilityLevels, 8);
 
 		this.hpPool = new Pool(params.hp, params.hp);
 		this.manaPool = new Pool(params.mana, params.mana);

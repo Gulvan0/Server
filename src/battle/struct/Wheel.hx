@@ -1,4 +1,5 @@
 package battle.struct;
+import managers.AbilityManager;
 import ID.AbilityID;
 import battle.Ability;
 import battle.Active;
@@ -72,22 +73,22 @@ class Wheel
 				cast(ability, Active).tick();
 	}
 	
-	public function new(pool:Array<AbilityID>, numOfSlots:Int) 
+	public function new(pool:Array<AbilityID>, levels:Map<AbilityID, Int>, numOfSlots:Int) 
 	{
 		Assert.assert(pool.length <= numOfSlots && numOfSlots >= 8 && numOfSlots <= 10);
 		
 		this.wheel = new Array<Ability>();
 		for (id in pool)
 			if (id == AbilityID.EmptyAbility || id == AbilityID.LockAbility)
-				this.wheel.push(new Ability(id));
-			/*else if (XMLUtils.parseAbility(id, "type", AbilityType) == AbilityType.Passive)
-				this.wheel.push(new Active(id));*///TODO: Rewrite
+				this.wheel.push(new Ability(id, 0));
+			else if (AbilityManager.abilities.get(id).type != AbilityType.Passive)
+				this.wheel.push(new Active(id, levels.get(id)));//TODO: Rewrite
 			else
-				this.wheel.push(new Passive(id));
+				this.wheel.push(new Passive(id, levels.get(id)));
 		for (i in pool.length...numOfSlots)
-			this.wheel[i] = new Ability(AbilityID.EmptyAbility);
+			this.wheel[i] = new Ability(EmptyAbility, 0);
 		for (i in numOfSlots...10)
-			this.wheel[i] = new Ability(AbilityID.LockAbility);
+			this.wheel[i] = new Ability(LockAbility, 0);
 		this.numOfSlots = numOfSlots;
 	}
 	

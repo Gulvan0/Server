@@ -35,18 +35,8 @@ class LoginManager
 	
 	public function sendPlPrData(c:IConnection)
 	{
-		var sl:SaveLoad = new SaveLoad();
-		sl.open("playerdata\\" + getLogin(c).toLowerCase() + ".xml");
-		var allData:String = sl.xml.toString();
-		var ereg:EReg = new EReg("<pattern.+?</pattern>", "");
-		var eregBlank:EReg = new EReg("[\\f\\n\\r\\t\\v]+", "");
-		var valuableData:String = allData;
-		while (eregBlank.match(valuableData))
-			valuableData = eregBlank.replace(valuableData, "");
-		while (ereg.match(valuableData))
-			valuableData = ereg.replace(valuableData, "");
-		c.send("PlayerProgressData", valuableData);
-		sl.close();
+		//TODO: Fill
+		c.send("PlayerProgressData", null);
 	}
 	
 	public function login(data:LoginPair, c:IConnection)

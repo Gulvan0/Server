@@ -46,6 +46,17 @@ class Ability
 		la.element = element;
 		return la;
 	}
+
+	public function isActive():Bool
+	{
+		return type != AbilityType.Passive;
+	}
+
+	public function isBH():Bool
+	{
+		//TODO: Fill
+		return false;
+	}
 	
 	public function new(id:AbilityID) 
 	{

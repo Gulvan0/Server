@@ -1,5 +1,6 @@
 package managers;
 
+import battle.Unit.ParameterList;
 import roaming.enums.Attribute;
 import managers.AbilityManager.TreePos;
 import haxe.Json;
@@ -138,9 +139,15 @@ class PlayerdataManager
     {
         if (amount == null)
             return;
-        
+
         //TODO: Fill
         Thread.create(updatePlayer.bind(login));
+    }
+
+    public function extractParams(login:String):ParameterList
+    {
+        //TODO: Fill
+        return null;
     }
 
     //? Probably will be required: toParams / gainXP with leveling and rewards (abp, attp, attribs)

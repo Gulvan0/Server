@@ -35,18 +35,28 @@ class Wheel
 		Assert.assert(wheel[pos].type != AbilityType.Passive); 
 		return cast wheel[pos];
 	}
+
+	public function actives():Array<AbilityID>
+	{
+		var activeAbs:Array<Ability> = wheel.filter(ab->ab.isActive());
+		var activeAbIDs:Array<AbilityID> = activeAbs.map(ab->ab.id);
+		return activeAbIDs;
+	}
+
+	public function bhAbs():Array<AbilityID>
+	{
+		var activeAbs:Array<Ability> = wheel.filter(ab->ab.isBH());
+		var activeAbIDs:Array<AbilityID> = activeAbs.map(ab->ab.id);
+		return activeAbIDs;
+	}
 	
 	public function passives(?trigger:Null<BattleEvent>):Array<AbilityID>
 	{
-		var res:Array<AbilityID> = [];
-		for (ab in wheel)
-			if (ab.type == AbilityType.Passive)
-			{
-				var p:Passive = cast ab;
-				if (trigger == null || p.reactsTo(trigger))
-					res.push(p.id);
-			}
-		return res;
+		var passiveAbs:Array<Ability> = wheel.filter(ab->!ab.isActive());
+		if (trigger == null)
+			passiveAbs = passiveAbs.filter(p->cast(p, Passive).reactsTo(trigger));
+		var passiveAbIDs:Array<AbilityID> = passiveAbs.map(ab->ab.id);
+		return passiveAbIDs;
 	}
 	
 	public function set(pos:Int, ability:Ability):Ability

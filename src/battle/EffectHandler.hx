@@ -119,7 +119,7 @@ class EffectHandler implements IModelObserver
 			procAbilities(BattleEvent.Death, u, data);
 	}
 	
-	public function abStriked(target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element, pattern:Pattern):Void 
+	public function abStriked(target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element, pattern:String):Void 
 	{
 		var t:Unit = getUnit(target);
 		var c:Unit = getUnit(caster);

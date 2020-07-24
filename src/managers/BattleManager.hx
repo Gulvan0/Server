@@ -115,7 +115,7 @@ class BattleManager
 	private static function loadUnit(login:String, team:Team, pos:Int):Unit
 	{
 		var i:UnitID = UnitID.Player(login);
-		var par:ParameterList = new Player(login).toParams();
+		var par:ParameterList = PlayerdataManager.instance.extractParams(login);
 		return new Unit(i, team, pos, par);
 	}
 

@@ -36,12 +36,6 @@ class Active extends Ability
 		
 		return la;
 	}
-
-	public function isBH():Bool
-	{
-		//TODO: Fill
-		return false;
-	}
 	
 	public function putOnCooldown()
 	{

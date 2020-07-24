@@ -1,5 +1,9 @@
 package io;
 
+import haxe.Json;
+import sys.io.File;
+import sys.FileSystem;
+
 class TreeParser 
 {
     public static function createMap():Map<Element, Tree>
@@ -8,7 +12,7 @@ class TreeParser
 
         for (e in Element.createAll())
         {
-            var path = Main.gamedataDir + AbilityUtils.getElementAbbreviation(k) + "\\abilities.json";
+            var path = Main.gamedataDir + AbilityUtils.getElementAbbreviation(e) + "\\abilities.json";
             if (!FileSystem.exists(path))
                 continue;
 

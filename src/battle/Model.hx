@@ -1,4 +1,5 @@
 package battle;
+import managers.PlayerdataManager;
 import ID.AbilityID;
 import ID.UnitID;
 import ID.BuffID;
@@ -95,7 +96,7 @@ class Model implements IInteractiveModel implements IMutableModel
 	private var bhTargets:Map<String, UnitCoords> = [];
 	private var bhHitsTaken:Map<String, Int> = [];
 
-	private var patterns:UPair<Map<AbilityID, String>>;
+	private var patterns:UPair<Map<AbilityID, Array<String>>>;
 	private var selectedPatterns:UPair<Map<AbilityID, Int>>;
 
 	private var onTerminate:(winners:Array<String>, losers:Array<String>, ?draw:Bool)->Void;
@@ -541,22 +542,18 @@ class Model implements IInteractiveModel implements IMutableModel
 		this.units = new UPair(allies, enemies);
 		this.readyUnits = [];
 		this.bhHitsTaken = [for (u in allies.concat(enemies)) if (u.isPlayer()) u.playerLogin()=>0];
-		this.patterns = new UPair([for (a in allies) new Map<AbilityID, Array<Pattern>>()], [for (e in enemies) new Map<AbilityID, Array<Pattern>>()]);
+		this.patterns = new UPair([for (a in allies) new Map()], [for (e in enemies) new Map()]);
 		this.selectedPatterns = new UPair([for (a in allies) new Map<AbilityID, Int>()], [for (e in enemies) new Map<AbilityID, Int>()]);
 		for (u in units)
-			for (i in 0...u.wheel.numOfSlots)
+			for (abID in u.wheel.bhAbs())
 			{
-				var ab = u.wheel.get(i);
-				patterns.getByUnit(u)[ab.id] = [];
-				if (ab.type != AbilityType.Passive && u.wheel.getActive(i).isBH())
-				{
-					if (u.isPlayer())
-						for (patternI in 0...3)
-							patterns.getByUnit(u)[ab.id][patternI] = PlayerdataManager.instance.getPattern(ab.id, patternI, u.playerLogin());
+				patterns.getByUnit(u)[abID] = [];
+				if (u.isPlayer())
+					for (patternI in 0...3)
+						patterns.getByUnit(u)[abID][patternI] = PlayerdataManager.instance.getPattern(abID, patternI, u.playerLogin());
 					else
-						patterns.getByUnit(u)[ab.id] = [/*Units.getPattern(u.id, ab.id)*/];
-					selectedPatterns.getByUnit(u)[ab.id] = 0;
-				}
+						patterns.getByUnit(u)[abID] = [Units.getPattern(u.id, abID)];
+				selectedPatterns.getByUnit(u)[abID] = 0;
 			}
 				
 		var effectHandler:EffectHandler = new EffectHandler();

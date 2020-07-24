@@ -22,33 +22,19 @@ class Units
 {
 	private static var model:IMutableModel;	
 	
-	//TODO: Rewrite
-	/*public static function getPattern(unit:UnitID, ability:AbilityID):Pattern
+	//TODO: Fill
+	public static function getPattern(unit:UnitID, ability:AbilityID):String
 	{	
-		var trajs:Array<Trajectory> = getTrajectories(unit, ability);
 		switch (unit)
 		{
-			case UnitID.Ghost, UnitID.Archghost:
-				if (ability == AbilityID.BoGhostStrike)
-					return [new Particle(200, 200, trajs[0]), new Particle(300, 200, trajs[0]), new Particle(400, 200, trajs[0]), new Particle(500, 200, trajs[0])];
+			case Ghost, Archghost:
+				if (ability == BoGhostStrike)
+					return "";
 			default:
-				return [];
+				return "";
 		}
-		return [];
+		return "";
 	}
-
-	public static function getTrajectories(unit:UnitID, ability:AbilityID):Array<Trajectory>
-	{
-		switch (unit)
-		{
-			case UnitID.Ghost, UnitID.Archghost:
-				if (ability == AbilityID.BoGhostStrike)
-					return [BH.linear()];
-			default:
-				return [];
-		}
-		return [];
-	}*/
 
 	public static function decide(m:IMutableModel, id:UnitID):BotDecision
 	{

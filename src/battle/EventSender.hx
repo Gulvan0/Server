@@ -2,6 +2,7 @@ package battle;
 import battle.Model.Particle;
 import MathUtils.Point;
 
+import ID.AbilityID;
 import battle.Buff;
 import battle.struct.UnitCoords;
 import battle.enums.Source;
@@ -90,10 +91,10 @@ class EventSender implements IModelObserver
 		room.broadcast("Throw", writer.write({target: target, caster: caster, id: id, type: type, element: element}));
 	}
 	
-	public function abStriked(target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element, pattern:Pattern):Void 
+	public function abStriked(target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element, pattern:String):Void 
 	{
 		var writer = new JsonWriter<StrikeDetails>();
-		room.broadcast("Strike", writer.write({target: target, caster: caster, id: id, type: type, element: element, pattern: pattern.map(p -> new PseudoParticle(p))}));
+		room.broadcast("Strike", writer.write({target: target, caster: caster, id: id, type: type, element: element, pattern: pattern}));
 	}
 	
 }

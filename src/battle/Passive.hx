@@ -19,10 +19,10 @@ class Passive extends Ability
 		return false;
 	}
 	
-	public function new(id:AbilityID) 
+	public function new(id:AbilityID, level:Int) 
 	{
-		super(id);
-		//TODO: Rewrite
+		super(id, level);
+		//TODO: Rewrite (needs analysis on where to store info about triggers)
 		//this.triggers = XMLUtils.parseTriggers(id);
 	}
 	

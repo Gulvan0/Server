@@ -2,6 +2,7 @@ package battle;
 import ID.AbilityID;
 import battle.Ability.LightweightAbility;
 import battle.enums.AbilityTarget;
+import managers.AbilityManager;
 
 import battle.enums.UnitType;
 import battle.struct.Countdown;
@@ -25,9 +26,9 @@ class Active extends Ability
 		var la:LightweightAbility = new LightweightAbility();
 		la.id = id;
 		la.name = name;
-		la.description = description;
 		la.type = type;
 		la.element = element;
+		la.level = level;
 		
 		la.cooldown = maxCooldown;
 		la.delay = cooldown;
@@ -48,17 +49,17 @@ class Active extends Ability
 			_cooldown.value--;
 	}
 	
-	public function new(id:AbilityID) 
+	public function new(id:AbilityID, level:Int) 
 	{
-		super(id);
+		super(id, level);
 		
 		if (!checkEmpty())
 		{
-			//TODO: Fill
-			/*this._cooldown = new Countdown(XMLUtils.parseAbility(id, "delay", 0), XMLUtils.parseAbility(id, "cooldown", 0));
-			this.manacost = XMLUtils.parseAbility(id, "manacost", 0);
-			this.possibleTarget = XMLUtils.parseAbility(id, "target", AbilityTarget);
-			this.aoe = XMLUtils.parseAbility(id, "aoe", true);*/
+			var ab = AbilityManager.abilities.get(id);
+			this._cooldown = new Countdown(0, ab.cooldown[level-1]);
+			this.manacost = ab.manacost[level-1];
+			this.possibleTarget = ab.target;
+			this.aoe = ab.aoe;
 		}
 	}
 	

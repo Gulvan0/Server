@@ -1,4 +1,5 @@
 package battle;
+import managers.AbilityManager;
 import ID.AbilityID;
 import battle.enums.AbilityTarget;
 import battle.enums.AbilityType;
@@ -8,9 +9,9 @@ class LightweightAbility
 {
 	public var id:AbilityID;
 	public var name:String;
-	public var description:String;
 	public var type:AbilityType;
 	public var element:Element;
+	public var level:Int;
 	
 	public var target:Null<AbilityTarget>;
 	public var manacost:Null<Int>;
@@ -32,16 +33,15 @@ class Ability
 
 	public var id(default, null):AbilityID;
 	public var name(default, null):String;
-	public var description(default, null):String;
 	public var type(default, null):AbilityType;
 	public var element(default, null):Element;
+	public var level(default, null):Int;
 	
 	public function toLightweight():LightweightAbility
 	{
 		var la:LightweightAbility = new LightweightAbility();
 		la.id = id;
 		la.name = name;
-		la.description = description;
 		la.type = type;
 		la.element = element;
 		return la;
@@ -54,20 +54,19 @@ class Ability
 
 	public function isBH():Bool
 	{
-		//TODO: Fill
-		return false;
+		return AbilityManager.abilities.get(id).danmakuType != null;
 	}
 	
-	public function new(id:AbilityID) 
+	public function new(id:AbilityID, level:Int) 
 	{
 		this.id = id;
+		this.level = level;
 		if (!checkEmpty())
 		{
-			//TODO: Fill
-			/*this.name = XMLUtils.parseAbility(id, "name", "");
-			this.description = XMLUtils.parseAbility(id, "description", "");
-			this.type = XMLUtils.parseAbility(id, "type", AbilityType);
-			this.element = XMLUtils.parseAbility(id, "element", Element);*/
+			var ab = AbilityManager.abilities.get(id);
+			this.name = ab.name;
+			this.type = ab.type;
+			this.element = ab.element;
 		}
 	}
 	

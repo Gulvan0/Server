@@ -10,7 +10,6 @@ import hxassert.Assert;
 import json2object.JsonParser;
 import sys.io.File;
 import sys.FileSystem;
-import roaming.Player;
 using MathUtils;
 
 typedef CharData = 
@@ -36,6 +35,7 @@ typedef Playerdata =
 
 class PlayerdataManager
 {
+    public static var instance:PlayerdataManager;
     public var cache(default, null):Map<String, Playerdata>;
 
     public function learnAbility(i:Int, j:Int, login:String):Bool
@@ -111,7 +111,9 @@ class PlayerdataManager
 		char.wheel = [];
 		
 		char.abp = GameRules.initialAbilityPoints + GameRules.abPointsLvlupBonus() * timesRewarded;
-		char.attp = GameRules.initialAttributePoints + GameRules.attPointsLvlupBonus() * timesRewarded;
+        char.attp = GameRules.initialAttributePoints + GameRules.attPointsLvlupBonus() * timesRewarded;
+        
+        Thread.create(updatePlayer.bind(login));
     }
     
     public function getPattern(id:AbilityID, pos:Int, login:String):String
@@ -124,6 +126,21 @@ class PlayerdataManager
     {
         Assert.assert(pos >= 0 && pos <= 2);
         File.saveContent(patternPath(login, id, pos), pattern);
+    }
+
+    public function gainXP(amount:Int, login:String) 
+    {
+        //TODO: Fill
+        Thread.create(updatePlayer.bind(login));
+    }
+
+    public function earnRating(amount:Null<Int>, login:String) 
+    {
+        if (amount == null)
+            return;
+        
+        //TODO: Fill
+        Thread.create(updatePlayer.bind(login));
     }
 
     //? Probably will be required: toParams / gainXP with leveling and rewards (abp, attp, attribs)
@@ -185,5 +202,6 @@ class PlayerdataManager
     public function new() 
     {
         cache = [];
+        instance = this;
     }
 }

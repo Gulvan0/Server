@@ -2,7 +2,6 @@ package managers;
 
 import ID.UnitID;
 import GameRules.BattleOutcome;
-import roaming.Player;
 import battle.Model;
 import battle.enums.Team;
 import battle.Unit;
@@ -73,52 +72,34 @@ class BattleManager
     
     public static function terminate(winners:Array<String>, losers:Array<String>, ?draw:Bool = false)
 	{
-		var w:Array<Player> = [for (login in winners) new Player(login)];
-		var l:Array<Player> = [for (login in losers) new Player(login)];
+		var winnerPlayers = winners.map(PlayerdataManager.instance.cache.get);
+		var loserPlayers = losers.map(PlayerdataManager.instance.cache.get);
 		var pvp:Bool = !Lambda.empty(losers) && !Lambda.empty(winners);
+
 		var deltaRating:Int = 0;
-		for (player in w) deltaRating += player.rating;
-		for (player in l) deltaRating -= player.rating;
+		for (player in winnerPlayers) 
+			deltaRating += player.rating;
+		for (player in loserPlayers) 
+			deltaRating -= player.rating;
 		deltaRating = Math.round(Math.abs(deltaRating));
 
-		var xpRewards:Map<String, Int> = [];
-		var ratingRewards:Map<String, Null<Int>> = [];
-		for (player in w)
-			if (pvp)
-			{
-				xpRewards[player.login] = GameRules.xpRewardPVP(draw? BattleOutcome.Draw : BattleOutcome.Win);
-				ratingRewards[player.login] = GameRules.ratingRewardPVP(draw? BattleOutcome.Draw : BattleOutcome.Win, deltaRating);
-				player.gainXP(xpRewards[player.login]);
-				player.rating += ratingRewards[player.login];
-			}
-			else
-			{
-				xpRewards[player.login] = GameRules.xpRewardPVE(draw? BattleOutcome.Draw : BattleOutcome.Win, player.isAtBossStage());
-				ratingRewards[player.login] = null;
-				player.gainXP(xpRewards[player.login]);
-			}
-		for (player in l)
-			if (pvp)
-			{
-				xpRewards[player.login] = GameRules.xpRewardPVP(draw? BattleOutcome.Draw : BattleOutcome.Loss);
-				ratingRewards[player.login] = GameRules.ratingRewardPVP(draw? BattleOutcome.Draw : BattleOutcome.Loss, deltaRating);
-				player.gainXP(xpRewards[player.login]);
-				player.rating += ratingRewards[player.login];
-			}
-			else
-			{
-				xpRewards[player.login] = GameRules.xpRewardPVE(draw? BattleOutcome.Draw : BattleOutcome.Loss, player.isAtBossStage());
-				ratingRewards[player.login] = null;
-				player.gainXP(xpRewards[player.login]);
-			}
-
-		for (l in winners.concat(losers)) 
+		function terminatePlayer(login:String, outcome:BattleOutcome)
 		{
-			var resultString:String = draw? "DRAW" : Lambda.has(winners, l)? "WIN" : "LOSS";
-			rooms.remove(l);
-			models.remove(l);
-			LoginManager.instance.getConnection(l).send("BattleEnded", {outcome: resultString, xp: xpRewards[l], rating: ratingRewards[l]});
+			var xpReward = pvp? GameRules.xpRewardPVP(outcome) : GameRules.xpRewardPVE(outcome, false); //? Add boss stage check later
+			var ratingReward = pvp? GameRules.ratingRewardPVP(outcome, deltaRating) : null;
+			PlayerdataManager.instance.gainXP(xpReward, login);
+			PlayerdataManager.instance.earnRating(ratingReward, login);
+
+			var resultString:String = outcome.getName().toUpperCase();
+			rooms.remove(login);
+			models.remove(login);
+			LoginManager.instance.getConnection(login).send("BattleEnded", {outcome: resultString, xp: xpReward, rating: ratingReward});
 		}
+
+		for (player in winners)
+			terminatePlayer(player, draw? Draw : Win);
+		for (player in losers)
+			terminatePlayer(player, draw? Draw : Loss);
 	}
 	
 	private function createEnemyArray(zone:Zone, stage:Int):Array<Unit>

@@ -16,7 +16,6 @@ import json2object.JsonWriter;
 import mphx.connection.IConnection;
 import mphx.server.impl.Server;
 import mphx.server.room.Room;
-import roaming.Player;
 import sys.io.File;
 import managers.ConnectionManager;
 using Utils;

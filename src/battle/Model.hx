@@ -4,7 +4,6 @@ import ID.UnitID;
 import ID.BuffID;
 import managers.ConnectionManager;
 import MathUtils.IntPoint;
-import roaming.Player;
 import MathUtils.Point;
 
 import Element;
@@ -96,7 +95,7 @@ class Model implements IInteractiveModel implements IMutableModel
 	private var bhTargets:Map<String, UnitCoords> = [];
 	private var bhHitsTaken:Map<String, Int> = [];
 
-	private var patterns:UPair<Map<AbilityID, Array<Pattern>>>;
+	private var patterns:UPair<Map<AbilityID, String>>;
 	private var selectedPatterns:UPair<Map<AbilityID, Int>>;
 
 	private var onTerminate:(winners:Array<String>, losers:Array<String>, ?draw:Bool)->Void;
@@ -553,12 +552,7 @@ class Model implements IInteractiveModel implements IMutableModel
 				{
 					if (u.isPlayer())
 						for (patternI in 0...3)
-						{
-							var pl:Player = new Player(u.playerLogin());
-							var abij:IntPoint = pl.findAbility(ab.id);
-							var patternData:Xml = Xml.parse(pl.getPattern(abij.i, abij.j, patternI));
-							//patterns.getByUnit(u)[ab.id][patternI] = getPattern(patternData, ab.id);//TODO: Update
-						}
+							patterns.getByUnit(u)[ab.id][patternI] = PlayerdataManager.instance.getPattern(ab.id, patternI, u.playerLogin());
 					else
 						patterns.getByUnit(u)[ab.id] = [/*Units.getPattern(u.id, ab.id)*/];
 					selectedPatterns.getByUnit(u)[ab.id] = 0;

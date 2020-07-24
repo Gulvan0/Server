@@ -1,4 +1,5 @@
 package roaming;
+import ID.AbilityID;
 import hxassert.Assert;
 
 /**
@@ -8,7 +9,7 @@ import hxassert.Assert;
 class Ability
 {
 	
-	public var id(default, null):ID;
+	public var id(default, null):AbilityID;
 	public var maxLvl(default, null):Int;
 	
 	public var currentLvl:Int;
@@ -30,7 +31,7 @@ class Ability
 		return lvl;
 	}
 	
-	public function new(id:ID, maxLvl:Int) 
+	public function new(id:AbilityID, maxLvl:Int) 
 	{
 		Assert.assert(maxLvl > 0);
 		

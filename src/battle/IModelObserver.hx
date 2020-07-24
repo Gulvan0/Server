@@ -1,10 +1,11 @@
 package battle;
+import ID.AbilityID;
 import battle.Model.Pattern;
 import battle.Model.AbilityInfo;
 import battle.Model.UnitInfo;
 import battle.enums.AbilityType;
 import battle.enums.Source;
-import battle.enums.StrikeType;
+
 import battle.struct.UnitCoords;
 import MathUtils.Point;
 /**
@@ -23,6 +24,6 @@ interface IModelObserver
 	public function miss(target:UnitCoords, element:Element):Void;
 	public function death(unit:UnitCoords):Void;
 	
-	public function abThrown(target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element):Void;
-	public function abStriked(target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element, pattern:Pattern):Void;
+	public function abThrown(target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element):Void;
+	public function abStriked(target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element, pattern:Pattern):Void;
 }

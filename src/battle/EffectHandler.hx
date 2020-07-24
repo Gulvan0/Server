@@ -1,4 +1,5 @@
 package battle;
+import ID.AbilityID;
 import battle.Model.Pattern;
 import MathUtils.Point;
 import battle.data.Buffs;
@@ -6,7 +7,6 @@ import battle.data.Passives;
 import battle.enums.AbilityType;
 import battle.Buff;
 import battle.enums.BuffMode;
-import battle.enums.StrikeType;
 import battle.struct.UnitCoords;
 import battle.enums.Source;
 import battle.Unit;
@@ -119,7 +119,7 @@ class EffectHandler implements IModelObserver
 			procAbilities(BattleEvent.Death, u, data);
 	}
 	
-	public function abStriked(target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element, pattern:Pattern):Void 
+	public function abStriked(target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element, pattern:Pattern):Void 
 	{
 		var t:Unit = getUnit(target);
 		var c:Unit = getUnit(caster);
@@ -129,7 +129,7 @@ class EffectHandler implements IModelObserver
 		procBuffs(BattleEvent.Strike, t);
 	}
 	
-	public function abThrown(target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element):Void 
+	public function abThrown(target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element):Void 
 	{
 		//no action - for now
 	}

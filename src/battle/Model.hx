@@ -1,9 +1,12 @@
 package battle;
+import ID.AbilityID;
+import ID.UnitID;
+import ID.BuffID;
+import managers.ConnectionManager;
 import MathUtils.IntPoint;
 import roaming.Player;
-import battle.data.BH;
 import MathUtils.Point;
-import battle.enums.StrikeType;
+
 import Element;
 import battle.Ability;
 import battle.IInteractiveModel;
@@ -36,8 +39,8 @@ enum TargetResult
 	Dead;
 } 
 
-typedef ModelState = {
-	var id:ID;
+typedef UnitData = {
+	var id:UnitID;
 	var name:String;
 	var element:Element;
 	var team:Team;
@@ -48,8 +51,13 @@ typedef ModelState = {
 	var buffs:Array<Buff.LightweightBuff>;
 };
 
+typedef BattleData = {
+	var common:Array<UnitData>;
+	var personal:Array<LightweightAbility>;
+} 
+
 typedef BHInfo = {
-	var ability:ID;
+	var ability:AbilityID;
 	var caster:UnitCoords;
 	var element:Element;
 };
@@ -88,18 +96,20 @@ class Model implements IInteractiveModel implements IMutableModel
 	private var bhTargets:Map<String, UnitCoords> = [];
 	private var bhHitsTaken:Map<String, Int> = [];
 
-	private var patterns:UPair<Map<ID, Array<Pattern>>>;
-	private var selectedPatterns:UPair<Map<ID, Int>>;
+	private var patterns:UPair<Map<AbilityID, Array<Pattern>>>;
+	private var selectedPatterns:UPair<Map<AbilityID, Int>>;
+
+	private var onTerminate:(winners:Array<String>, losers:Array<String>, ?draw:Bool)->Void;
 
 	public function getUnits():UPair<Unit>
 	{
 		return units;
 	}
 	
-	public function getInitialState():String
+	public function getBattleData(login:String):String
 	{
-		var writer = new JsonWriter<Array<ModelState>>();
-		return writer.write([for (u in units) {
+		var writer = new JsonWriter<BattleData>();
+		return writer.write({common: [for (u in units) {
 		id: u.id,
 		name: u.name,
 		element: u.element,
@@ -109,13 +119,7 @@ class Model implements IInteractiveModel implements IMutableModel
 		mana: u.manaPool,
 		alacrity: u.alacrityPool,
 		buffs: [for (b in u.buffQueue.queue) b.toLightweight()]
-		}]);
-	}
-	
-	public function getPersonal(login:String):String
-	{
-		var writer = new JsonWriter<Array<LightweightAbility>>();
-		return writer.write(units.get(getUnit(login)).wheel.getlwArray());
+		}], personal: units.get(getUnit(login)).wheel.getlwArray()});
 	}
 	
 	private function getUnit(login:String):UnitCoords
@@ -123,7 +127,7 @@ class Model implements IInteractiveModel implements IMutableModel
 		for (u in units)
 			switch (u.id) 
 			{
-				case ID.Player(l): 
+				case UnitID.Player(l): 
 					if (l == login)
 						return UnitCoords.get(u);
 				default:
@@ -183,7 +187,7 @@ class Model implements IInteractiveModel implements IMutableModel
 		for (o in observers) o.alacUpdate(target, dalac, source);
 	}
 	
-	public function castBuff(id:ID, targetCoords:UnitCoords, casterCoords:UnitCoords, duration:Int)
+	public function castBuff(id:BuffID, targetCoords:UnitCoords, casterCoords:UnitCoords, duration:Int)
 	{
 		var target:Unit = units.get(targetCoords);
 		var caster:Unit = units.get(casterCoords);
@@ -213,14 +217,14 @@ class Model implements IInteractiveModel implements IMutableModel
 	{
 		if (!checkTurn(login))
 		{
-			Main.warn(login, "It's not your turn currently");
+			ConnectionManager.warn(login, "It's not your turn currently");
 			return;
 		}
 		
 		var chooseResult:ChooseResult = checkChoose(abilityPos);
 		if (chooseResult != ChooseResult.Ok)
 		{
-			Main.warn(login, switch (chooseResult)
+			ConnectionManager.warn(login, switch (chooseResult)
 			{
 				case ChooseResult.Empty: "There is no ability in this slot";
 				case ChooseResult.Manacost: "Not enough mana";
@@ -236,7 +240,7 @@ class Model implements IInteractiveModel implements IMutableModel
 			case TargetResult.Ok:
 				useAbility(targetCoords, currentUnit, units.get(currentUnit).wheel.getActive(abilityPos));
 			case TargetResult.Invalid:
-				Main.warn(login, "Chosen ability cannot be used on this target");
+				ConnectionManager.warn(login, "Chosen ability cannot be used on this target");
 			default: //Skip
 		}
 	}
@@ -246,7 +250,7 @@ class Model implements IInteractiveModel implements IMutableModel
 		ability.putOnCooldown();
 		changeMana(caster, caster, -ability.manacost, Source.God);
 				
-		for (o in observers) o.abThrown(target, caster, ability.id, ability.strikeType, ability.element);
+		for (o in observers) o.abThrown(target, caster, ability.id, ability.type, ability.element);
 			
 		for (t in (ability.aoe? units.allied(target) : [units.get(target)]))
 			if (Utils.flipMiss(t, units.get(caster), ability))
@@ -269,13 +273,14 @@ class Model implements IInteractiveModel implements IMutableModel
 					traj = [[for (t in 0...500) new Point(-6, 0)]];
 				}
 				var selectedPattern:Int = selectedPatterns.get(caster)[ability.id];
-				for (o in observers) o.abStriked(UnitCoords.get(t), caster, ability.id, ability.strikeType, ability.element, patterns.get(caster)[ability.id][selectedPattern]);
+				for (o in observers) o.abStriked(UnitCoords.get(t), caster, ability.id, ability.type, ability.element, patterns.get(caster)[ability.id][selectedPattern]);
 				if (!ability.isBH())
 					postTurnProcess();
 			}
 	}
 
-	private function getPattern(xml:Xml, abilityID:ID):Pattern
+	//TODO: Rewrite
+	/*private function getPattern(xml:Xml, abilityID:AbilityID):Pattern
 	{
 		var res:Pattern = [];
 		for (particle in xml.elementsNamed("particle"))
@@ -284,7 +289,7 @@ class Model implements IInteractiveModel implements IMutableModel
 			res.push(new Particle(Std.parseFloat(particle.get("x")), Std.parseFloat(particle.get("y")), BH.convertToTrajectory(abilityID, params)));
 		} 
 		return res;
-	}
+	}*/
 
 	//================================================================================
     // BH
@@ -419,17 +424,17 @@ class Model implements IInteractiveModel implements IMutableModel
 		for (u in (units.getTeam(draw? Team.Left : winner))) 
 			switch (u.id)
 			{
-				case ID.Player(pid): winners.push(pid);
+				case UnitID.Player(pid): winners.push(pid);
 				default:
 			}
 		for (u in (units.getTeam((winner == Team.Left || draw)? Team.Right : Team.Left))) 
 			switch (u.id)
 			{
-				case ID.Player(pid): losers.push(pid);
+				case UnitID.Player(pid): losers.push(pid);
 				default:
 			}
 			
-		Main.terminate(winners, losers, draw);
+		onTerminate(winners, losers, draw);
 	}
 	
 	private function defineWinner():Null<Team>
@@ -473,7 +478,7 @@ class Model implements IInteractiveModel implements IMutableModel
 		for (u in units)
 			switch (u.id)
 			{
-				case ID.Player(id): 
+				case UnitID.Player(id): 
 					if (id == peerID)
 					{
 						end(u.team == Team.Left? Team.Right : Team.Left);
@@ -530,20 +535,21 @@ class Model implements IInteractiveModel implements IMutableModel
 		alacrityIncrement();
 	}
 	
-	public function new(allies:Array<Unit>, enemies:Array<Unit>, room:BattleRoom) 
+	public function new(allies:Array<Unit>, enemies:Array<Unit>, room:BattleRoom, onTerminate) 
 	{
+		this.onTerminate = onTerminate;
 		this.room = room;
 		this.units = new UPair(allies, enemies);
 		this.readyUnits = [];
 		this.bhHitsTaken = [for (u in allies.concat(enemies)) if (u.isPlayer()) u.playerLogin()=>0];
-		this.patterns = new UPair([for (a in allies) new Map<ID, Array<Pattern>>()], [for (e in enemies) new Map<ID, Array<Pattern>>()]);
-		this.selectedPatterns = new UPair([for (a in allies) new Map<ID, Int>()], [for (e in enemies) new Map<ID, Int>()]);
+		this.patterns = new UPair([for (a in allies) new Map<AbilityID, Array<Pattern>>()], [for (e in enemies) new Map<AbilityID, Array<Pattern>>()]);
+		this.selectedPatterns = new UPair([for (a in allies) new Map<AbilityID, Int>()], [for (e in enemies) new Map<AbilityID, Int>()]);
 		for (u in units)
 			for (i in 0...u.wheel.numOfSlots)
 			{
 				var ab = u.wheel.get(i);
 				patterns.getByUnit(u)[ab.id] = [];
-				if (ab.type == AbilityType.Active && u.wheel.getActive(i).isBH())
+				if (ab.type != AbilityType.Passive && u.wheel.getActive(i).isBH())
 				{
 					if (u.isPlayer())
 						for (patternI in 0...3)
@@ -551,10 +557,10 @@ class Model implements IInteractiveModel implements IMutableModel
 							var pl:Player = new Player(u.playerLogin());
 							var abij:IntPoint = pl.findAbility(ab.id);
 							var patternData:Xml = Xml.parse(pl.getPattern(abij.i, abij.j, patternI));
-							patterns.getByUnit(u)[ab.id][patternI] = getPattern(patternData, ab.id);
+							//patterns.getByUnit(u)[ab.id][patternI] = getPattern(patternData, ab.id);//TODO: Update
 						}
 					else
-						patterns.getByUnit(u)[ab.id] = [Units.getPattern(u.id, ab.id)];
+						patterns.getByUnit(u)[ab.id] = [/*Units.getPattern(u.id, ab.id)*/];
 					selectedPatterns.getByUnit(u)[ab.id] = 0;
 				}
 			}

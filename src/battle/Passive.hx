@@ -1,4 +1,5 @@
 package battle;
+import ID.AbilityID;
 import battle.data.Passives.BattleEvent;
 
 /**
@@ -18,10 +19,11 @@ class Passive extends Ability
 		return false;
 	}
 	
-	public function new(id:ID) 
+	public function new(id:AbilityID) 
 	{
 		super(id);
-		this.triggers = XMLUtils.parseTriggers(id);
+		//TODO: Rewrite
+		//this.triggers = XMLUtils.parseTriggers(id);
 	}
 	
 }

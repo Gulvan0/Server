@@ -5,6 +5,8 @@ import battle.struct.BuffQueue;
 import battle.struct.FloatPool;
 import battle.struct.Pool;
 import battle.struct.Wheel;
+import ID.AbilityID;
+import ID.UnitID;
 import hxassert.Assert;
 
 typedef ParameterList = {
@@ -12,7 +14,7 @@ typedef ParameterList = {
 	var element:Null<Element>;
 	var hp:Int;
 	var mana:Int;
-	var wheel:Array<ID>;
+	var wheel:Array<AbilityID>;
 	
 	var strength:Int;
 	var flow:Int;
@@ -38,7 +40,7 @@ typedef SubordinaryParameterList = {
 class Unit
 {
 	
-	public var id(default, null):ID;
+	public var id(default, null):UnitID;
 	public var name(default, null):String;
 	public var element(default, null):Element;
 	public var team(default, null):Team;
@@ -77,12 +79,12 @@ class Unit
 		return hpPool.value > 0;
 	}
 	
-	public function new(id:ID, team:Team, position:Int, ?params:Null<ParameterList>, ?subparams:Null<SubordinaryParameterList>) 
+	public function new(id:UnitID, team:Team, position:Int, ?params:Null<ParameterList>, ?subparams:Null<SubordinaryParameterList>) 
 	{
 		Assert.assert(position >= 0 && position <= 2);
 		
-		if (params == null)
-			params = XMLUtils.parseUnit(id);
+		/*if (params == null)
+			params = XMLUtils.parseUnit(id);*///TODO: Update
 		this.id = id;
 		this.name = params.name;
 		this.element = params.element;
@@ -90,7 +92,7 @@ class Unit
 		this.position = position;
 		
 		if (Lambda.empty(params.wheel))
-			wheel = new Wheel([ID.LgArcFlash, ID.LgCharge, ID.LgDisrupt, ID.LgElectricalStorm, ID.LgEMPBlast], 8);
+			wheel = new Wheel([AbilityID.LgArcFlash, AbilityID.LgCharge, AbilityID.LgDisrupt, AbilityID.LgElectricalStorm, AbilityID.LgEMPBlast], 8);
 		else
 			wheel = new Wheel(params.wheel, 8);
 
@@ -132,7 +134,7 @@ class Unit
 	{
 		return switch (id)
 		{
-			case ID.Player(v): true;
+			case UnitID.Player(v): true;
 			default: false;
 		};
 	}
@@ -141,7 +143,7 @@ class Unit
 	{
 		return switch (id)
 		{
-			case ID.Player(v): v;
+			case UnitID.Player(v): v;
 			default: "ERROR!";
 		};
 	}

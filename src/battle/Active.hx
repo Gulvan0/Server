@@ -1,7 +1,8 @@
 package battle;
+import ID.AbilityID;
 import battle.Ability.LightweightAbility;
 import battle.enums.AbilityTarget;
-import battle.enums.StrikeType;
+
 import battle.enums.UnitType;
 import battle.struct.Countdown;
 
@@ -11,8 +12,6 @@ import battle.struct.Countdown;
  */
 class Active extends Ability 
 {
-	
-	public var strikeType(default, null):StrikeType;
 	public var possibleTarget(default, null):AbilityTarget;
 	public var aoe(default, null):Bool;
 	
@@ -40,7 +39,8 @@ class Active extends Ability
 
 	public function isBH():Bool
 	{
-		return strikeType == StrikeType.Bolt || strikeType == StrikeType.Kick;
+		//TODO: Fill
+		return false;
 	}
 	
 	public function putOnCooldown()
@@ -54,17 +54,17 @@ class Active extends Ability
 			_cooldown.value--;
 	}
 	
-	public function new(id:ID) 
+	public function new(id:AbilityID) 
 	{
 		super(id);
 		
-		if (!checkEmpty() && id != ID.NullID)
+		if (!checkEmpty())
 		{
-			this._cooldown = new Countdown(XMLUtils.parseAbility(id, "delay", 0), XMLUtils.parseAbility(id, "cooldown", 0));
+			//TODO: Fill
+			/*this._cooldown = new Countdown(XMLUtils.parseAbility(id, "delay", 0), XMLUtils.parseAbility(id, "cooldown", 0));
 			this.manacost = XMLUtils.parseAbility(id, "manacost", 0);
 			this.possibleTarget = XMLUtils.parseAbility(id, "target", AbilityTarget);
-			this.strikeType = XMLUtils.parseAbility(id, "strike", StrikeType);
-			this.aoe = XMLUtils.parseAbility(id, "aoe", true);
+			this.aoe = XMLUtils.parseAbility(id, "aoe", true);*/
 		}
 	}
 	

@@ -1,11 +1,12 @@
 package battle;
+import ID.AbilityID;
 import battle.enums.AbilityTarget;
 import battle.enums.AbilityType;
 import Element;
 
 class LightweightAbility
 {
-	public var id:ID;
+	public var id:AbilityID;
 	public var name:String;
 	public var description:String;
 	public var type:AbilityType;
@@ -29,7 +30,7 @@ class LightweightAbility
 class Ability 
 {
 
-	public var id(default, null):ID;
+	public var id(default, null):AbilityID;
 	public var name(default, null):String;
 	public var description(default, null):String;
 	public var type(default, null):AbilityType;
@@ -46,21 +47,22 @@ class Ability
 		return la;
 	}
 	
-	public function new(id:ID) 
+	public function new(id:AbilityID) 
 	{
 		this.id = id;
-		if (!checkEmpty() && id != ID.NullID)
+		if (!checkEmpty())
 		{
-			this.name = XMLUtils.parseAbility(id, "name", "");
+			//TODO: Fill
+			/*this.name = XMLUtils.parseAbility(id, "name", "");
 			this.description = XMLUtils.parseAbility(id, "description", "");
 			this.type = XMLUtils.parseAbility(id, "type", AbilityType);
-			this.element = XMLUtils.parseAbility(id, "element", Element);
+			this.element = XMLUtils.parseAbility(id, "element", Element);*/
 		}
 	}
 	
 	public inline function checkEmpty():Bool
 	{
-		return id == ID.EmptyAbility || id == ID.LockAbility;
+		return id == AbilityID.EmptyAbility || id == AbilityID.LockAbility;
 	}
 	
 }

@@ -1,4 +1,5 @@
 package battle;
+import ID.BuffID;
 import battle.data.Buffs;
 import battle.data.Passives.BattleEvent;
 import battle.enums.BuffMode;
@@ -7,7 +8,7 @@ import battle.struct.UnitCoords;
 
 class LightweightBuff
 {
-	public var id:ID;
+	public var id:BuffID;
 	public var name:String;
 	public var description:String;
 	public var element:Element;
@@ -28,7 +29,7 @@ class Buff
 {
 	private var model:Model;
 	
-	public var id(default, null):ID;
+	public var id(default, null):BuffID;
 	public var name(default, null):String;
 	public var description(default, null):String;
 	public var element(default, null):Element;
@@ -84,17 +85,17 @@ class Buff
 		Buffs.useBuff(model, id, owner, caster, mode);
 	}
 	
-	public function new(m:Model, id:ID, duration:Int, target:UnitCoords, caster:UnitCoords) 
+	public function new(m:Model, id:BuffID, duration:Int, target:UnitCoords, caster:UnitCoords) 
 	{
 		this.model = m;
 		this.id = id;
-		
-		this.name = XMLUtils.parseBuff(id, "name", "");
+		//TODO:Fill
+		/*this.name = XMLUtils.parseBuff(id, "name", "");
 		this.description = XMLUtils.parseBuff(id, "description", "");
 		this.element = XMLUtils.parseBuff(id, "element", Element);
 		this.isOverTime = XMLUtils.parseBuff(id, "isOverTime", true);
 		this.isStackable = XMLUtils.parseBuff(id, "isStackable", true);
-		this.triggers = XMLUtils.parseTriggers(id); 
+		this.triggers = XMLUtils.parseTriggers(id); */
 		
 		this.owner = target;
 		this.caster = caster;

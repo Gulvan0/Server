@@ -1,40 +1,23 @@
 package battle;
 import battle.Model.Particle;
 import MathUtils.Point;
-import battle.enums.StrikeType;
+
 import battle.Buff;
 import battle.struct.UnitCoords;
 import battle.enums.Source;
 import battle.Unit;
 import json2object.JsonWriter;
 import battle.Model.Pattern;
+import battle.enums.AbilityType;
 
 typedef HPupdate = {target:UnitCoords, delta:Int, newV:Int, element:Element, crit:Bool, source:Source}
 typedef ManaUpdate = {target:UnitCoords, delta:Int, newV:Int}
 typedef AlacUpdate = {target:UnitCoords, delta:Float, newV:Float}
 typedef MissDetails = {target:UnitCoords, element:Element}
 typedef DeathDetails = {target:UnitCoords}
-typedef ThrowDetails = {target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element}
-typedef StrikeDetails = {target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element, pattern:PseudoPattern}
+typedef ThrowDetails = {target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element}
+typedef StrikeDetails = {target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element, pattern:String}
 typedef BuffQueueUpdate = {target:UnitCoords, queue:Array<LightweightBuff>}
-
-class PseudoParticle
-{
-	var x:Float;
-	var y:Float;
-	var traj:String;
-
-	public function new(p:Particle)
-	{
-		this.x = p.x;
-		this.y = p.y;
-		this.traj = "";
-		for (t in p.traj)
-			this.traj += '${t.x};${t.y}|';
-		this.traj = this.traj.substr(0, this.traj.length - 1);
-	}
-}
-typedef PseudoPattern = Array<PseudoParticle>;
 
 /**
  * Broadcasts battle events
@@ -101,13 +84,13 @@ class EventSender implements IModelObserver
 		room.broadcast("Death", writer.write({target: unit}));
 	}
 	
-	public function abThrown(target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element):Void 
+	public function abThrown(target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element):Void 
 	{
 		var writer = new JsonWriter<ThrowDetails>();
 		room.broadcast("Throw", writer.write({target: target, caster: caster, id: id, type: type, element: element}));
 	}
 	
-	public function abStriked(target:UnitCoords, caster:UnitCoords, id:ID, type:StrikeType, element:Element, pattern:Pattern):Void 
+	public function abStriked(target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element, pattern:Pattern):Void 
 	{
 		var writer = new JsonWriter<StrikeDetails>();
 		room.broadcast("Strike", writer.write({target: target, caster: caster, id: id, type: type, element: element, pattern: pattern.map(p -> new PseudoParticle(p))}));

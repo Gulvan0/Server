@@ -1,5 +1,6 @@
 package;
 
+import managers.LoginManager;
 import battle.Unit;
 import hxassert.Assert;
 import mphx.connection.IConnection;
@@ -20,20 +21,20 @@ class BattleRoom
 	public function broadcast(event:String, ?data:Null<Dynamic>)
 	{
 		for (c in clients)
-			Main.loginManager.getConnection(c).send(event, data);
+			LoginManager.instance.getConnection(c).send(event, data);
 	}
 
 	public function share(sourceLogin:String, event:String, ?data:Null<Dynamic>)
 	{
 		for (c in clients)
 			if (c != sourceLogin)
-				Main.loginManager.getConnection(c).send(event, data);
+				LoginManager.instance.getConnection(c).send(event, data);
 	}
 	
 	public function player(unit:Unit):IConnection
 	{
 		Assert.assert(unit.isPlayer());
-		return Main.loginManager.getConnection(unit.id.getParameters()[0]);
+		return LoginManager.instance.getConnection(unit.id.getParameters()[0]);
 	}
 	
 	public function new() 

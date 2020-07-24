@@ -1,4 +1,6 @@
 package battle.data;
+import ID.UnitID;
+import ID.AbilityID;
 import battle.Model.Particle;
 import battle.Model.Trajectory;
 import battle.Model.Pattern;
@@ -20,13 +22,14 @@ class Units
 {
 	private static var model:IMutableModel;	
 	
-	public static function getPattern(unit:ID, ability:ID):Pattern
+	//TODO: Rewrite
+	/*public static function getPattern(unit:UnitID, ability:AbilityID):Pattern
 	{	
 		var trajs:Array<Trajectory> = getTrajectories(unit, ability);
 		switch (unit)
 		{
-			case ID.UnitGhost, ID.UnitArchghost:
-				if (ability == ID.BoGhostStrike)
+			case UnitID.Ghost, UnitID.Archghost:
+				if (ability == AbilityID.BoGhostStrike)
 					return [new Particle(200, 200, trajs[0]), new Particle(300, 200, trajs[0]), new Particle(400, 200, trajs[0]), new Particle(500, 200, trajs[0])];
 			default:
 				return [];
@@ -34,26 +37,26 @@ class Units
 		return [];
 	}
 
-	public static function getTrajectories(unit:ID, ability:ID):Array<Trajectory>
+	public static function getTrajectories(unit:UnitID, ability:AbilityID):Array<Trajectory>
 	{
 		switch (unit)
 		{
-			case ID.UnitGhost, ID.UnitArchghost:
-				if (ability == ID.BoGhostStrike)
+			case UnitID.Ghost, UnitID.Archghost:
+				if (ability == AbilityID.BoGhostStrike)
 					return [BH.linear()];
 			default:
 				return [];
 		}
 		return [];
-	}
+	}*/
 
-	public static function decide(m:IMutableModel, id:ID):BotDecision
+	public static function decide(m:IMutableModel, id:UnitID):BotDecision
 	{
 		model = m;
 		
 		switch (id)
 		{
-			case ID.UnitGhost, ID.UnitArchghost:
+			case UnitID.Ghost, UnitID.Archghost:
 				return ghost();
 			default:
 				null;

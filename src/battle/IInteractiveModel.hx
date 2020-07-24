@@ -7,8 +7,7 @@ import battle.struct.UnitCoords;
 interface IInteractiveModel 
 {
 	public function start():Void;
-	public function getInitialState():String;
-	public function getPersonal(login:String):String;
+	public function getBattleData(login:String):String;
 	public function useRequest(login:String, abilityPos:Int, targetCoords:UnitCoords):Void;
 	public function skipTurn(login:String):Void;
 	public function quit(login:String):Void;

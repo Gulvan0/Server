@@ -1,4 +1,5 @@
 package battle.data;
+import ID.BuffID;
 import battle.IMutableModel;
 import battle.enums.BuffMode;
 import Element;
@@ -19,7 +20,7 @@ class Buffs
 	private static var target:Unit;
 	private static var mode:BuffMode;
 	
-	public static function useBuff(mod:IMutableModel, id:ID, targetCoords:UnitCoords, casterCoords:UnitCoords, m:BuffMode)
+	public static function useBuff(mod:IMutableModel, id:BuffID, targetCoords:UnitCoords, casterCoords:UnitCoords, m:BuffMode)
 	{
 		model = mod;
 		target = model.getUnits().get(targetCoords);
@@ -27,19 +28,19 @@ class Buffs
 		
 		switch (id)
 		{
-			case ID.BuffLgConductivity:
+			case LgConductivity:
 				conductivity();
-			case ID.BuffLgCharged:
+			case LgCharged:
 				charged();
-			case ID.BuffLgStrikeback:
+			case LgStrikeback:
 				strikeback();
-			case ID.BuffLgClarity:
+			case LgClarity:
 				clarity();
-			case ID.BuffLgSnared:
+			case LgSnared:
 				snared();
-			case ID.BuffLgEnergized:
+			case LgEnergized:
 				energized();
-			case ID.BuffLgReenergizing:
+			case LgReenergizing:
 				reenergizing();
 			default:
 				throw "Buffs->useBuff() exception: Invalid ID: " + id.getName();
@@ -124,7 +125,7 @@ class Buffs
 			case BuffMode.End:
 				target.flow = target.flow * 2;
 			case BuffMode.Proc:
-				target.buffQueue.dispellOneByID(ID.BuffLgSnared);
+				target.buffQueue.dispellOneByID(LgSnared);
 			default:
 		}
 	}

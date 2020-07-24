@@ -1,4 +1,5 @@
 package battle.struct;
+import ID.BuffID;
 import battle.Buff;
 import battle.Model;
 import battle.data.Passives.BattleEvent;
@@ -56,14 +57,14 @@ class BuffQueue
 		return [for (b in queue.slice(0, queue.length - newBuffs)) if (b.reactsTo(e)) b];
 	}
 	
-	public function dispellOneByID(id:ID)
+	public function dispellOneByID(id:BuffID)
 	{
 		var ind:Int = indexOfBuff(id);
 		if (ind >= 0)
 			dispellBuff(ind);
 	}
 
-	public function dispellAllByID(id:ID)
+	public function dispellAllByID(id:BuffID)
 	{
 		var ind:Int = indexOfBuff(id);
 		while (ind >= 0)
@@ -130,7 +131,7 @@ class BuffQueue
 	}
 	
 	//We need separate function because we compare only by id. indexOf() thinks that buffs with different current durations are different 
-	private function indexOfBuff(id:ID):Int
+	private function indexOfBuff(id:BuffID):Int
 	{
 		for (i in 0...queue.length)
 			if (queue[i].id == id)

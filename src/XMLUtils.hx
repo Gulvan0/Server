@@ -1,4 +1,7 @@
 package;
+import ID.AbilityID;
+import ID.BuffID;
+import ID.UnitID;
 import MathUtils.Point;
 import battle.Unit.ParameterList;
 import battle.data.Passives.BattleEvent;
@@ -47,7 +50,7 @@ class XMLUtils
 			
 			for (ability in row.elementsNamed("ability"))
 			{
-				var id:ID = ID.createByName(ability.get("id"));
+				var id:AbilityID = AbilityID.createByName(ability.get("id"));
 				var maxlvl:Int = Std.parseInt(ability.get("maxlvl"));
 				
 				abilityRow.push(new Ability(id, maxlvl));
@@ -90,9 +93,9 @@ class XMLUtils
 		return requirements;
 	}
 	
-	public static function parseStage(zone:Zone, stage:Int):Array<ID>
+	public static function parseStage(zone:Zone, stage:Int):Array<UnitID>
 	{
-		var output:Array<ID> = [];
+		var output:Array<UnitID> = [];
 		var xml:Xml = fromFile("data\\Stages.xml");
 		
 		xml = findNode(xml, "zone", "id", zone.getName());
@@ -100,14 +103,13 @@ class XMLUtils
 		xml = xml.firstChild();
 			
 		for (enemyID in parseValueArray(xml))
-			output.push(Type.createEnum(ID, enemyID));
+			output.push(Type.createEnum(UnitID, enemyID));
 		
 		return output;
 	}
 	
 	public static function nextZones(zone:Zone):Array<Zone>
 	{
-		var output:Array<ID> = [];
 		var xml:Xml = fromFile("data\\Stages.xml");
 		
 		xml = findNode(xml, "zone", "id", zone.getName());
@@ -129,7 +131,7 @@ class XMLUtils
 		return count;
 	}
 	
-	public static function parseAbility<T>(ability:ID, param:String, paramType:T):Dynamic
+	public static function parseAbility<T>(ability:AbilityID, param:String, paramType:T):Dynamic
 	{
 		var xml:Xml = fromFile("data\\Abilities.xml");
 		xml = findNode(xml, "ability", "id", ability.getName());
@@ -138,7 +140,7 @@ class XMLUtils
 		return castNode(xml.nodeValue, paramType);
 	}
 
-	public static function getParticleCount(bhAbility:ID):Int
+	public static function getParticleCount(bhAbility:AbilityID):Int
 	{
 		var xml:Xml = fromFile("data\\Abilities.xml");
 		xml = findNode(xml, "ability", "id", bhAbility.getName());
@@ -147,7 +149,7 @@ class XMLUtils
 		return Std.parseInt(xml.firstChild().nodeValue);
 	}
 
-	public static function getBHParameters(ability:ID):Xml
+	public static function getBHParameters(ability:AbilityID):Xml
 	{
 		var xml:Xml = fromFile("data\\Abilities.xml");
 		xml = findNode(xml, "ability", "id", ability.getName());
@@ -155,7 +157,7 @@ class XMLUtils
 		return xml;
 	}
 
-	public static function getAbilityPosition(id:ID, element:Element):Point
+	public static function getAbilityPosition(id:AbilityID, element:Element):Point
 	{
 		for (row in getTree(element).elementsNamed("row"))
 			for (ability in row.elementsNamed("ability"))
@@ -164,7 +166,7 @@ class XMLUtils
 		return null;
 	}
 	
-	public static function parseTriggers(object:ID):Array<BattleEvent>
+	public static function parseTriggers(object:EnumValue):Array<BattleEvent>
 	{
 		var output:Array<BattleEvent> = [];
 		var xml:Xml;
@@ -186,7 +188,7 @@ class XMLUtils
 		return output;
 	}
 	
-	public static function parseBuff<T>(buff:ID, param:String, paramType:T):Dynamic
+	public static function parseBuff<T>(buff:BuffID, param:String, paramType:T):Dynamic
 	{
 		var xml:Xml = fromFile("data\\Buffs.xml");
 		xml = findNode(xml, "buff", "id", buff.getName());
@@ -196,14 +198,14 @@ class XMLUtils
 		return castNode(xml.nodeValue, paramType);
 	}
 	
-	public static function parseUnit(unit:ID):ParameterList
+	public static function parseUnit(unit:UnitID):ParameterList
 	{
 		var xml:Xml = fromFile("data\\Units.xml");
 		xml = findNode(xml, "unit", "id", unit.getName());
 		
-		var wheel:Array<ID> = [];
+		var wheel:Array<AbilityID> = [];
 		for (id in parseValueArray(findNode(xml, "wheel").firstChild()))
-			wheel.push(ID.createByName(id));
+			wheel.push(AbilityID.createByName(id));
 		
 		return {
 			name:castNode(findNode(xml, "name").firstChild().nodeValue, ""),

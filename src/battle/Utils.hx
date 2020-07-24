@@ -1,5 +1,6 @@
 package battle;
-import battle.enums.StrikeType;
+import battle.enums.AbilityType;
+
 
 /**
  * @author Gulvan
@@ -33,11 +34,12 @@ class Utils
 	public static function flipMiss(target:Unit, caster:Unit, ability:Active):Bool
 	{
 		var baseChance:Float = 0.02 + (target.intellect - caster.intellect) * 0.0017;
-		return switch (ability.strikeType)
+		return switch (ability.type)
 		{
-			case StrikeType.Bolt: 0.75 * baseChance >= Math.random();
-			case StrikeType.Spell: false;
-			case StrikeType.Kick: baseChance >= Math.random();
+			case AbilityType.Bolt: 0.75 * baseChance >= Math.random();
+			case AbilityType.Spell: false;
+			case AbilityType.Kick: baseChance >= Math.random();
+			default: false;
 		}
 	}
 	

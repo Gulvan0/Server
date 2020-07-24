@@ -1,4 +1,4 @@
-package;
+package managers;
 import sys.io.FileOutput;
 import sys.FileSystem;
 import haxe.crypto.Md5;
@@ -13,6 +13,7 @@ using StringTools;
  */
 class LoginManager 
 {
+	public static var instance:LoginManager;
 	private var logins:Map<String, String> = new Map();
 	private var connections:Map<String, IConnection> = new Map();
 	
@@ -76,8 +77,14 @@ class LoginManager
 		connections.remove(l);
 		Sys.println('(J/L) $l disconnected');
 	}
+
+	public function registerAndLogin(data:LoginPair, sender:IConnection) 
+	{
+		if (register(data, sender))
+			login(data, sender);
+	}
 	
-	public function register(pair:LoginPair, c:IConnection):Bool
+	private function register(pair:LoginPair, c:IConnection):Bool
 	{
 		if (getLogin(c) != null)
 		{
@@ -86,6 +93,7 @@ class LoginManager
 		}
 			
 		var content:String = File.getContent(loginPath());
+		//TODO: xml->json
 		for (p in Xml.parse(content).elementsNamed("player"))
 			if (p.get("login").toLowerCase() == pair.login.toLowerCase())
 			{
@@ -109,11 +117,11 @@ class LoginManager
 
 	private function createPlayer(login:String)
 	{
-		var str:String = File.getContent(Main.playersDir() + "d.xml");
+		var str:String = File.getContent(Main.playersDir + "d.xml");
 		str = strReplace(str, "dname", login);
 		str = strReplace(str, "dabp", "" + GameRules.initialAbilityPoints);
 		str = strReplace(str, "dattp", "" + GameRules.initialAttributePoints);
-		var fo:FileOutput = File.write(Main.playersDir() + login.toLowerCase() + ".xml");
+		var fo:FileOutput = File.write(Main.playersDir + login.toLowerCase() + ".xml");
 		fo.writeString(str);
 		fo.close();
 	}
@@ -133,7 +141,7 @@ class LoginManager
 	
 	private static function loginPath():String
 	{
-		return Main.playersDir() + "playerslist.xml";
+		return Main.playersDir + "playerslist.xml";
 	}
 
 	private static function strReplace(str:String, sub:String, by:String):String
@@ -147,7 +155,7 @@ class LoginManager
 	
 	public function new() 
 	{
-		
+		instance = this;
 	}
 	
 }

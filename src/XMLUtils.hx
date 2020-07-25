@@ -197,28 +197,6 @@ class XMLUtils
 			
 		return castNode(xml.nodeValue, paramType);
 	}
-	
-	public static function parseUnit(unit:UnitID):ParameterList
-	{
-		var xml:Xml = fromFile("data\\Units.xml");
-		xml = findNode(xml, "unit", "id", unit.getName());
-		
-		var wheel:Array<AbilityID> = [];
-		for (id in parseValueArray(findNode(xml, "wheel").firstChild()))
-			wheel.push(AbilityID.createByName(id));
-		
-		return {
-			name:castNode(findNode(xml, "name").firstChild().nodeValue, ""),
-			element:castNode(findNode(xml, "element").firstChild().nodeValue, Element),
-			hp:castNode(findNode(xml, "hp").firstChild().nodeValue, 1),
-			mana:castNode(findNode(xml, "mana").firstChild().nodeValue, 1),
-			strength:castNode(findNode(xml, "strength").firstChild().nodeValue, 1),
-			flow:castNode(findNode(xml, "flow").firstChild().nodeValue, 1),
-			intellect:castNode(findNode(xml, "intellect").firstChild().nodeValue, 1),
-			wheel:wheel
-		}
-	}
-	
 	public static function print(xml:Xml):String
 	{
 		var s:String = Printer.print(xml, true);

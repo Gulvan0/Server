@@ -146,8 +146,27 @@ class PlayerdataManager
 
     public function extractParams(login:String):ParameterList
     {
-        //TODO: Fill
-        return null;
+        var char = cache.get(login).character;
+        var wheel:Array<AbilityID> = [];
+        var abilityLevels:Map<AbilityID, Int> = [];
+        for (idStr in char.wheel)
+        {
+            var id:AbilityID = AbilityID.createByName(idStr);
+            var abPos:TreePos = AbilityManager.findAbility(id);
+            wheel.push(id);
+            abilityLevels.set(id, char.tree[abPos.i][abPos.j]);
+        }
+        return {
+            name: char.name,
+            element: Element.createByName(char.element),
+            hp: GameRules.basicHP + GameRules.hpStBonus(char.s),
+            mana: GameRules.basicMana + GameRules.manaInBonus(char.i),
+            wheel: wheel,
+            abilityLevels: abilityLevels,
+            strength: char.s,
+            flow: char.f,
+            intellect: char.i
+        };
     }
 
     //? Probably will be required: toParams / gainXP with leveling and rewards (abp, attp, attribs)

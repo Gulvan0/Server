@@ -131,7 +131,27 @@ class PlayerdataManager
 
     public function gainXP(amount:Int, login:String) 
     {
-        //TODO: Fill
+        var char = cache.get(login).character;
+        var levelsGained = 0;
+        var xpLeftToLvl = GameRules.xpToLvlup(char.level) - char.xp; 
+
+        while (amount >= xpLeftToLvl)
+        {
+            amount -= xpLeftToLvl;
+            char.level++;
+            char.xp = 0;
+            xpLeftToLvl = GameRules.xpToLvlup(char.level);
+            levelsGained++;
+        }
+        char.xp = amount;
+
+        var bonus =  GameRules.attributeLvlupBonus(Element.createByName(char.element));
+        char.s += bonus[Strength] * levelsGained;
+        char.f += bonus[Flow] * levelsGained;
+        char.i += bonus[Intellect] * levelsGained;
+        char.abp += GameRules.abPointsLvlupBonus() * levelsGained;
+        char.attp += GameRules.attPointsLvlupBonus() * levelsGained;
+
         Thread.create(updatePlayer.bind(login));
     }
 
@@ -140,7 +160,7 @@ class PlayerdataManager
         if (amount == null)
             return;
 
-        //TODO: Fill
+        cache.get(login).rating += amount;
         Thread.create(updatePlayer.bind(login));
     }
 
@@ -168,8 +188,6 @@ class PlayerdataManager
             intellect: char.i
         };
     }
-
-    //? Probably will be required: toParams / gainXP with leveling and rewards (abp, attp, attribs)
     //? Add in alpha 5.0: getCompletedStageCount, canVisit, proceed, isAtBossStage
     
     //=====================================================================================================================================================

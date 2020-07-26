@@ -17,7 +17,7 @@ typedef AlacUpdate = {target:UnitCoords, delta:Float, newV:Float}
 typedef MissDetails = {target:UnitCoords, element:Element}
 typedef DeathDetails = {target:UnitCoords}
 typedef ThrowDetails = {target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element}
-typedef StrikeDetails = {target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element, pattern:String}
+typedef StrikeDetails = {target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element, pattern:String}//TODO: Delayed ids and patterns
 typedef BuffQueueUpdate = {target:UnitCoords, queue:Array<LightweightBuff>}
 
 /**
@@ -73,7 +73,7 @@ class EventSender implements IModelObserver
 		room.player(current).send("Tick");
 	}
 	
-	public function miss(target:UnitCoords, element:Element):Void 
+	public function miss(target:UnitCoords, caster:UnitCoords, element:Element):Void 
 	{
 		var writer = new JsonWriter<MissDetails>();
 		room.broadcast("Miss", writer.write({target: target, element: element}));
@@ -90,7 +90,7 @@ class EventSender implements IModelObserver
 		var writer = new JsonWriter<ThrowDetails>();
 		room.broadcast("Throw", writer.write({target: target, caster: caster, id: id, type: type, element: element}));
 	}
-	
+	//TODO: Send delayed ids and patterns
 	public function abStriked(target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element, pattern:String):Void 
 	{
 		var writer = new JsonWriter<StrikeDetails>();

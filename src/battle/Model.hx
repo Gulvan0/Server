@@ -249,34 +249,34 @@ class Model implements IInteractiveModel implements IMutableModel
 	{
 		ability.putOnCooldown();
 		changeMana(caster, caster, -ability.manacost, Source.God);
-				
 		for (o in observers) o.abThrown(target, caster, ability.id, ability.type, ability.element);
 			
-		for (t in (ability.aoe? units.allied(target) : [units.get(target)]))
+		var targets:Array<Unit> = ability.aoe? units.allied(target) : [units.get(target)];
+		for (t in targets)
+		{
+			var tCoords:UnitCoords = UnitCoords.get(t);
+
 			if (Utils.flipMiss(t, units.get(caster), ability))
 			{
-				for (o in observers) o.miss(UnitCoords.get(t), ability.element);
+				for (o in observers) o.miss(tCoords, caster, ability.element);
+				postTurnProcess();
+			}
+			else if (!ability.isBH() || !t.isPlayer())
+			{
+				Abilities.hit(this, ability.id, tCoords, caster, ability.element);
+				for (o in observers) o.abStriked(tCoords, caster, ability.id, ability.type, ability.element, "");
 				postTurnProcess();
 			}
 			else
 			{
-				var pattern:Array<Array<Point>> = [];
-				var traj:Array<Array<Point>> = [];
-				if (!ability.isBH() || !t.isPlayer())
-					Abilities.hit(this, ability.id, UnitCoords.get(t), caster, ability.element);
-				else
-				{
-					bhInfo = {ability:ability.id, caster: caster, element: ability.element};
-					if (t.isPlayer())
-						bhTargets.set(t.playerLogin(), UnitCoords.get(t));
-					pattern = [[new Point(400, 100), new Point(550, 200), new Point(600, 50), new Point(600, 200), new Point(800, 50), new Point(900, 200), new Point(1000, 50), new Point(1100, 200), new Point(1200, 50), new Point(1300, 200)]];
-					traj = [[for (t in 0...500) new Point(-6, 0)]];
-				}
+				bhInfo = {ability:ability.id, caster: caster, element: ability.element};
+				bhTargets.set(t.playerLogin(), tCoords);
+
 				var selectedPattern:Int = selectedPatterns.get(caster)[ability.id];
-				for (o in observers) o.abStriked(UnitCoords.get(t), caster, ability.id, ability.type, ability.element, patterns.get(caster)[ability.id][selectedPattern]);
-				if (!ability.isBH())
-					postTurnProcess();
+				var pattern:String = patterns.get(caster)[ability.id][selectedPattern];
+				for (o in observers) o.abStriked(tCoords, caster, ability.id, ability.type, ability.element, pattern);//TODO: Store and send delayed ids and patterns
 			}
+		}
 	}
 
 	//================================================================================

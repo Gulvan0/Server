@@ -279,18 +279,6 @@ class Model implements IInteractiveModel implements IMutableModel
 			}
 	}
 
-	//TODO: Rewrite
-	/*private function getPattern(xml:Xml, abilityID:AbilityID):Pattern
-	{
-		var res:Pattern = [];
-		for (particle in xml.elementsNamed("particle"))
-		{
-			var params:Map<String, Float> = [for (param in particle.elementsNamed("param")) param.get("name") => Std.parseFloat(param.firstChild().nodeValue)];
-			res.push(new Particle(Std.parseFloat(particle.get("x")), Std.parseFloat(particle.get("y")), BH.convertToTrajectory(abilityID, params)));
-		} 
-		return res;
-	}*/
-
 	//================================================================================
     // BH
     //================================================================================

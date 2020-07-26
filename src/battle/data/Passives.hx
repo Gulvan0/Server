@@ -12,11 +12,13 @@ enum BattleEvent
 	ManaUpdate;
 	AlacUpdate;
 	Throw;
-	Strike;
-	Miss;
+	IncomingStrike;
+	OutgoingStrike;
+	IncomingMiss;
+	OutgoingMiss;
 	Tick;
 	Death;
-	Crit;
+	OutgoingCrit;
 }
 
 /**

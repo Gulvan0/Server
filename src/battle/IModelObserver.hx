@@ -21,7 +21,7 @@ interface IModelObserver
 	
 	public function preTick(current:Unit):Void;
 	public function tick(current:Unit):Void;
-	public function miss(target:UnitCoords, element:Element):Void;
+	public function miss(target:UnitCoords, caster:UnitCoords, element:Element):Void;
 	public function death(unit:UnitCoords):Void;
 	
 	public function abThrown(target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element):Void;

@@ -1,4 +1,6 @@
 package battle.data;
+import hxassert.Assert;
+import battle.EffectHandler.EffectData;
 import ID.BuffID;
 import battle.IMutableModel;
 import battle.enums.BuffMode;
@@ -19,12 +21,16 @@ class Buffs
 	
 	private static var target:Unit;
 	private static var mode:BuffMode;
+	private static var data:EffectData;
 	
-	public static function useBuff(mod:IMutableModel, id:BuffID, targetCoords:UnitCoords, casterCoords:UnitCoords, m:BuffMode)
+	public static function useBuff(mod:IMutableModel, id:BuffID, targetCoords:UnitCoords, casterCoords:UnitCoords, m:BuffMode, ?procData:EffectData)
 	{
+		Assert.require(m == BuffMode.Proc || procData == null);
+
 		model = mod;
 		target = model.getUnits().get(targetCoords);
 		mode = m;
+		data = procData;
 		
 		switch (id)
 		{

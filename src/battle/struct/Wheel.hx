@@ -82,7 +82,7 @@ class Wheel
 			if (id == AbilityID.EmptyAbility || id == AbilityID.LockAbility)
 				this.wheel.push(new Ability(id, 0));
 			else if (AbilityManager.abilities.get(id).type != AbilityType.Passive)
-				this.wheel.push(new Active(id, levels.get(id)));//TODO: Rewrite
+				this.wheel.push(new Active(id, levels.get(id)));
 			else
 				this.wheel.push(new Passive(id, levels.get(id)));
 		for (i in pool.length...numOfSlots)

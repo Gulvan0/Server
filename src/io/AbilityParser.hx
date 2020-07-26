@@ -1,5 +1,6 @@
 package io;
 
+import battle.data.Passives.BattleEvent;
 import battle.enums.AttackType;
 import battle.enums.DispenserType;
 import hxassert.Assert;
@@ -19,17 +20,13 @@ typedef Ability =
     var element:Element;
     var type:AbilityType;
     var target:Null<AbilityTarget>;
-    ///Empty if passive
-    var manacost:Array<Int>; 
-    ///Empty if passive
-    var cooldown:Array<Int>;
+    var manacost:Array<Int>; //Empty if passive
+    var cooldown:Array<Int>;//Empty if passive
     var maxlvl:Int;
-    ///Null if not danmaku ability
-    var danmakuType:Null<AttackType>; 
-    ///Null if not danmaku ability
-    var danmakuDispenser:Null<DispenserType>; 
-    ///False if passive
-    var aoe:Bool; 
+    var danmakuType:Null<AttackType>; //Null if not danmaku ability
+    var danmakuDispenser:Null<DispenserType>; //Null if not danmaku ability
+    var aoe:Bool; //False if passive
+    var triggers:Array<BattleEvent>; //Empty if active
 }
 
 class AbilityParser 
@@ -105,6 +102,9 @@ class AbilityParser
         var aoe:Bool = false;
         if (obj.hasField("aoe"))
             aoe = obj.field("aoe");
+        var triggers:Array<BattleEvent> = [];
+        if (obj.hasField("triggers"))
+            triggers = obj.field("triggers").map(BattleEvent.createByName);
 
         return {
             id:id,
@@ -118,7 +118,8 @@ class AbilityParser
             maxlvl: maxlvl,
             danmakuType: danmakuType,
             danmakuDispenser: danmakuDispenser,
-            aoe: aoe
+            aoe: aoe,
+            triggers: triggers
         };
     }
 

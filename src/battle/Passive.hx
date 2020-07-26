@@ -1,4 +1,5 @@
 package battle;
+import managers.AbilityManager;
 import ID.AbilityID;
 import battle.data.Passives.BattleEvent;
 
@@ -13,17 +14,14 @@ class Passive extends Ability
 	
 	public function reactsTo(event:BattleEvent):Bool
 	{
-		for (e in triggers)
-			if (e == event)
-				return true;
-		return false;
+		return Lambda.has(triggers, event);
 	}
 	
 	public function new(id:AbilityID, level:Int) 
 	{
 		super(id, level);
-		//TODO: Rewrite (needs analysis on where to store info about triggers)
-		//this.triggers = XMLUtils.parseTriggers(id);
+		if (!checkEmpty())
+			this.triggers = AbilityManager.abilities.get(id).triggers;
 	}
 	
 }

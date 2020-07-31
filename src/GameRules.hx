@@ -26,6 +26,8 @@ class GameRules
     public static var treeWidth:Int = 4;
     public static var treeHeight:Int = 3;
 
+    public static var defaultDelayedPatternDuration:Int = 5;
+
     public static function xpToLvlup(currentLevel:Int):Int
 	{
 		Assert.assert(currentLevel > 0);

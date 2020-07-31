@@ -28,6 +28,8 @@ class Abilities
 	private static var caster:Unit;
 	private static var element:Element;
 	
+	//TODO: Rewrite the entire class
+
 	public static function hit(m:IMutableModel, id:AbilityID, targetCoords:UnitCoords, casterCoords:UnitCoords, e:Element, ?hitNumber:Int)
 	{
 		model = m;
@@ -58,7 +60,6 @@ class Abilities
 
 	private static function defaultDistribution(hitNumber:Int, expectedHits:Int, expectedDamage:Int, id:AbilityID):Int
 	{
-		//TODO: Rewrite
 		/*var totalParticles:Int = XMLUtils.getParticleCount(id);
 		var floatDamage:Float;
 		if (hitNumber <= expectedHits)

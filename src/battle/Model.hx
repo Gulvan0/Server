@@ -1,4 +1,6 @@
 package battle;
+import battle.struct.DelayedPatternQueue;
+import battle.enums.AttackType;
 import managers.PlayerdataManager;
 import ID.AbilityID;
 import ID.UnitID;
@@ -92,9 +94,9 @@ class Model implements IInteractiveModel implements IMutableModel
 	
 	private var readyUnits:Array<Unit>;
 
+	private var abilityTargets:Array<UnitCoords> = [];
 	private var bhInfo:Null<BHInfo> = null;
-	private var bhTargets:Map<String, UnitCoords> = [];
-	private var bhHitsTaken:Map<String, Int> = [];
+	private var bhHitsTaken:Map<UnitCoords, Int> = [];
 
 	private var patterns:UPair<Map<AbilityID, Array<String>>>;
 	private var selectedPatterns:UPair<Map<AbilityID, Int>>;
@@ -247,35 +249,66 @@ class Model implements IInteractiveModel implements IMutableModel
 	
 	private function useAbility(target:UnitCoords, caster:UnitCoords, ability:Active)
 	{
-		ability.putOnCooldown();
-		changeMana(caster, caster, -ability.manacost, Source.God);
-		for (o in observers) o.abThrown(target, caster, ability.id, ability.type, ability.element);
+		throwAb(target, caster, ability);
 			
+		var danmakuType:Null<AttackType> = ability.danmakuType();
+		var pattern:String = "";
+		if (danmakuType != null)
+		{
+			bhInfo = {ability:ability.id, caster: caster, element: ability.element};
+
+			var selectedPattern:Int = selectedPatterns.get(caster)[ability.id];
+			pattern = patterns.get(caster)[ability.id][selectedPattern];
+		}
+
 		var targets:Array<Unit> = ability.aoe? units.allied(target) : [units.get(target)];
 		for (t in targets)
 		{
 			var tCoords:UnitCoords = UnitCoords.get(t);
+			abilityTargets.push(tCoords);
 
 			if (Utils.flipMiss(t, units.get(caster), ability))
 			{
 				for (o in observers) o.miss(tCoords, caster, ability.element);
-				postTurnProcess();
+				strikeFinished(tCoords);
 			}
-			else if (!ability.isBH() || !t.isPlayer())
-			{
-				Abilities.hit(this, ability.id, tCoords, caster, ability.element);
-				for (o in observers) o.abStriked(tCoords, caster, ability.id, ability.type, ability.element, "");
-				postTurnProcess();
-			}
-			else
-			{
-				bhInfo = {ability:ability.id, caster: caster, element: ability.element};
-				bhTargets.set(t.playerLogin(), tCoords);
+			else 
+				strikeAb(tCoords, caster, ability, danmakuType, pattern, t.delayedPatterns);
+		}
+	}
 
-				var selectedPattern:Int = selectedPatterns.get(caster)[ability.id];
-				var pattern:String = patterns.get(caster)[ability.id][selectedPattern];
-				for (o in observers) o.abStriked(tCoords, caster, ability.id, ability.type, ability.element, pattern);//TODO: Store and send delayed ids and patterns
-			}
+	private function throwAb(target:UnitCoords, caster:UnitCoords, ability:Active)
+	{
+		ability.putOnCooldown();
+		changeMana(caster, caster, -ability.manacost, Source.God);
+		for (o in observers) o.abThrown(target, caster, ability.id, ability.type, ability.element);
+	}
+
+	private function strikeAb(target:UnitCoords, caster:UnitCoords, ability:Active, danmakuType:AttackType, pattern:String, delayedQueue:DelayedPatternQueue)
+	{
+		if (danmakuType == AttackType.Instant)
+		{
+			delayedQueue.flush();
+			for (o in observers) o.abStriked(target, caster, ability.id, ability.type, ability.element, pattern);
+			//TODO: Bot danamku
+		}
+		else 
+		{
+			if (danmakuType == AttackType.Delayed)
+				delayedQueue.add(ability, pattern);
+			for (o in observers) o.abStriked(target, caster, ability.id, ability.type, ability.element, pattern);
+			Abilities.hit(this, ability.id, target, caster, ability.element);
+			strikeFinished(target);
+		}	
+	}
+
+	private function strikeFinished(target:UnitCoords) 
+	{
+		abilityTargets.remove(target);
+		if (abilityTargets.empty())
+		{
+			bhInfo = null;
+			postTurnProcess();
 		}
 	}
 
@@ -283,22 +316,27 @@ class Model implements IInteractiveModel implements IMutableModel
     // BH
     //================================================================================
 
-	public function boom(login:String)
+	public function playerCollided(login:String)
 	{
-		Abilities.hit(this, bhInfo.ability, bhTargets[login], bhInfo.caster, bhInfo.element, ++bhHitsTaken[login]);
+		boom(getUnit(login));
+	}
+
+	public function playerBHFinished(login:String)
+	{
+		bhOver(getUnit(login));
+	}
+
+	public function boom(coords:UnitCoords)
+	{
+		Abilities.hit(this, bhInfo.ability, coords, bhInfo.caster, bhInfo.element, ++bhHitsTaken[coords]);
 		if (!bothTeamsAlive())
 			end(defineWinner());
 	}
 
-	public function bhOver(login:String)
+	public function bhOver(coords:UnitCoords)
 	{
-		bhHitsTaken[login] = 0;
-		bhTargets.remove(login);
-		if (bhTargets.empty())
-		{
-			bhInfo = null;
-			postTurnProcess();
-		}
+		bhHitsTaken[coords] = 0;
+		strikeFinished(coords);
 	}
 
 	//Maybe some validity checkers
@@ -529,7 +567,7 @@ class Model implements IInteractiveModel implements IMutableModel
 		this.room = room;
 		this.units = new UPair(allies, enemies);
 		this.readyUnits = [];
-		this.bhHitsTaken = [for (u in allies.concat(enemies)) if (u.isPlayer()) u.playerLogin()=>0];
+		this.bhHitsTaken = [for (u in allies.concat(enemies)) UnitCoords.get(u) => 0];
 		this.patterns = new UPair([for (a in allies) new Map()], [for (e in enemies) new Map()]);
 		this.selectedPatterns = new UPair([for (a in allies) new Map<AbilityID, Int>()], [for (e in enemies) new Map<AbilityID, Int>()]);
 		for (u in units)

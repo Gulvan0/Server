@@ -12,6 +12,30 @@ class Point
 	}
 }
 
+class Vect
+{
+	public var dx:Float;
+	public var dy:Float;
+
+	public function length() 
+	{
+		return Math.sqrt(dx*dx + dy*dy);
+	}
+
+	public function normalize(?newLength:Int = 1) 
+	{
+		var coef = newLength/length();
+		dx *= coef;
+		dy *= coef;
+	}
+	
+	public function new(dx:Float, dy:Float)
+	{
+		this.dx = dx;
+		this.dy = dy;
+	}
+}
+
 class IntPoint
 {
 	public var i:Int;

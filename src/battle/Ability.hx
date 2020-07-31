@@ -1,4 +1,5 @@
 package battle;
+import battle.enums.AttackType;
 import managers.AbilityManager;
 import ID.AbilityID;
 import battle.enums.AbilityTarget;
@@ -54,7 +55,12 @@ class Ability
 
 	public function isBH():Bool
 	{
-		return AbilityManager.abilities.get(id).danmakuType != null;
+		return danmakuType() != null;
+	}
+
+	public function danmakuType():Null<AttackType>
+	{
+		return AbilityManager.abilities.get(id).danmakuType;
 	}
 	
 	public function new(id:AbilityID, level:Int) 

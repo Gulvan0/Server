@@ -22,7 +22,7 @@ class Units
 {
 	private static var model:IMutableModel;	
 	
-	//TODO: Fill
+	//TODO: [PvE Update] Fill
 	public static function getPattern(unit:UnitID, ability:AbilityID):String
 	{	
 		switch (unit)

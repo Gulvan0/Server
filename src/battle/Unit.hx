@@ -5,6 +5,7 @@ import battle.struct.BuffQueue;
 import battle.struct.FloatPool;
 import battle.struct.Pool;
 import battle.struct.Wheel;
+import battle.struct.DelayedPatternQueue;
 import ID.AbilityID;
 import ID.UnitID;
 import hxassert.Assert;
@@ -52,6 +53,7 @@ class Unit
 	public var manaPool(default, null):Pool;
 	public var alacrityPool(default, null):FloatPool;
 	public var buffQueue(default, null):BuffQueue;
+	public var delayedPatterns(default, null):DelayedPatternQueue;
 	
 	public var strength:Int;
 	public var flow:Int;
@@ -103,6 +105,7 @@ class Unit
 		this.intellect = params.intellect;
 		
 		this.buffQueue = subparams != null? subparams.buffQueue : new BuffQueue();
+		this.delayedPatterns = new DelayedPatternQueue();
 		
 		this.damageIn = subparams != null? subparams.damageIn : new Linear(1, 0);
 		this.damageOut = subparams != null? subparams.damageOut : new Linear(1, 0);

@@ -44,7 +44,7 @@ class AbilityParser
             for (prop in Reflect.fields(full))
             {
                 var id:AbilityID = AbilityID.createByName(prop);
-                var abilityObject = full.field(prop);
+                var abilityObject = Reflect.field(full, prop);
                 abilities.set(id, initAbility(abilityObject, id, element));
             }
         }
@@ -61,8 +61,8 @@ class AbilityParser
         var description:Map<String, String> = [];
         var descObj = obj.field("description");
         for (prop in Reflect.fields(descObj))
-            description.set(prop, descObj.field(prop));
-        var type:AbilityType = AbilityType.createByName("type");
+            description.set(prop, Reflect.field(descObj, prop));
+        var type:AbilityType = AbilityType.createByName(obj.field("type"));
         var target:Null<AbilityTarget> = obj.hasField("target")? AbilityTarget.createByName(obj.field("target")) : null;
 
         var maxlvl:Int = obj.field("maxlvl");
@@ -96,8 +96,8 @@ class AbilityParser
             var props = obj.field("danmakuProps");
             Assert.assert(props.hasField("type"));
             Assert.assert(props.hasField("dispenser"));
-            danmakuType = props.field("type");
-            danmakuDispenser = cast props.field("dispenser");
+            danmakuType = AttackType.createByName(props.field("type"));
+            danmakuDispenser = DispenserType.createByName(props.field("dispenser"));
         }
         var aoe:Bool = false;
         if (obj.hasField("aoe"))

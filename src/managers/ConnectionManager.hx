@@ -173,16 +173,10 @@ class ConnectionManager
 				battleManager.getRoom(l).share(l, "BHTick", data);
 		});
 
-		server.events.on("BHVanish", function(data:Dynamic, sender:IConnection){
-			var l:Null<String> = getFighting(sender);
-			if (l != null)
-				battleManager.getRoom(l).share(l, "BHVanish", data);
-		});
-
 		server.events.on("BHBoom", function(data:Dynamic, sender:IConnection){
 			var l:Null<String> = getFighting(sender);
 			if (l != null)
-				battleManager.getModel(l).boom(l);
+				battleManager.getModel(l).playerCollided(l);
 		});
 
 		server.events.on("BHFinished", function(data:Dynamic, sender:IConnection){
@@ -196,7 +190,7 @@ class ConnectionManager
 					{
 						server.events.remove("DemoClosed");
 						sender.send("BHCloseGame");
-						battleManager.getModel(l).bhOver(l);
+						battleManager.getModel(l).playerBHFinished(l);
 					}
 				});
 				battleManager.getRoom(l).share(l, "BHCloseDemo");

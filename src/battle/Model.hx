@@ -290,7 +290,7 @@ class Model implements IInteractiveModel implements IMutableModel
 		{
 			delayedQueue.flush();
 			for (o in observers) o.abStriked(target, caster, ability.id, ability.type, ability.element, pattern);
-			//TODO: Bot danamku
+			//TODO: [PvE Update] Bot danamku
 		}
 		else 
 		{

@@ -1,4 +1,5 @@
 package managers;
+import haxe.Json;
 import sys.io.FileOutput;
 import sys.FileSystem;
 import haxe.crypto.Md5;
@@ -76,71 +77,57 @@ class LoginManager
 	
 	private function register(pair:LoginPair, c:IConnection):Bool
 	{
+		if (pair.login.length >= 2)
+		{
+			c.send("SmallLogin");
+			return false;
+		}
+
 		if (getLogin(c) != null)
 		{
 			c.send("AlreadyLogged");
 			return false;
 		}
-			
-		var content:String = File.getContent(loginPath());
-		//TODO: xml->json
-		for (p in Xml.parse(content).elementsNamed("player"))
-			if (p.get("login").toLowerCase() == pair.login.toLowerCase())
-			{
-				c.send("AlreadyRegistered");
-				return false;
-			}
 		
-		if (pair.login.length >= 2)
+		var l = pair.login.toLowerCase();
+		var listPath:String = Main.playersDir + "list.json";	
+		var content:String = File.getContent(listPath);
+		var list:Dynamic = Json.parse(content);
+		
+		if (Reflect.hasField(list, l))
 		{
-			File.saveContent(loginPath(), content + "\n<player login=\"" + pair.login.toLowerCase() + "\">" + Md5.encode(pair.password) + "</player>");
-			createPlayer(pair.login);
-			Sys.println('(J/L) Registered ${pair.login}');
-			return true;
+			c.send("AlreadyRegistered");
+			return false;
 		}
-		else
-		{
-			c.send("SmallLogin");
-			return false;	
-		}
+		
+		Reflect.setField(list, l, Md5.encode(pair.password));
+		File.saveContent(listPath, Json.stringify(list, null, "\t"));
+		createPlayer(pair.login);
+		Sys.println('(J/L) Registered ${pair.login}');
+		return true;
 	}
 
 	private function createPlayer(login:String)
 	{
-		var str:String = File.getContent(Main.playersDir + "d.xml");
-		str = strReplace(str, "dname", login);
-		str = strReplace(str, "dabp", "" + GameRules.initialAbilityPoints);
-		str = strReplace(str, "dattp", "" + GameRules.initialAttributePoints);
-		var fo:FileOutput = File.write(Main.playersDir + login.toLowerCase() + ".xml");
-		fo.writeString(str);
-		fo.close();
+		var l = login.toLowerCase();
+		var path = Main.playersDir + l + "\\";
+		FileSystem.createDirectory(path + "patterns\\");
+
+		var str:String = File.getContent(Main.playersDir + "default.json");
+		str = str.replace('dname', login);
+		str = str.replace('"dabp"', "" + GameRules.initialAbilityPoints);
+		str = str.replace('"dattp"', "" + GameRules.initialAttributePoints);
+		File.saveContent(path + l + ".json", str);
 	}
 	
 	private function checkPassword(pair:LoginPair):Bool
 	{
-		var xml:Xml = Xml.parse(File.getContent(loginPath()));
+		var list = Json.parse(File.getContent(Main.playersDir + "list.json"));
 		
-		for (p in xml.elementsNamed("player"))
-		{
-			if (p.get("login") == pair.login.toLowerCase())
-				return Md5.encode(pair.password) == p.firstChild().nodeValue;
-		}
-		
-		return false;
-	}
-	
-	private static function loginPath():String
-	{
-		return Main.playersDir + "playerslist.xml";
-	}
-
-	private static function strReplace(str:String, sub:String, by:String):String
-	{
-		var a:Array<String> = str.split(sub);
-		str = a[0];
-		for (i in 1...a.length)
-			str += by + a[i];
-		return str;
+		if (Reflect.hasField(list, pair.login.toLowerCase()))
+			return Md5.encode(pair.password) == Reflect.field(list, pair.login.toLowerCase());
+		else
+			return false;
 	}
 	
 	public function new() 

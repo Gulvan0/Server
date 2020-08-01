@@ -9,7 +9,6 @@ import sys.io.File;
 using StringTools;
 
 /**
- * ...
  * @author gulvan
  */
 class LoginManager 
@@ -36,8 +35,13 @@ class LoginManager
 	
 	public function sendPlPrData(c:IConnection)
 	{
-		//TODO: Fill
-		c.send("PlayerProgressData", null);
+		var l = getLogin(c);
+		if (l == null)
+			return;
+
+		var path = Main.playersDir + l + "\\" + l + ".json";
+		if (FileSystem.exists(path))
+			c.send("PlayerProgressData", File.getContent(path));
 	}
 	
 	public function login(data:LoginPair, c:IConnection)
@@ -45,6 +49,7 @@ class LoginManager
 		if (getLogin(c) == null && getConnection(data.login) == null)
 			if (checkPassword(data))
 			{
+				PlayerdataManager.instance.loadPlayer(data.login);
 				logins[c.getContext().peerToString()] = data.login;
 				connections[data.login] = c;
 				c.send("LoggedIn");
@@ -64,6 +69,7 @@ class LoginManager
 			return;
 		
 		var l:String = logins[peer];
+		PlayerdataManager.instance.unloadPlayer(l);
 		logins.remove(peer);
 		connections.remove(l);
 		Sys.println('(J/L) $l disconnected');

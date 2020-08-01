@@ -104,12 +104,13 @@ class BattleManager
 	
 	private function createEnemyArray(zone:Zone, stage:Int):Array<Unit>
 	{
-		var enemyIDs:Array<UnitID> = XMLUtils.parseStage(zone, stage);
+		//TODO: [Conquest update] Rewrite
+		/*var enemyIDs:Array<UnitID> = XMLUtils.parseStage(zone, stage);
 		var enemies:Array<Unit> = [];
 		for (i in 0...enemyIDs.length)
-			enemies.push(new Unit(enemyIDs[i], Team.Right, i));
+			enemies.push(new Unit(enemyIDs[i], Team.Right, i));*/
 			
-		return enemies;
+		return [];
 	}
 	
 	private static function loadUnit(login:String, team:Team, pos:Int):Unit

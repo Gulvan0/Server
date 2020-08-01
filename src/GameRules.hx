@@ -1,7 +1,7 @@
 package;
 
-import roaming.enums.Attribute;
 import hxassert.Assert;
+import battle.enums.Attribute;
 
 enum BattleOutcome
 {

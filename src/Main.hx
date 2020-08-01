@@ -3,7 +3,6 @@ package;
 import managers.AbilityManager;
 import managers.LoginManager;
 import MathUtils.IntPoint;
-import roaming.enums.Attribute;
 import GameRules.BattleOutcome;
 import battle.IInteractiveModel;
 import battle.Model;

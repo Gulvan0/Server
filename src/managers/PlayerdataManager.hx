@@ -1,7 +1,7 @@
 package managers;
 
+import battle.enums.Attribute;
 import battle.Unit.ParameterList;
-import roaming.enums.Attribute;
 import managers.AbilityManager.TreePos;
 import haxe.Json;
 import sys.thread.Thread;

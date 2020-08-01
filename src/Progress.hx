@@ -8,7 +8,8 @@ import battle.struct.Pool;
 class Progress 
 {
 	
-	public var progress:Map<Zone, Pool>;
+	//TODO: [Conquest update] Rewrite
+	/*public var progress:Map<Zone, Pool>;
 	public var currentZone(default, set):Zone;
 	
 	public function new(prog:Map<Zone, Int>, current:Zone) 
@@ -45,6 +46,6 @@ class Progress
 			return currentZone = value;
 		else
 			throw "Attempt to get to the locked zone";
-	}
+	}*/
 	
 }

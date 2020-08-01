@@ -1,4 +1,4 @@
-package roaming.enums;
+package battle.enums;
 
 /**
  * @author Gulvan

@@ -1,6 +1,7 @@
 package;
 
 import managers.AbilityManager;
+import managers.BuffManager;
 import managers.LoginManager;
 import MathUtils.IntPoint;
 import GameRules.BattleOutcome;
@@ -45,6 +46,8 @@ class Main
 		gamedataDir = getGamedataDir();
 		Sys.println("Reading abilities");
 		AbilityManager.init();
+		Sys.println("Reading buffs");
+		BuffManager.init();
 		Sys.println("Initializing connection");
 		ConnectionManager.init();
 	}

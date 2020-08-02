@@ -58,7 +58,7 @@ class EffectHandler implements IModelObserver
 	private function procBuffs(e:BattleEvent, unit:Unit, ?data:EffectData)
 	{
 		for (buff in unit.buffQueue.getTriggering(e))
-			Buffs.useBuff(model, buff.id, buff.owner, buff.caster, BuffMode.Proc, data);
+			Buffs.useBuff(model, buff.id, buff.owner, buff.caster, BuffMode.Proc, buff.properties, data);
 	}
 	
 	/* INTERFACE battle.IModelObserver */

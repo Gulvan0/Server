@@ -17,13 +17,14 @@ import haxe.Constraints.Function;
  
 class Buffs
 {
+	//TODO: Rewrite switch and implementations
 	private static var model:IMutableModel;
 	
 	private static var target:Unit;
 	private static var mode:BuffMode;
 	private static var data:EffectData;
 	
-	public static function useBuff(mod:IMutableModel, id:BuffID, targetCoords:UnitCoords, casterCoords:UnitCoords, m:BuffMode, ?procData:EffectData)
+	public static function useBuff(mod:IMutableModel, id:BuffID, targetCoords:UnitCoords, casterCoords:UnitCoords, m:BuffMode, properties:Map<String, String>, ?procData:EffectData)
 	{
 		Assert.require(m == BuffMode.Proc || procData == null);
 

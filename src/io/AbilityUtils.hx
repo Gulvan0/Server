@@ -32,7 +32,7 @@ class AbilityUtils
         }
     }
 
-    public static function retrieveImplicitName(ab:AbilityID):String
+    public static function retrieveImplicitName(ab:EnumValue):String
     {
         var contracted:String = ab.getName().substr(2);
         var full:String = "";

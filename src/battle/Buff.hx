@@ -1,10 +1,12 @@
 package battle;
+import managers.BuffManager;
 import ID.BuffID;
 import battle.data.Buffs;
 import battle.data.Passives.BattleEvent;
 import battle.enums.BuffMode;
 import Element;
 import battle.struct.UnitCoords;
+using Lambda;
 
 class LightweightBuff
 {
@@ -12,6 +14,7 @@ class LightweightBuff
 	public var name:String;
 	public var description:String;
 	public var element:Element;
+	public var properties:Map<String, String>;
 	
 	public var duration:Int;
 	
@@ -33,9 +36,9 @@ class Buff
 	public var name(default, null):String;
 	public var description(default, null):String;
 	public var element(default, null):Element;
-	public var isOverTime(default, null):Bool;
-	public var isStackable(default, null):Bool;
+	public var flags(default, null):Array<BuffFlag>;
 	public var triggers(default, null):Array<BattleEvent>;
+	public var properties(default, null):Map<String, String>;
 	
 	public var owner(default, null):UnitCoords;
 	public var caster(default, null):UnitCoords;
@@ -50,6 +53,7 @@ class Buff
 		lb.description = description;
 		lb.element = element;
 		lb.duration = duration;
+		lb.properties = properties;
 		return lb;
 	}
 	
@@ -63,7 +67,7 @@ class Buff
 	
 	public function tickAndCheckEnded():Bool
 	{
-		if (isOverTime)
+		if (flags.has(BuffFlag.Overtime))
 			act(BuffMode.OverTime);
 		duration--;
 		
@@ -82,20 +86,20 @@ class Buff
 	
 	private function act(mode:BuffMode)
 	{
-		Buffs.useBuff(model, id, owner, caster, mode);
+		Buffs.useBuff(model, id, owner, caster, mode, properties);
 	}
 	
-	public function new(m:Model, id:BuffID, duration:Int, target:UnitCoords, caster:UnitCoords) 
+	public function new(m:Model, id:BuffID, duration:Int, target:UnitCoords, caster:UnitCoords, ?properties:Map<String, String>) 
 	{
+		var buffObj = BuffManager.buffs.get(id);
 		this.model = m;
 		this.id = id;
-		//TODO:Fill
-		/*this.name = XMLUtils.parseBuff(id, "name", "");
-		this.description = XMLUtils.parseBuff(id, "description", "");
-		this.element = XMLUtils.parseBuff(id, "element", Element);
-		this.isOverTime = XMLUtils.parseBuff(id, "isOverTime", true);
-		this.isStackable = XMLUtils.parseBuff(id, "isStackable", true);
-		this.triggers = XMLUtils.parseTriggers(id); */
+		this.properties = properties == null? [] : properties;
+		this.name = buffObj.name;
+		this.description = buffObj.rawDesc;
+		this.element = buffObj.element;
+		this.flags = buffObj.flags;
+		this.triggers = buffObj.triggers;
 		
 		this.owner = target;
 		this.caster = caster;

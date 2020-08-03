@@ -33,24 +33,55 @@ class Buffs
 		mode = m;
 		data = procData;
 		
-		switch (id)
-		{
-			case LgConductivity:
-				conductivity();
-			case LgCharged:
-				charged();
-			case LgStrikeback:
-				strikeback();
+		switch id {
+			case LgCharged: charged();
+			case LgReEnergizing: reenergizing();
+			case LgEnergyBarrier: energyBarrier();
 			case LgClarity:
-				clarity();
 			case LgSnared:
-				snared();
-			case LgEnergized:
-				energized();
-			case LgReenergizing:
-				reenergizing();
+			case LgStrikeback:
+			case LgReboot:
+			case LgMagnetized:
+			case LgManaShiftPos:
+			case LgManaShiftNeg:
+			case LgLightningShield:
+			case LgBlessed:
+			case LgDCForm:
+			case LgACForm:
+		}
+	}
+	
+	private static function charged()
+	{
+		switch (mode)
+		{
+			case BuffMode.Cast:
+				target.flow = Math.round(target.flow * 1.5);
+			case BuffMode.End:
+				target.flow = Math.round(target.flow / 1.5);
 			default:
-				throw "Buffs->useBuff() exception: Invalid ID: " + id.getName();
+		}
+	}
+
+	private static function reenergizing()
+	{
+		switch (mode)
+		{
+			case BuffMode.OverTime:
+				model.changeMana(UnitCoords.get(target), UnitCoords.get(target), 5, Source.Buff);
+			default:
+		}
+	}
+
+	private static function energyBarrier()
+	{
+		switch (mode)
+		{
+			case BuffMode.Cast:
+				target.shields.addImpenetrable();
+			case BuffMode.End:
+				target.shields.removeImpenetrable();
+			default:
 		}
 	}
 	
@@ -69,28 +100,14 @@ class Buffs
 		}
 	}
 	
-	private static function charged()
-	{
-		switch (mode)
-		{
-			case BuffMode.Cast:
-				target.flow *= 2;
-			case BuffMode.End:
-				target.flow = Math.round(target.flow / 2);
-			default:
-		}
-	}
-	
 	private static function clarity()
 	{
-		var modifier:Linear = new Linear(1, 0.5);
-		
 		switch (mode)
 		{
 			case BuffMode.Cast:
-				target.critChance.combine(modifier);
+				target.changeCritChance(0.5);
 			case BuffMode.End:
-				target.critChance.detach(modifier);
+				target.changeCritChance(-0.5);
 			default:
 		}
 	}
@@ -133,16 +150,6 @@ class Buffs
 				target.flow = target.flow * 2;
 			case BuffMode.Proc:
 				target.buffQueue.dispellOneByID(LgSnared);
-			default:
-		}
-	}
-	
-	private static function reenergizing()
-	{
-		switch (mode)
-		{
-			case BuffMode.OverTime:
-				model.changeMana(UnitCoords.get(target), UnitCoords.get(target), 20, Source.Buff);
 			default:
 		}
 	}

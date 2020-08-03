@@ -1,4 +1,5 @@
 package battle.struct;
+import managers.BuffManager.BuffFlag;
 import ID.BuffID;
 import battle.Buff;
 import battle.Model;
@@ -6,6 +7,7 @@ import battle.data.Passives.BattleEvent;
 import hxassert.Assert;
 import Element;
 import MathUtils;
+using Lambda;
 
 /**
  * Represents a unit's queue of buffs
@@ -21,40 +23,33 @@ class BuffQueue
 	{
 		var index:Int = indexOfBuff(buff.id);
 		
-		if (index == -1 || buff.isStackable)
+		if (index == -1 || buff.flags.has(Stackable))
 		{
 			queue.push(buff);
-			trace ("Buff casted: " + buff.name);
 			buff.onCast();
-			trace ("Buff activated");
 			newBuffs++;
 		}
 		else
-		{
 			queue[index] = buff;
-			trace("Buff updated: " + buff.name);
-		}
 	}
 	
 	public function tick()
 	{
-		var i:Int = queue.length - 1;
-		while (i >= 0)
+		var i:Int = 0;
+		while (i < queue.length)
 		{
-			trace("Ticking: " + queue[i].name + ", duration: " + queue[i].duration + "(-1 now)");
 			if (queue[i].tickAndCheckEnded())
-			{
 				dispellBuff(i);
-				trace ("Dispelled");
-			}
-			i--;
+			else
+				i++;
 		}
 		newBuffs = 0;
 	}
 	
 	public function getTriggering(e:BattleEvent):Array<Buff>
 	{
-		return [for (b in queue.slice(0, queue.length - newBuffs)) if (b.reactsTo(e)) b];
+		var activatedBuffs = queue.slice(0, queue.length - newBuffs);
+		return activatedBuffs.filter(b -> b.reactsTo(e));
 	}
 	
 	public function dispellOneByID(id:BuffID)
@@ -73,41 +68,50 @@ class BuffQueue
 			ind = indexOfBuff(id);
 		}
 	}
-	
-	public function dispellByElement(?elements:Array<Element>, ?count:Int = -1)
+
+	public function stunCondition():Bool 
 	{
-		Assert.assert(count > 0 || count == -1);
+		for (buff in queue)
+			if (buff.flags.has(Stun))
+				return true;
+		return false;
+	}
+
+	/**
+	 * If elements == null, buffs are dispelled irrespective of their elements
+	 * If count == null, every matching buff is dispelled
+	**/
+	public function dispellByElement(?elements:Array<Element>, ?count:Null<Int>)
+	{
+		Assert.assert(count == null || count > 0);
 		
 		var candidates:Array<Buff> = new Array<Buff>();
 		
 		if (elements == null)
 			candidates = queue;
 		else
-			for (buff in queue)
-				for (element in elements)
-					if (buff.element == element)
-					{
-						candidates.push(buff);
-						break;
-					}
-					
+			candidates = queue.filter(b -> elements.has(b.element));
 		
-		if (count == -1)
+		if (count == null)
 			count = candidates.length;
 				
 		if (count < candidates.length)
 			for (i in 0...count)
-				dispellBuff(MathUtils.randomInt(0, candidates.length));
+			{
+				var localInd = MathUtils.randomInt(0, candidates.length);
+				var globalInd = indexOfBuff(candidates[localInd].id);
+				dispellBuff(globalInd);
+				candidates.splice(localInd, 1);
+			}
 		else
-			for (i in 0...candidates.length)
-				dispellBuff(0);
+			for (buff in candidates)
+				dispellBuff(indexOfBuff(buff.id));
 	}
 	
 	private function dispellBuff(index:Int)
 	{
 		if (index >= 0)
 		{
-			trace ("Dispelled buff: " + queue[index].name);
 			queue[index].onEnd();
 			queue.splice(index, 1);
 		}

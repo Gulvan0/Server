@@ -155,12 +155,10 @@ class Model implements IInteractiveModel implements IMutableModel
 		if (source != Source.God)
 		{	
 			dhp = Utils.calcBoost(dhp, caster, target);
-			
-			if (Utils.flipCrit(caster))
-			{
-				crit = true;
-				dhp = Utils.calcCrit(dhp, caster);
-			}
+			dhp = caster.rollCrit(dhp);
+
+			if (dhp < 0)
+				dhp = -target.shields.penetrate(-dhp);
 		}
 
 		target.hpPool.value += dhp;	

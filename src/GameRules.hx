@@ -23,6 +23,9 @@ class GameRules
     public static var basicHP:Int = -50;
     public static var basicMana:Int = 80;
 
+    public static var basicCritChance:Float = 0.1;
+    public static var basicCritMultiplier:Float = 1.5;
+
     public static var treeWidth:Int = 4;
     public static var treeHeight:Int = 3;
 

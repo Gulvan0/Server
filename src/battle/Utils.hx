@@ -7,16 +7,6 @@ import battle.enums.AbilityType;
  */
 class Utils 
 {
-
-	public static function calcCrit(dhp:Int, caster:Unit):Int
-	{
-		return Math.round(caster.critDamage.apply(dhp));
-	}
-	
-	public static function flipCrit(caster:Unit):Bool
-	{
-		return Math.random() < caster.critChance.apply(1);
-	}
 	
 	public static function calcBoost(dhp:Int, caster:Unit, target:Unit):Int
 	{

@@ -2,6 +2,7 @@ package battle;
 import battle.enums.Team;
 import battle.enums.UnitType;
 import battle.struct.BuffQueue;
+import battle.struct.ShieldQueue;
 import battle.struct.FloatPool;
 import battle.struct.Pool;
 import battle.struct.Wheel;
@@ -26,7 +27,7 @@ typedef ParameterList = {
 typedef SubordinaryParameterList = {
 	var buffQueue:BuffQueue;
 	
-	var critChance:Linear;
+	var critChance:Float;
 	var critDamage:Linear;
 	var damageIn:Linear;
 	var damageOut:Linear;
@@ -54,6 +55,7 @@ class Unit
 	public var alacrityPool(default, null):FloatPool;
 	public var buffQueue(default, null):BuffQueue;
 	public var delayedPatterns(default, null):DelayedPatternQueue;
+	public var shields(default, null):ShieldQueue;
 	
 	public var strength:Int;
 	public var flow:Int;
@@ -63,7 +65,7 @@ class Unit
 	public var damageOut:Linear;
 	public var healIn:Linear;
 	public var healOut:Linear;
-	public var critChance:Linear;
+	public var critChance(default, null):Float;
 	public var critDamage:Linear;
 	
 	public function tick()
@@ -71,15 +73,27 @@ class Unit
 		wheel.tick();
 		buffQueue.tick();
 	}
+
+	public function changeCritChance(delta:Float) 
+	{
+		critChance += delta;
+	}
 	
 	public function isStunned():Bool
 	{
-		return false;
+		return buffQueue.stunCondition();
 	}
 	
 	public function isAlive():Bool
 	{
 		return hpPool.value > 0;
+	}
+
+	public function rollCrit(dhp:Int):Int
+	{
+		if (Math.random() < critChance)
+			return Math.round(critDamage.apply(Math.abs(dhp))) * MathUtils.sign(dhp);
+		return dhp;
 	}
 	
 	public function new(id:UnitID, team:Team, position:Int, ?params:Null<ParameterList>, ?subparams:Null<SubordinaryParameterList>) 
@@ -87,7 +101,7 @@ class Unit
 		Assert.assert(position >= 0 && position <= 2);
 		
 		/*if (params == null)
-			params = XMLUtils.parseUnit(id);*///TODO: Update
+			params = XMLUtils.parseUnit(id);*///TODO: [PvE Update] Rewrite
 		this.id = id;
 		this.name = params.name;
 		this.element = params.element;
@@ -106,14 +120,15 @@ class Unit
 		
 		this.buffQueue = subparams != null? subparams.buffQueue : new BuffQueue();
 		this.delayedPatterns = new DelayedPatternQueue();
+		this.shields = new ShieldQueue();
 		
 		this.damageIn = subparams != null? subparams.damageIn : new Linear(1, 0);
 		this.damageOut = subparams != null? subparams.damageOut : new Linear(1, 0);
 		this.healIn = subparams != null? subparams.healIn : new Linear(1, 0);
 		this.healOut = subparams != null? subparams.healOut : new Linear(1, 0);
 		
-		this.critChance = subparams != null? subparams.critChance : new Linear(0, 0);
-		this.critDamage = subparams != null? subparams.critDamage : new Linear(1, 0);
+		this.critChance = subparams != null? subparams.critChance : GameRules.basicCritChance;
+		this.critDamage = subparams != null? subparams.critDamage : new Linear(GameRules.basicCritMultiplier, 0);
 	}
 	
 	public function figureRelation(unit:Unit):UnitType

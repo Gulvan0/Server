@@ -26,6 +26,9 @@ class GameRules
     public static var basicCritChance:Float = 0.1;
     public static var basicCritMultiplier:Float = 1.5;
 
+    public static var baseMissChance:Float = 0.02;
+    public static var missChancePerDeltaIn:Float = 0.0017;
+
     public static var treeWidth:Int = 4;
     public static var treeHeight:Int = 3;
 

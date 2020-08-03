@@ -1,4 +1,5 @@
 package battle.data;
+import battle.data.Passives.BattleEvent;
 import hxassert.Assert;
 import battle.EffectHandler.EffectData;
 import ID.BuffID;
@@ -17,16 +18,15 @@ import haxe.Constraints.Function;
  
 class Buffs
 {
-	//TODO: Rewrite switch and implementations
 	private static var model:IMutableModel;
 	
 	private static var target:Unit;
 	private static var mode:BuffMode;
 	private static var data:EffectData;
 	
-	public static function useBuff(mod:IMutableModel, id:BuffID, targetCoords:UnitCoords, casterCoords:UnitCoords, m:BuffMode, properties:Map<String, String>, ?procData:EffectData)
+	public static function useBuff(mod:IMutableModel, id:BuffID, targetCoords:UnitCoords, casterCoords:UnitCoords, m:BuffMode, properties:Map<String, String>, ?procData:EffectData, ?procCause:BattleEvent)
 	{
-		Assert.require(m == BuffMode.Proc || procData == null);
+		Assert.require(m == BuffMode.Proc || (procData == null && procCause == null));
 
 		model = mod;
 		target = model.getUnits().get(targetCoords);
@@ -39,15 +39,15 @@ class Buffs
 			case LgEnergyBarrier: energyBarrier();
 			case LgClarity: clarity();
 			case LgSnared: snared();
-			case LgStrikeback:
-			case LgReboot:
-			case LgMagnetized:
-			case LgManaShiftPos:
-			case LgManaShiftNeg:
-			case LgLightningShield:
-			case LgBlessed:
-			case LgDCForm:
-			case LgACForm:
+			case LgStrikeback: strikeback(properties);
+			case LgReboot: reboot(properties);
+			case LgMagnetized: return;
+			case LgManaShiftPos: manaShiftPos(properties);
+			case LgManaShiftNeg: manaShiftNeg(properties);
+			case LgLightningShield: lightningShield(properties, procCause);
+			case LgBlessed: blessed();
+			case LgDCForm: dcForm(properties);
+			case LgACForm: acForm(properties);
 		}
 	}
 	
@@ -113,27 +113,129 @@ class Buffs
 		}
 	}
 	
-	private static function strikeback()
+	private static function strikeback(properties:Map<String, String>)
 	{
-		var modifier:Linear = new Linear(2, 0);
-		
+		Assert.require(properties.exists("mul"));
+		var mul:Float = Std.parseFloat(properties.get("mul"));
+
+		var modifier:Linear = new Linear(mul, 0);
 		switch (mode)
 		{
 			case BuffMode.Cast:
-				target.critDamage.combine(modifier);
+				target.damageOut.combine(modifier);
 			case BuffMode.End:
-				target.critDamage.detach(modifier);
+				target.damageOut.detach(modifier);
 			default:
 		}
 	}
 	
-	private static function energized()
+	private static function reboot(properties:Map<String, String>)
 	{
-		var modifier:Linear = new Linear(2, 0);
+		Assert.require(properties.exists("hpregen%"));
+		var hpregenpercentage:Float = Std.parseFloat(properties.get("hpregen%"));
+		var hpRegen:Int = Math.round(hpregenpercentage * target.hpPool.maxValue);
+		
+		switch (mode)
+		{
+			case BuffMode.OverTime:
+				var ownerCoords = UnitCoords.get(target);
+				model.changeHP(ownerCoords, ownerCoords, hpRegen, Element.Lightning, Source.Buff);
+			default:
+		}
+	}
+
+	private static function manaShiftPos(properties:Map<String, String>)
+	{
+		Assert.require(properties.exists("mana"));
+		var mana:Int = Math.round(Std.parseFloat(properties.get("mana")));
+		
+		switch (mode)
+		{
+			case BuffMode.OverTime:
+				var ownerCoords = UnitCoords.get(target);
+				model.changeMana(ownerCoords, ownerCoords, mana, Source.Buff);
+			default:
+		}
+	}
+
+	private static function manaShiftNeg(properties:Map<String, String>)
+	{
+		Assert.require(properties.exists("mana"));
+		var mana:Int = Math.round(Std.parseFloat(properties.get("mana")));
+		
+		switch (mode)
+		{
+			case BuffMode.OverTime:
+				var ownerCoords = UnitCoords.get(target);
+				model.changeMana(ownerCoords, ownerCoords, -mana, Source.Buff);
+			default:
+		}
+	}
+
+	private static function lightningShield(properties:Map<String, String>, cause:BattleEvent)
+	{
+		Assert.require(properties.exists("chanceIn") && properties.exists("chanceOut") && properties.exists("dam"));
+		var chanceIn:Float = Std.parseInt(properties.get("chanceIn")) / 100;
+		var chanceOut:Float = Std.parseInt(properties.get("chanceOut")) / 100;
+		var damage:Int = Std.parseInt(properties.get("dam"));
+		
+		switch (mode)
+		{
+			case BuffMode.Proc:
+				if (cause == IncomingStrike && Math.random() < chanceIn)
+					model.changeHP(UnitCoords.get(data.caster), UnitCoords.get(target), -damage, Element.Lightning, Source.Buff);
+				else if (cause == OutgoingStrike && Math.random() < chanceOut)
+					model.changeHP(UnitCoords.get(data.target), UnitCoords.get(target), -damage, Element.Lightning, Source.Buff);
+			default:
+		}
+	}
+
+	private static function blessed()
+	{
+		var multiplier:Float = Math.POSITIVE_INFINITY;
+		switch (mode)
+		{
+			case BuffMode.Cast:
+				target.accuracyMultipliers.push(multiplier);
+			case BuffMode.End:
+				target.accuracyMultipliers.remove(multiplier);
+			default:
+		}
+	}
+
+	private static function dcForm(properties:Map<String, String>)
+	{
+		Assert.require(properties.exists("mregen") && properties.exists("daminc"));
+		var mregen:Int = Std.parseInt(properties.get("mregen"));
+		var daminc:Float = Std.parseInt(properties.get("daminc")) / 100;
+		var modifier:Linear = new Linear(daminc, 0);
 		
 		switch (mode)
 		{
 			case BuffMode.Cast:
+				target.damageOut.combine(modifier);
+			case BuffMode.OverTime:
+				var ownerCoords = UnitCoords.get(target);
+				model.changeMana(ownerCoords, ownerCoords, mregen, Source.Buff);
+			case BuffMode.End:
+				target.damageOut.detach(modifier);
+			default:
+		}
+	}
+
+	private static function acForm(properties:Map<String, String>)
+	{
+		Assert.require(properties.exists("mregen") && properties.exists("daminc"));
+		var mpenalty:Float = Std.parseInt(properties.get("daminc")) / 100;
+		var daminc:Float = Std.parseInt(properties.get("daminc")) / 100;
+		var modifier:Linear = new Linear(daminc, 0);
+		var absolutePenalty:Int = Math.round(mpenalty*target.manaPool.maxValue);
+		
+		switch (mode)
+		{
+			case BuffMode.Cast:
+				var ownerCoords = UnitCoords.get(target);
+				model.changeMana(ownerCoords, ownerCoords, -absolutePenalty, Source.Buff);
 				target.damageOut.combine(modifier);
 			case BuffMode.End:
 				target.damageOut.detach(modifier);

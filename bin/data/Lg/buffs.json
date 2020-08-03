@@ -39,7 +39,7 @@
         "flags": ["overtime", "stackable"]
     },
     "LgLightningShield": {
-        "description": "Every unit that attacks this shield's owner has a `ch1`% chance to recieve `dam` damage. The owner also has a `ch2`% chance to deal `dam` additional damage to the target",
+        "description": "Every unit that attacks this shield's owner has a `chanceIn`% chance to recieve `dam` damage. The owner also has a `chanceOut`% chance to deal `dam` additional damage to the target",
         "triggers": ["IncomingStrike", "OutgoingStrike"]
     },
     "LgBlessed": {

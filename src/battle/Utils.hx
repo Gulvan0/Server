@@ -1,6 +1,6 @@
 package battle;
 import battle.enums.AbilityType;
-
+using Lambda;
 
 /**
  * @author Gulvan
@@ -8,7 +8,7 @@ import battle.enums.AbilityType;
 class Utils 
 {
 	
-	public static function calcBoost(dhp:Int, caster:Unit, target:Unit):Int
+	public static function calcBoostedDHP(dhp:Int, caster:Unit, target:Unit):Int
 	{
 		var boostModifiers:Array<Linear>;
 		
@@ -23,12 +23,26 @@ class Utils
 	
 	public static function flipMiss(target:Unit, caster:Unit, ability:Active):Bool
 	{
-		var baseChance:Float = 0.02 + (target.intellect - caster.intellect) * 0.0017;
+		var baseMissChance:Float = GameRules.baseMissChance + (target.intellect - caster.intellect) * GameRules.missChancePerDeltaIn;
+		var baseHitChance:Float = 1 - baseMissChance;
+
+		if (caster.accuracyMultipliers.has(Math.POSITIVE_INFINITY))
+			if (caster.accuracyMultipliers.has(Math.NEGATIVE_INFINITY))
+				baseHitChance = 0.5;
+			else
+				baseHitChance = Math.POSITIVE_INFINITY;
+		else if (caster.accuracyMultipliers.has(Math.NEGATIVE_INFINITY))
+			baseHitChance = Math.NEGATIVE_INFINITY;
+		else
+			for (m in caster.accuracyMultipliers)
+				baseHitChance *= m;
+
+		var missChance:Float = 1 - baseHitChance;
 		return switch (ability.type)
 		{
-			case AbilityType.Bolt: 0.75 * baseChance >= Math.random();
+			case AbilityType.Bolt: 0.75 * missChance >= Math.random();
 			case AbilityType.Spell: false;
-			case AbilityType.Kick: baseChance >= Math.random();
+			case AbilityType.Kick: missChance >= Math.random();
 			default: false;
 		}
 	}

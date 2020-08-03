@@ -154,7 +154,7 @@ class Model implements IInteractiveModel implements IMutableModel
 		
 		if (source != Source.God)
 		{	
-			dhp = Utils.calcBoost(dhp, caster, target);
+			dhp = Utils.calcBoostedDHP(dhp, caster, target);
 			dhp = caster.rollCrit(dhp);
 
 			if (dhp < 0)

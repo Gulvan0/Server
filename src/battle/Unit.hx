@@ -73,6 +73,7 @@ class Unit
 	public var healOut:Linear;
 	public var critChance(default, null):Float;
 	public var critDamage:Linear;
+	public var accuracyMultipliers(default, null):Array<Float>;
 
 	public var strength(get, never):Int;
 	public function get_strength():Int
@@ -165,6 +166,8 @@ class Unit
 		
 		this.critChance = subparams != null? subparams.critChance : GameRules.basicCritChance;
 		this.critDamage = subparams != null? subparams.critDamage : new Linear(GameRules.basicCritMultiplier, 0);
+
+		this.accuracyMultipliers = [];
 	}
 	
 	public function figureRelation(unit:Unit):UnitType

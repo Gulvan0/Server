@@ -166,7 +166,7 @@ class Abilities
 	
 	private static function energize()
 	{
-		model.castBuff(LgReenergizing, UnitCoords.get(caster), UnitCoords.get(caster), 5);
+		model.castBuff(LgReEnergizing, UnitCoords.get(caster), UnitCoords.get(caster), 5);
 	}
 	
 	private static function disrupt()

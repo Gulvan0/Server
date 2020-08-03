@@ -430,9 +430,9 @@ class Model implements IInteractiveModel implements IMutableModel
 		var sum:Float = 0;
 		for (u in units.both)
 			if (checkAlive([u]))
-				sum += u.flow;
+				sum += u.speed;
 				
-		return unit.flow / sum;
+		return unit.speed / sum;
 	}
 	
 	//================================================================================

@@ -37,8 +37,8 @@ class Buffs
 			case LgCharged: charged();
 			case LgReEnergizing: reenergizing();
 			case LgEnergyBarrier: energyBarrier();
-			case LgClarity:
-			case LgSnared:
+			case LgClarity: clarity();
+			case LgSnared: snared();
 			case LgStrikeback:
 			case LgReboot:
 			case LgMagnetized:
@@ -53,12 +53,13 @@ class Buffs
 	
 	private static function charged()
 	{
+		var modifier:Linear = new Linear(1.5, 0);
 		switch (mode)
 		{
 			case BuffMode.Cast:
-				target.flow = Math.round(target.flow * 1.5);
+				target.flBonus.combine(modifier);
 			case BuffMode.End:
-				target.flow = Math.round(target.flow / 1.5);
+				target.flBonus.detach(modifier);
 			default:
 		}
 	}
@@ -85,21 +86,6 @@ class Buffs
 		}
 	}
 	
-	private static function conductivity()
-	{
-		var modifier:Linear = new Linear(1.5, 0);
-		switch (mode)
-		{
-			case BuffMode.Cast:
-				target.healIn.combine(modifier);
-				target.damageIn.combine(modifier);
-			case BuffMode.End:
-				target.healIn.detach(modifier);
-				target.damageIn.detach(modifier);
-			default:
-		}
-	}
-	
 	private static function clarity()
 	{
 		switch (mode)
@@ -108,6 +94,21 @@ class Buffs
 				target.changeCritChance(0.5);
 			case BuffMode.End:
 				target.changeCritChance(-0.5);
+			default:
+		}
+	}
+	
+	private static function snared()
+	{
+		var modifier:Linear = new Linear(0.2, 0);
+		switch (mode)
+		{
+			case BuffMode.Cast:
+				target.speedBonus.combine(modifier);
+			case BuffMode.End:
+				target.speedBonus.detach(modifier);
+			case BuffMode.Proc:
+				target.buffQueue.dispellOneByID(LgSnared);
 			default:
 		}
 	}
@@ -136,20 +137,6 @@ class Buffs
 				target.damageOut.combine(modifier);
 			case BuffMode.End:
 				target.damageOut.detach(modifier);
-			default:
-		}
-	}
-	
-	private static function snared()
-	{
-		switch (mode)
-		{
-			case BuffMode.Cast:
-				target.flow = Math.floor(target.flow / 2);
-			case BuffMode.End:
-				target.flow = target.flow * 2;
-			case BuffMode.Proc:
-				target.buffQueue.dispellOneByID(LgSnared);
 			default:
 		}
 	}

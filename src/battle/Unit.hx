@@ -57,16 +57,47 @@ class Unit
 	public var delayedPatterns(default, null):DelayedPatternQueue;
 	public var shields(default, null):ShieldQueue;
 	
-	public var strength:Int;
-	public var flow:Int;
-	public var intellect:Int;
+	private var _strength:Int;
+	private var _flow:Int;
+	private var _intellect:Int;
+	public var speed(get, never):Int;
 	
+	public var stBonus:Linear;
+	public var flBonus:Linear;
+	public var inBonus:Linear;
+	public var speedBonus:Linear;
+
 	public var damageIn:Linear;
 	public var damageOut:Linear;
 	public var healIn:Linear;
 	public var healOut:Linear;
 	public var critChance(default, null):Float;
 	public var critDamage:Linear;
+
+	public var strength(get, never):Int;
+	public function get_strength():Int
+	{
+		return Math.round(stBonus.apply(_strength));
+	}
+
+	public var flow(get, never):Int;
+	public function get_flow():Int
+	{
+		return Math.round(flBonus.apply(_flow));
+	}
+
+	public var intellect(get, never):Int;
+	public function get_intellect():Int
+	{
+		return Math.round(speedBonus.apply(_intellect));
+	}
+
+	public function get_speed():Int
+	{
+		return Math.round(speedBonus.apply(flow));
+	}
+
+	//==========================================================================================================
 	
 	public function tick()
 	{
@@ -114,9 +145,14 @@ class Unit
 		this.manaPool = new Pool(params.mana, params.mana);
 		this.alacrityPool = new FloatPool(0, 100);
 		
-		this.strength = params.strength;
-		this.flow = params.flow;
-		this.intellect = params.intellect;
+		this._strength = params.strength;
+		this._flow = params.flow;
+		this._intellect = params.intellect;
+
+		this.stBonus = new Linear(1, 0);
+		this.flBonus = new Linear(1, 0);
+		this.inBonus = new Linear(1, 0);
+		this.speedBonus = new Linear(1, 0);
 		
 		this.buffQueue = subparams != null? subparams.buffQueue : new BuffQueue();
 		this.delayedPatterns = new DelayedPatternQueue();

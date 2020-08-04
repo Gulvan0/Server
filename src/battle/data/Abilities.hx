@@ -45,7 +45,7 @@ class Abilities
 			case LgEnergize: energize(level);
 			case LgElectricalStorm: electricalStorm(level);
 			case LgDisrupt: disrupt(level);
-			case LgVoltSnare:
+			case LgVoltSnare: voltSnare(level);
 			case LgHighVoltage:
 			case LgArcFlash:
 			case LgThunderbirdSoul:
@@ -148,6 +148,22 @@ class Abilities
 		model.castBuff(LgClarity, cCoords, cCoords, 1);
 	} 
 
+	private static function voltSnare(level:Int)
+	{
+		var damage:Int = Math.round(1.35 * caster.intellect);
+		var duration:Array<Int> = [1, 2, 3];
+		
+		model.changeHP(UnitCoords.get(target), UnitCoords.get(caster), -damage, element, Source.Ability);
+		model.castBuff(LgSnared, UnitCoords.get(target), UnitCoords.get(caster), duration[level-1]);
+	}
+
+	private static function highVoltage(level:Int)
+	{
+		var damage:Int = Math.round(0.45 * caster.intellect);
+		
+		model.changeHP(UnitCoords.get(target), UnitCoords.get(caster), -damage, element, Source.Ability);
+	}
+
 	private static function arcFlash(?hitNumber:Int)
 	{
 		/*var expectedHits:Int = 2;
@@ -173,14 +189,6 @@ class Abilities
 		
 		model.changeHP(UnitCoords.get(target), UnitCoords.get(caster), delta, element, Source.Ability);
 		model.dispellBuffs(UnitCoords.get(target), [Element.Lightning]);
-	}
-	
-	private static function voltSnare()
-	{
-		var damage:Int = caster.intellect;
-		
-		model.changeHP(UnitCoords.get(target), UnitCoords.get(caster), -damage, element, Source.Ability);
-		model.castBuff(LgSnared, UnitCoords.get(target), UnitCoords.get(caster), 3);
 	}
 	
 	private static function empBlast()

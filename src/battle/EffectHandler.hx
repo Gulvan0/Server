@@ -128,13 +128,13 @@ class EffectHandler implements IModelObserver
 		}
 	}
 	
-	public function abStriked(target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element, pattern:String):Void 
+	public function abStriked(target:UnitCoords, caster:UnitCoords, ab:Ability, pattern:String):Void 
 	{
 		var t:Unit = getUnit(target);
 		var c:Unit = getUnit(caster);
-		var data:EffectData = new EffectData(t, c, null, element, null);
+		var data:EffectData = new EffectData(t, c, null, ab.element, null);
 		
-		procAbilities(BattleEvent.IncomingStrike, t, data);
+		procAbilities(BattleEvent.IncomingStrike, t, data); //TODO: Level?
 		procBuffs(BattleEvent.IncomingStrike, t, data);
 		procAbilities(BattleEvent.OutgoingStrike, c, data);
 		procBuffs(BattleEvent.OutgoingStrike, c, data);

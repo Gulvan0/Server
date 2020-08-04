@@ -290,14 +290,14 @@ class Model implements IInteractiveModel implements IMutableModel
 		if (danmakuType == AttackType.Instant)
 		{
 			delayedQueue.flush();
-			for (o in observers) o.abStriked(target, caster, ability.id, ability.type, ability.element, pattern);
+			for (o in observers) o.abStriked(target, caster, ability, pattern);
 			//TODO: [PvE Update] Bot danamku
 		}
 		else 
 		{
 			if (danmakuType == AttackType.Delayed)
 				delayedQueue.add(ability, pattern);
-			for (o in observers) o.abStriked(target, caster, ability.id, ability.type, ability.element, pattern);
+			for (o in observers) o.abStriked(target, caster, ability, pattern);
 			Abilities.hit(this, ability.id, ability.level, target, caster, ability.element);
 			strikeFinished(target);
 		}	

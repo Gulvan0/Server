@@ -17,7 +17,7 @@ typedef AlacUpdate = {target:UnitCoords, delta:Float, newV:Float}
 typedef MissDetails = {target:UnitCoords, element:Element}
 typedef DeathDetails = {target:UnitCoords}
 typedef ThrowDetails = {target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element}
-typedef StrikeDetails = {target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element, pattern:String}
+typedef StrikeDetails = {target:UnitCoords, caster:UnitCoords, id:AbilityID, level:Int, type:AbilityType, element:Element, pattern:String}
 typedef BuffQueueUpdate = {target:UnitCoords, queue:Array<LightweightBuff>}
 
 /**
@@ -91,10 +91,10 @@ class EventSender implements IModelObserver
 		room.broadcast("Throw", writer.write({target: target, caster: caster, id: id, type: type, element: element}));
 	}
 	
-	public function abStriked(target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element, pattern:String):Void 
+	public function abStriked(target:UnitCoords, caster:UnitCoords, ab:Ability, pattern:String):Void 
 	{
 		var writer = new JsonWriter<StrikeDetails>();
-		room.broadcast("Strike", writer.write({target: target, caster: caster, id: id, type: type, element: element, pattern: pattern}));
+		room.broadcast("Strike", writer.write({target: target, caster: caster, id: ab.id, level: ab.level, type: ab.type, element: ab.element, pattern: pattern}));
 	}
 	
 }

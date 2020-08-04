@@ -9,6 +9,12 @@ import Element;
 import MathUtils;
 using Lambda;
 
+enum BuffQueueState
+{
+	OwnersTurn;
+	OthersTurn;
+}
+
 /**
  * Represents a unit's queue of buffs
  * @author Gulvan
@@ -16,18 +22,37 @@ using Lambda;
 class BuffQueue
 {
 
-	public var queue(default, null):Array<Buff>;
-	private var newBuffs:Int;
+	public var queue(get, never):Array<Buff>;
+	private var activated:Array<Buff>;
+	private var notActivated:Array<Buff>;
+	public var state(default, set):BuffQueueState;
 	
+	public function get_queue():Array<Buff>
+	{
+		return activated.concat(notActivated);
+	}
+
+	public function set_state(v:BuffQueueState):BuffQueueState
+	{
+		if (state == OwnersTurn && v == OthersTurn)
+		{
+			activated = activated.concat(notActivated);
+			notActivated = [];
+		}
+		return state = v;
+	}
+
 	public function addBuff(buff:Buff)
 	{
 		var index:Int = indexOfBuff(buff.id);
 		
 		if (index == -1 || buff.flags.has(Stackable))
 		{
-			queue.push(buff);
+			if (state == OwnersTurn)
+				notActivated.push(buff);
+			else 
+				activated.push(buff);
 			buff.onCast();
-			newBuffs++;
 		}
 		else
 			queue[index] = buff;
@@ -36,20 +61,20 @@ class BuffQueue
 	public function tick()
 	{
 		var i:Int = 0;
-		while (i < queue.length)
+		while (i < activated.length)
 		{
-			if (queue[i].tickAndCheckEnded())
+			if (activated[i].tickAndCheckEnded())
 				dispellBuff(i);
 			else
 				i++;
 		}
-		newBuffs = 0;
+		for (buff in notActivated)
+			buff.overtimeWithoutTick();
 	}
 	
 	public function getTriggering(e:BattleEvent):Array<Buff>
 	{
-		var activatedBuffs = queue.slice(0, queue.length - newBuffs);
-		return activatedBuffs.filter(b -> b.reactsTo(e));
+		return activated.filter(b -> b.reactsTo(e));
 	}
 	
 	public function dispellOneByID(id:BuffID)
@@ -111,10 +136,17 @@ class BuffQueue
 	private function dispellBuff(index:Int)
 	{
 		if (index >= 0)
-		{
-			queue[index].onEnd();
-			queue.splice(index, 1);
-		}
+			if (index < activated.length)
+			{
+				activated[index].onEnd();
+				activated.splice(index, 1);
+			}
+			else 
+			{
+				var mergedIndex:Int = index - activated.length;
+				notActivated[mergedIndex].onEnd();
+				notActivated.splice(mergedIndex, 1);
+			}
 	}
 	
 	public function elementalCount(element:Element):Int
@@ -130,8 +162,9 @@ class BuffQueue
 	
 	public function new() 
 	{
-		queue = new Array<battle.Buff>();
-		newBuffs = 0;
+		activated = [];
+		notActivated = [];
+		state = OthersTurn;
 	}
 	
 	//We need separate function because we compare only by id. indexOf() thinks that buffs with different current durations are different 

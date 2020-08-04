@@ -14,7 +14,7 @@ interface IMutableModel
 	public function changeAlacrity(target:UnitCoords, caster:UnitCoords, dalac:Float, source:Source):Void;
 	
 	public function castBuff(id:BuffID, target:UnitCoords, caster:UnitCoords, duration:Int):Void;
-	public function dispellBuffs(target:UnitCoords, ?elements:Array<Element>, ?count:Int = -1):Void;
+	public function dispellBuffs(target:UnitCoords, ?elements:Array<Element>, ?count:Int):Void;
 	
 	public function getUnits():UPair<Unit>;
 }

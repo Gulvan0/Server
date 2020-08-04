@@ -188,7 +188,7 @@ class PlayerdataManager
             intellect: char.i
         };
     }
-    //? Add in alpha 5.0: getCompletedStageCount, canVisit, proceed, isAtBossStage
+    //TODO: [Conquest Update] getCompletedStageCount, canVisit, proceed, isAtBossStage
     
     //=====================================================================================================================================================
 

@@ -17,23 +17,19 @@ import battle.enums.Team;
  * @author Gulvan
  */
 typedef BotDecision = {target:UnitCoords, abilityNum:Int}
- 
+
+//TODO: [PvE Update] Implement getPattern() and decide()
 class Units 
 {
 	private static var model:IMutableModel;	
 	
-	//TODO: [PvE Update] Fill
 	public static function getPattern(unit:UnitID, ability:AbilityID):String
 	{	
 		switch (unit)
 		{
-			case Ghost, Archghost:
-				if (ability == BoGhostStrike)
-					return "";
 			default:
 				return "";
 		}
-		return "";
 	}
 
 	public static function decide(m:IMutableModel, id:UnitID):BotDecision
@@ -42,8 +38,6 @@ class Units
 		
 		switch (id)
 		{
-			case UnitID.Ghost, UnitID.Archghost:
-				return ghost();
 			default:
 				null;
 		}
@@ -51,7 +45,7 @@ class Units
 		throw "battle.data.Units->decide() exception: Invalid unit ID: " + id.getName();	
 	}
 	
-	private static function ghost():BotDecision
+	private static function straight():BotDecision
 	{
 		var target:UnitCoords = findWeakestUnit(model.getUnits().left);
 		

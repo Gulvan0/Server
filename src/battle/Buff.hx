@@ -67,11 +67,16 @@ class Buff
 	
 	public function tickAndCheckEnded():Bool
 	{
-		if (flags.has(BuffFlag.Overtime))
-			act(BuffMode.OverTime);
+		overtimeWithoutTick();
 		duration--;
 		
 		return (duration == 0)? true : false;
+	}
+
+	public function overtimeWithoutTick()
+	{
+		if (flags.has(BuffFlag.Overtime))
+			act(BuffMode.OverTime);
 	}
 	
 	public function onCast()

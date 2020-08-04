@@ -7,27 +7,27 @@ enum AbilityID
 {
 	//Lg abilities
 	LgLightningBolt;
-	LgStrikeback;
-	LgVoltSnare;
-	LgShockTherapy;
-	
-	LgArcFlash;
-	LgDisrupt;
+	LgCharge;
 	LgEnergize;
 	LgElectricalStorm;
 	
-	LgEMPBlast;
-	LgThunderbirdSoul;
-	LgCharge;
-	LgHighVoltage;
-
 	LgEnergyBarrier;
+	LgDisrupt;
+	LgVoltSnare;
+	LgHighVoltage;
+	
+	LgArcFlash;
+	LgThunderbirdSoul;
 	LgSparkle;
-	LgBallLightning;
 	LgAtomicOverload;
 
+	LgStrikeback;
 	LgWarp;
+	LgShockTherapy;
+	LgBallLightning;
+
 	LgDash;
+	LgEMPBlast;
 	LgReboot;
 	LgSwiftnessAura;
 
@@ -42,7 +42,7 @@ enum AbilityID
 	LgACForm;
 	
 	//Bot abilities
-	BoGhostStrike;
+	//...
 
 	//Special
 	EmptyAbility;
@@ -53,8 +53,6 @@ enum AbilityID
 enum UnitID 
 {
 	Player(id:String);
-	Ghost;
-	Archghost;
 }
 	
 enum BuffID 

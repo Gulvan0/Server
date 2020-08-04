@@ -1,4 +1,5 @@
 package battle;
+import hxassert.Assert;
 import battle.enums.AttackType;
 import managers.AbilityManager;
 import ID.AbilityID;
@@ -65,6 +66,7 @@ class Ability
 	
 	public function new(id:AbilityID, level:Int) 
 	{
+		Assert.require(level > 0);
 		this.id = id;
 		this.level = level;
 		if (!checkEmpty())

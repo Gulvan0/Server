@@ -1,4 +1,6 @@
 package battle;
+import hxassert.Assert;
+import battle.struct.BuffQueue.BuffQueueState;
 import battle.struct.DelayedPatternQueue;
 import battle.enums.AttackType;
 import managers.PlayerdataManager;
@@ -62,6 +64,7 @@ typedef BHInfo = {
 	var ability:AbilityID;
 	var caster:UnitCoords;
 	var element:Element;
+	var level:Int;
 };
 
 typedef Trajectory = Array<Point>;
@@ -200,7 +203,7 @@ class Model implements IInteractiveModel implements IMutableModel
 		for (o in observers) o.buffQueueUpdate(targetCoords, target.buffQueue.queue);
 	}
 	
-	public function dispellBuffs(targetCoords:UnitCoords, ?elements:Array<Element>, ?count:Int = -1)
+	public function dispellBuffs(targetCoords:UnitCoords, ?elements:Array<Element>, ?count:Int)
 	{
 		var target:Unit = units.get(targetCoords);
 		
@@ -253,7 +256,7 @@ class Model implements IInteractiveModel implements IMutableModel
 		var pattern:String = "";
 		if (danmakuType != null)
 		{
-			bhInfo = {ability:ability.id, caster: caster, element: ability.element};
+			bhInfo = {ability:ability.id, caster: caster, element: ability.element, level: ability.level};
 
 			var selectedPattern:Int = selectedPatterns.get(caster)[ability.id];
 			pattern = patterns.get(caster)[ability.id][selectedPattern];
@@ -295,7 +298,7 @@ class Model implements IInteractiveModel implements IMutableModel
 			if (danmakuType == AttackType.Delayed)
 				delayedQueue.add(ability, pattern);
 			for (o in observers) o.abStriked(target, caster, ability.id, ability.type, ability.element, pattern);
-			Abilities.hit(this, ability.id, target, caster, ability.element);
+			Abilities.hit(this, ability.id, ability.level, target, caster, ability.element);
 			strikeFinished(target);
 		}	
 	}
@@ -326,7 +329,7 @@ class Model implements IInteractiveModel implements IMutableModel
 
 	public function boom(coords:UnitCoords)
 	{
-		Abilities.hit(this, bhInfo.ability, coords, bhInfo.caster, bhInfo.element, ++bhHitsTaken[coords]);
+		Abilities.hit(this, bhInfo.ability, bhInfo.level, coords, bhInfo.caster, bhInfo.element, ++bhHitsTaken[coords]);
 		if (!bothTeamsAlive())
 			end(defineWinner());
 	}
@@ -368,26 +371,24 @@ class Model implements IInteractiveModel implements IMutableModel
 	
 	private function processReady()
 	{
-		if (!Lambda.empty(readyUnits))
-		{
-			var index:Int = Math.floor(Math.random() * readyUnits.length);
-			var unit:Unit = readyUnits[index];
-			currentUnit = UnitCoords.get(unit);
-			readyUnits = [];
-			changeAlacrity(currentUnit, currentUnit, -unit.alacrityPool.value, Source.God);
+		Assert.require(!Lambda.empty(readyUnits));
+		
+		var index:Int = Math.floor(Math.random() * readyUnits.length);
+		var unit:Unit = readyUnits[index];
+		currentUnit = UnitCoords.get(unit);
+		readyUnits = [];
+		changeAlacrity(currentUnit, currentUnit, -unit.alacrityPool.value, Source.God);
 			
-			if (!unit.isStunned() && checkAlive([unit]))
-			{
-				if (!unit.isPlayer())
-					botMakeTurn(unit);
-				else
-					room.player(unit).send("Turn");
-			}
+		if (!unit.isStunned() && checkAlive([unit]))
+		{
+			unit.buffQueue.state = BuffQueueState.OwnersTurn;
+			if (!unit.isPlayer())
+				botMakeTurn(unit);
 			else
-				postTurnProcess();
+				room.player(unit).send("Turn");
 		}
 		else
-			throw "Trying to process empty readyUnits array";
+			postTurnProcess();
 	}
 	
 	private function postTurnProcess()
@@ -407,6 +408,7 @@ class Model implements IInteractiveModel implements IMutableModel
 			unit.tick();
 			for (o in observers) o.tick(unit);
 			for (o in observers) for (u in haveBuffs) o.buffQueueUpdate(UnitCoords.get(u), u.buffQueue.queue);
+			unit.buffQueue.state = BuffQueueState.OthersTurn;
 		}
 			
 		if (!bothTeamsAlive()) 

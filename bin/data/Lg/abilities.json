@@ -312,7 +312,7 @@
         "manacost": 50,
         "cooldown": [30,25,20],
         "maxlvl": 3,
-        "flags": ["ultimate"]
+        "flags": ["aoe", "ultimate"]
     },
     "LgRejuvenate": {
         "description": {
@@ -324,7 +324,7 @@
         "manacost": 0,
         "cooldown": [30,28,26],
         "maxlvl": 3,
-        "flags": ["ultimate"]
+        "flags": ["aoe", "ultimate"]
     },
     "LgDCForm": {
         "name": "AC Form",

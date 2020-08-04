@@ -29,8 +29,6 @@ class Abilities
 	private static var caster:Unit;
 	private static var element:Element;
 	
-	//TODO: Rewrite the entire class
-
 	public static function hit(m:IMutableModel, id:AbilityID, level:Int, targetCoords:UnitCoords, casterCoords:UnitCoords, e:Element, ?hitNumber:Int)
 	{
 		Assert.require(level > 0);
@@ -58,11 +56,11 @@ class Abilities
 			case LgMagneticField: magneticField(level);
 			case LgManaShift: manaShift(level);
 			case LgLightningShield: lightningShield(level);
-			case LgRapidStrikes:
-			case LgGuardianOfLight:
-			case LgRejuvenate:
-			case LgDCForm:
-			case LgACForm:
+			case LgRapidStrikes: rapidStrikes(level);
+			case LgGuardianOfLight: guardianOfLight(level);
+			case LgRejuvenate: rejuvenate(level);
+			case LgDCForm: dcForm(level);
+			case LgACForm: acForm(level);
 			case LgDash: Assert.fail('$id is a danmaku skill; thus hit() has no sense'); //TODO: Make sure it's impossible to use danmaku skill out of BHGame
 			case LgEnergyBarrier, LgThunderbirdSoul, LgStrikeback: Assert.fail('$id is passive; thus hit() has no sense');
 			case LgSwiftnessAura: Assert.fail('$id is aura; thus hit() has no sense');
@@ -286,6 +284,28 @@ class Abilities
 		var damage:Int = Math.round(minDamage + ratio * (maxDamage - minDamage));
 		
 		model.changeHP(UnitCoords.get(target), UnitCoords.get(caster), -damage, element, Source.Ability);
+	}
+
+	private static function guardianOfLight(level:Int)
+	{
+		model.castBuff(LgBlessed, UnitCoords.get(target), UnitCoords.get(caster), 8);
+	}
+
+	private static function rejuvenate(level:Int)
+	{
+		model.changeMana(UnitCoords.get(target), UnitCoords.get(caster), target.manaPool.maxValue, Source.Ability);
+	}
+
+	private static function dcForm(level:Int)
+	{
+		var manaregens:Array<Int> = [0, 7, 14];
+		model.castBuff(LgDCForm, UnitCoords.get(target), UnitCoords.get(caster), 6, ['daminc' => '10', 'mregen' => '${manaregens[level-1]}']);
+	}
+
+	private static function acForm(level:Int)
+	{
+		var manapenaltys:Array<Int> = [40, 30, 20];
+		model.castBuff(LgACForm, UnitCoords.get(target), UnitCoords.get(caster), 6, ['daminc' => '20', 'mpenalty' => '${manapenaltys[level-1]}']);
 	}
 	
 	//================================================================================

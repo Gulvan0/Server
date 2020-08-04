@@ -29,6 +29,14 @@ class Wheel
 		Assert.assert(pos >= 0 && pos <= 9);
 		return wheel[pos];
 	}
+
+	public function getByID(id:AbilityID):Null<Ability>
+	{
+		for (ab in wheel)
+			if (ab.id == id)
+				return ab;
+		return null;
+	}
 	
 	public function getActive(pos:Int):Active
 	{
@@ -53,11 +61,15 @@ class Wheel
 	
 	public function passives(?trigger:Null<BattleEvent>):Array<AbilityID>
 	{
+		return passiveAbs(trigger).map(ab->ab.id);
+	}
+
+	public function passiveAbs(?trigger:Null<BattleEvent>):Array<Ability>
+	{
 		var passiveAbs:Array<Ability> = wheel.filter(ab->!ab.isActive());
 		if (trigger == null)
 			passiveAbs = passiveAbs.filter(p->cast(p, Passive).reactsTo(trigger));
-		var passiveAbIDs:Array<AbilityID> = passiveAbs.map(ab->ab.id);
-		return passiveAbIDs;
+		return passiveAbs;
 	}
 	
 	public function set(pos:Int, ability:Ability):Ability

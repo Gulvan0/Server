@@ -51,8 +51,8 @@ class EffectHandler implements IModelObserver
 	
 	private function procAbilities(e:BattleEvent, unit:Unit, data:EffectData)
 	{
-		for (passive in unit.wheel.passives(e))
-			Passives.handle(model, passive, e, data);
+		for (passive in unit.wheel.passiveAbs(e))
+			Passives.handle(model, passive.id, passive.level, e, data);
 	}
 	
 	private function procBuffs(e:BattleEvent, unit:Unit, ?data:EffectData)

@@ -46,6 +46,7 @@ class Ability
 		la.name = name;
 		la.type = type;
 		la.element = element;
+		la.level = level;
 		return la;
 	}
 

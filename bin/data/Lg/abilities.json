@@ -299,7 +299,8 @@
         "manacost": 15,
         "cooldown": [6,5,4,3],
         "maxlvl": 4,
-        "flags": ["multistrike"]
+        "flags": ["multistrike"],
+        "strikeCount": 4
     },
     "LgGuardianOfLight": {
         "description": {

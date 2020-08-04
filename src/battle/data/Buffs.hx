@@ -131,9 +131,8 @@ class Buffs
 	
 	private static function reboot(properties:Map<String, String>)
 	{
-		Assert.require(properties.exists("hpregen%"));
-		var hpregenpercentage:Float = Std.parseFloat(properties.get("hpregen%"));
-		var hpRegen:Int = Math.round(hpregenpercentage * target.hpPool.maxValue);
+		Assert.require(properties.exists("hpregen"));
+		var hpRegen:Int = Std.parseInt(properties.get("hpregen"));
 		
 		switch (mode)
 		{

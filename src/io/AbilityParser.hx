@@ -12,6 +12,13 @@ import sys.FileSystem;
 import haxe.Json;
 using Reflect;
 
+enum AbilityFlag
+{
+    AOE;
+    Multistrike(count:Int);
+    Ultimate;
+}
+
 typedef Ability =
 {
     var id:AbilityID;
@@ -25,7 +32,7 @@ typedef Ability =
     var maxlvl:Int;
     var danmakuType:Null<AttackType>; //Null if not danmaku ability
     var danmakuDispenser:Null<DispenserType>; //Null if not danmaku ability
-    var aoe:Bool; //False if passive
+    var flags:Array<AbilityFlag>;
     var triggers:Array<BattleEvent>; //Empty if active
 }
 
@@ -99,9 +106,21 @@ class AbilityParser
             danmakuType = AttackType.createByName(props.field("type"));
             danmakuDispenser = DispenserType.createByName(props.field("dispenser"));
         }
-        var aoe:Bool = false;
-        if (obj.hasField("aoe"))
-            aoe = obj.field("aoe");
+        var flags:Array<AbilityFlag> = [];
+        if (obj.hasField("flags"))
+        {
+            var flagStrs:Array<String> = obj.field("flags");
+            for (flagStr in flagStrs)
+                if (flagStr == "multistrike")
+                {
+                    Assert.assert(obj.hasField("strikeCount"));
+                    flags.push(Multistrike(obj.field("strikeCount")));
+                }
+                else if (flagStr == "aoe")
+                    flags.push(AOE);
+                else if (flagStr == "ultimate")
+                    flags.push(Ultimate);
+        }
         var triggers:Array<BattleEvent> = [];
         if (obj.hasField("triggers"))
             triggers = obj.field("triggers").map(BattleEvent.createByName);
@@ -118,7 +137,7 @@ class AbilityParser
             maxlvl: maxlvl,
             danmakuType: danmakuType,
             danmakuDispenser: danmakuDispenser,
-            aoe: aoe,
+            flags: flags,
             triggers: triggers
         };
     }

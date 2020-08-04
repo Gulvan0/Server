@@ -1,4 +1,5 @@
 package battle;
+import io.AbilityParser.AbilityFlag;
 import hxassert.Assert;
 import battle.struct.BuffQueue.BuffQueueState;
 import battle.struct.DelayedPatternQueue;
@@ -190,7 +191,7 @@ class Model implements IInteractiveModel implements IMutableModel
 		for (o in observers) o.alacUpdate(target, dalac, source);
 	}
 	
-	public function castBuff(id:BuffID, targetCoords:UnitCoords, casterCoords:UnitCoords, duration:Int)
+	public function castBuff(id:BuffID, targetCoords:UnitCoords, casterCoords:UnitCoords, duration:Int, ?properties:Map<String, String>)
 	{
 		var target:Unit = units.get(targetCoords);
 		var caster:Unit = units.get(casterCoords);
@@ -198,7 +199,7 @@ class Model implements IInteractiveModel implements IMutableModel
 		if (targetCoords.equals(casterCoords))
 			duration++;
 		
-		target.buffQueue.addBuff(new Buff(this, id, duration, targetCoords, casterCoords));
+		target.buffQueue.addBuff(new Buff(this, id, duration, targetCoords, casterCoords, properties));
 		
 		for (o in observers) o.buffQueueUpdate(targetCoords, target.buffQueue.queue);
 	}
@@ -262,7 +263,7 @@ class Model implements IInteractiveModel implements IMutableModel
 			pattern = patterns.get(caster)[ability.id][selectedPattern];
 		}
 
-		var targets:Array<Unit> = ability.aoe? units.allied(target) : [units.get(target)];
+		var targets:Array<Unit> = buildTargets(target, ability);
 		for (t in targets)
 		{
 			var tCoords:UnitCoords = UnitCoords.get(t);
@@ -276,6 +277,18 @@ class Model implements IInteractiveModel implements IMutableModel
 			else 
 				strikeAb(tCoords, caster, ability, danmakuType, pattern, t.delayedPatterns);
 		}
+	}
+
+	private function buildTargets(target:UnitCoords, ability:Active):Array<Unit>
+	{
+		for (flag in ability.flags)
+			switch flag 
+			{
+				case AOE: return units.allied(target);
+				case Multistrike(count): return [for (i in 0...count) units.get(target)];
+				default:
+			}
+		return [units.get(target)];
 	}
 
 	private function throwAb(target:UnitCoords, caster:UnitCoords, ability:Active)

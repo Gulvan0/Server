@@ -149,13 +149,14 @@ class BuffQueue
 			}
 	}
 	
-	public function elementalCount(element:Element):Int
+	public function elementalCount(element:Element, ?onlyDispellable:Bool = false):Int
 	{
 		var count:Int = 0;
 		
 		for (buff in queue)
 			if (buff.element == element)
-				count++;
+				if (!onlyDispellable || !buff.flags.has(Undispellable))
+					count++;
 				
 		return count;
 	}

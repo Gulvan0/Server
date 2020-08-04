@@ -1,4 +1,5 @@
 package battle;
+import io.AbilityParser.AbilityFlag;
 import ID.AbilityID;
 import battle.Ability.LightweightAbility;
 import battle.enums.AbilityTarget;
@@ -14,7 +15,7 @@ import battle.struct.Countdown;
 class Active extends Ability 
 {
 	public var possibleTarget(default, null):AbilityTarget;
-	public var aoe(default, null):Bool;
+	public var flags(default, null):Array<AbilityFlag>;
 	
 	private var _cooldown:Countdown;
 	public var cooldown(get, null):Int;
@@ -59,7 +60,7 @@ class Active extends Ability
 			this._cooldown = new Countdown(0, ab.cooldown[level-1]);
 			this.manacost = ab.manacost[level-1];
 			this.possibleTarget = ab.target;
-			this.aoe = ab.aoe;
+			this.flags = ab.flags;
 		}
 	}
 	

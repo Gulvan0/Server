@@ -58,6 +58,11 @@ class Wheel
 		var activeAbIDs:Array<AbilityID> = activeAbs.map(ab->ab.id);
 		return activeAbIDs;
 	}
+
+	public function auras():Array<Ability>
+	{
+		return wheel.filter(ab->(ab.type == Aura));
+	}
 	
 	public function passives(?trigger:Null<BattleEvent>):Array<AbilityID>
 	{

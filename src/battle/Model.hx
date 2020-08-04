@@ -17,6 +17,7 @@ import battle.Ability;
 import battle.IInteractiveModel;
 import battle.data.Abilities;
 import battle.data.Units;
+import battle.data.Auras;
 import battle.enums.AbilityType;
 import battle.enums.Source;
 import battle.enums.Team;
@@ -168,7 +169,11 @@ class Model implements IInteractiveModel implements IMutableModel
 		target.hpPool.value += dhp;	
 		for (o in observers) o.hpUpdate(target, caster, dhp, element, crit, source);
 		if (!target.isAlive())
+		{
+			for (ab in target.wheel.auras())
+				Auras.deactivate(ab.id, ab.level, this, targetCoords);
 			for (o in observers) o.death(targetCoords);
+		}
 	}
 	
 	public function changeMana(targetCoords:UnitCoords, casterCoords:UnitCoords, dmana:Int, source:Source)
@@ -252,6 +257,8 @@ class Model implements IInteractiveModel implements IMutableModel
 	private function useAbility(target:UnitCoords, caster:UnitCoords, ability:Active)
 	{
 		throwAb(target, caster, ability);
+		if (ability.type == BHSkill)
+			return;
 			
 		var danmakuType:Null<AttackType> = ability.danmakuType();
 		var pattern:String = "";
@@ -584,6 +591,7 @@ class Model implements IInteractiveModel implements IMutableModel
 		this.patterns = new UPair([for (a in allies) new Map()], [for (e in enemies) new Map()]);
 		this.selectedPatterns = new UPair([for (a in allies) new Map<AbilityID, Int>()], [for (e in enemies) new Map<AbilityID, Int>()]);
 		for (u in units)
+		{
 			for (abID in u.wheel.bhAbs())
 			{
 				patterns.getByUnit(u)[abID] = [];
@@ -594,6 +602,9 @@ class Model implements IInteractiveModel implements IMutableModel
 						patterns.getByUnit(u)[abID] = [Units.getPattern(u.id, abID)];
 				selectedPatterns.getByUnit(u)[abID] = 0;
 			}
+			for (ab in u.wheel.auras())
+				Auras.activate(ab.id, ab.level, this, UnitCoords.get(u));
+		}
 				
 		var effectHandler:EffectHandler = new EffectHandler();
 		this.observers = [effectHandler, new EventSender(room)];

@@ -69,6 +69,7 @@ class Abilities
 		}
 	}
 
+	//TODO: [Alpha 4.0] Make sure it's impossible to use danmaku skill out of BHGame
 	private static function defaultDistribution(hitNumber:Int, expectedHits:Int, expectedDamage:Int, id:AbilityID):Int
 	{
 		/*var totalParticles:Int = XMLUtils.getParticleCount(id);

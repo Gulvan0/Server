@@ -42,6 +42,8 @@ class LoginManager
 		var path = Main.playersDir + l + "\\" + l + ".json";
 		if (FileSystem.exists(path))
 			c.send("PlayerProgressData", File.getContent(path));
+		else 
+			trace("Warning: no playerdata was sent to " + l);
 	}
 	
 	public function login(data:LoginPair, c:IConnection)

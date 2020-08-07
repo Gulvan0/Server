@@ -101,10 +101,10 @@ class AbilityParser
         if (obj.hasField("danmakuProps"))
         {
             var props = obj.field("danmakuProps");
-            Assert.assert(props.hasField("type"));
-            Assert.assert(props.hasField("dispenser"));
-            danmakuType = AttackType.createByName(props.field("type"));
-            danmakuDispenser = DispenserType.createByName(props.field("dispenser"));
+            Assert.assert(Reflect.hasField(props, "type"));
+            Assert.assert(Reflect.hasField(props, "dispenser"));
+            danmakuType = AttackType.createByName(Reflect.field(props, "type"));
+            danmakuDispenser = DispenserType.createByName(Reflect.field(props, "dispenser"));
         }
         var flags:Array<AbilityFlag> = [];
         if (obj.hasField("flags"))
@@ -121,9 +121,9 @@ class AbilityParser
                 else if (flagStr == "ultimate")
                     flags.push(Ultimate);
         }
-        var triggers:Array<BattleEvent> = [];
+        var triggersStr:Array<String> = [];
         if (obj.hasField("triggers"))
-            triggers = obj.field("triggers").map(BattleEvent.createByName);
+            triggersStr = obj.field("triggers");
 
         return {
             id:id,
@@ -138,7 +138,7 @@ class AbilityParser
             danmakuType: danmakuType,
             danmakuDispenser: danmakuDispenser,
             flags: flags,
-            triggers: triggers
+            triggers: triggersStr.map(BattleEvent.createByName.bind(_, null))
         };
     }
 

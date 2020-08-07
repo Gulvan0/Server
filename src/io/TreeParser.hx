@@ -12,11 +12,11 @@ class TreeParser
 
         for (e in Element.createAll())
         {
-            var path = Main.gamedataDir + AbilityUtils.getElementAbbreviation(e) + "\\abilities.json";
+            var path = Main.gamedataDir + AbilityUtils.getElementAbbreviation(e) + "\\tree.json";
             if (!FileSystem.exists(path))
                 continue;
 
-            var tree:Tree = Json.parse(File.getContent(path));
+            var tree:Tree = new Tree(Json.parse(File.getContent(path)));
             map.set(e, tree);
         }
         return map;

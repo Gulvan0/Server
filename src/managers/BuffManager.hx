@@ -30,7 +30,7 @@ typedef ParsedBuff =
 
 class BuffManager
 {
-    public static var buffs(default, null):Map<BuffID, ParsedBuff>;
+    public static var buffs(default, null):Map<BuffID, ParsedBuff> = [];
     
     public static function init() 
     {

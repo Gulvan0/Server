@@ -36,7 +36,7 @@ class Tree
         return reqs;
     }
 
-    public function new() 
+    public function new(grid:Array<Array<TreeAbility>>) 
     {
         
     }

@@ -1,5 +1,6 @@
 package managers;
 
+import GameRules.BattleOutcome;
 import battle.enums.Attribute;
 import battle.Unit.ParameterList;
 import managers.AbilityManager.TreePos;
@@ -26,6 +27,13 @@ typedef CharData =
     var i:Int;
     var wheel:Array<String>;
     var tree:Array<Array<Int>>;
+}
+
+typedef ClassRecord = 
+{
+    var element:String;
+    var wins:Int;
+    var losses:Int;
 }
 
 typedef Playerdata = 
@@ -188,6 +196,27 @@ class PlayerdataManager
             intellect: char.i
         };
     }
+
+    public function addRecord(login:String, element:Element, outcome:BattleOutcome)
+    {
+        //TODO: [Ranked Update] Fill (don't forget to check File.exists; if not, create it. Same for element object)
+    }
+
+    public function getFourMostPlayedRecords(login:String):Array<ClassRecord>
+    {
+       var path = recordPath(login);
+        if (!FileSystem.exists(path))
+            return [];
+
+        var content = File.getContent(path);
+        var parser:JsonParser<Array<ClassRecord>> = new JsonParser<Array<ClassRecord>>();
+        parser.fromJson(content);
+
+        var recArray:Array<ClassRecord> = parser.value.copy();
+        recArray.sort((rec1, rec2)->(rec1.wins + rec1.losses - rec2.wins - rec2.losses));
+        return recArray.slice(0, 4);
+    }
+
     //TODO: [Conquest Update] getCompletedStageCount, canVisit, proceed, isAtBossStage
     
     //=====================================================================================================================================================
@@ -207,7 +236,6 @@ class PlayerdataManager
     
     //=====================================================================================================================================================
     
-    //TODO: Call on register
     public function loadPlayer(login:String) 
     {
         var path = pdPath(login);
@@ -227,7 +255,6 @@ class PlayerdataManager
         File.saveContent(path, newdata);
     }
 
-    //TODO: Call on disconnect
     public function unloadPlayer(login:String) 
     {
         cache.remove(login);
@@ -241,6 +268,11 @@ class PlayerdataManager
     public static inline function patternPath(login:String, ability:AbilityID, pos:Int):String
     {
         return Main.playersDir + login + "\\patterns\\" + ability.getName() + "\\" + (pos+1) + ".json";
+    }
+
+    public static inline function recordPath(login:String):String
+    {
+        return Main.playersDir + login + "\\record.json";
     }
 
     public function new() 

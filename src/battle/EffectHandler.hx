@@ -134,7 +134,7 @@ class EffectHandler implements IModelObserver
 		var c:Unit = getUnit(caster);
 		var data:EffectData = new EffectData(t, c, null, ab.element, null);
 		
-		procAbilities(BattleEvent.IncomingStrike, t, data); //TODO: Level?
+		procAbilities(BattleEvent.IncomingStrike, t, data);
 		procBuffs(BattleEvent.IncomingStrike, t, data);
 		procAbilities(BattleEvent.OutgoingStrike, c, data);
 		procBuffs(BattleEvent.OutgoingStrike, c, data);

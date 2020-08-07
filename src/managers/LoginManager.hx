@@ -1,4 +1,6 @@
 package managers;
+import managers.PlayerdataManager.ClassRecord;
+import managers.PlayerdataManager.Playerdata;
 import haxe.Json;
 import sys.io.FileOutput;
 import sys.FileSystem;
@@ -7,6 +9,8 @@ import mphx.connection.IConnection;
 import Main.LoginPair;
 import sys.io.File;
 using StringTools;
+
+typedef RoamData = {player:Playerdata, record:Array<ClassRecord>}
 
 /**
  * @author gulvan
@@ -39,11 +43,13 @@ class LoginManager
 		if (l == null)
 			return;
 
-		var path = Main.playersDir + l + "\\" + l + ".json";
-		if (FileSystem.exists(path))
-			c.send("PlayerProgressData", File.getContent(path));
-		else 
-			trace("Warning: no playerdata was sent to " + l);
+		var data:RoamData = 
+		{
+			player: PlayerdataManager.instance.cache.get(l), 
+			record: PlayerdataManager.instance.getFourMostPlayedRecords(l)
+		};
+
+		c.send("PlayerProgressData", Json.stringify(data));
 	}
 	
 	public function login(data:LoginPair, c:IConnection)

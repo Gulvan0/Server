@@ -463,6 +463,7 @@ class Model implements IInteractiveModel implements IMutableModel
 	
 	public function end(winner:Null<Team>)
 	{
+		//TODO: [Ranked Update] Add records if ranked
 		var winners:Array<String> = [];
 		var losers:Array<String> = [];
 		var draw:Bool = winner == null;

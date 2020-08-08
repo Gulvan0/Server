@@ -290,7 +290,7 @@
     },
     "LgRapidStrikes": {
         "description": {
-            "main": "Launch 4 projectiles that deal damage based on how much faster than the target the caster is",
+            "main": "Launch 4 projectiles that deal damage based on how much faster the caster than the target is",
             "Damage": "<22-67>% of In each",
             "Attack Count": "<4>"
         },
@@ -299,8 +299,7 @@
         "manacost": 15,
         "cooldown": [6,5,4,3],
         "maxlvl": 4,
-        "flags": ["multistrike"],
-        "strikeCount": 4
+        "flags": ["multistrike"]
     },
     "LgGuardianOfLight": {
         "description": {
@@ -312,7 +311,7 @@
         "manacost": 50,
         "cooldown": [30,25,20],
         "maxlvl": 3,
-        "flags": ["aoe", "ultimate"]
+        "flags": ["ultimate"]
     },
     "LgRejuvenate": {
         "description": {
@@ -324,7 +323,7 @@
         "manacost": 0,
         "cooldown": [30,28,26],
         "maxlvl": 3,
-        "flags": ["aoe", "ultimate"]
+        "flags": ["ultimate"]
     },
     "LgDCForm": {
         "name": "AC Form",

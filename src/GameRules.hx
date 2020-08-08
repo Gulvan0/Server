@@ -30,7 +30,7 @@ class GameRules
     public static var missChancePerDeltaIn:Float = 0.0017;
 
     public static var treeWidth:Int = 4;
-    public static var treeHeight:Int = 3;
+    public static var treeHeight:Int = 7;
 
     public static var defaultDelayedPatternDuration:Int = 5;
 

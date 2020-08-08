@@ -105,8 +105,9 @@ class ConnectionManager
 		//======================================================================================================
 
 		server.events.on("LearnAbility", function(d:String, sender:IConnection){
-            var data:Array<Int> = d.split("|").map(Std.parseInt);
-            asLogged(sender, playerManager.learnAbility.bind(data[0], data[1]));
+			var charPair:Array<String> = d.split("|");
+			var data:Array<Int> = [for (c in charPair) Std.parseInt(c)];
+			asLogged(sender, playerManager.learnAbility.bind(data[0], data[1]));
 		});
 
 		server.events.on("PutAbility", function(d:String, sender:IConnection){

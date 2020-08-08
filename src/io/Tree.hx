@@ -38,7 +38,7 @@ class Tree
 
     public function new(grid:Array<Array<TreeAbility>>) 
     {
-        
+        this.grid = grid;
     }
 
 }

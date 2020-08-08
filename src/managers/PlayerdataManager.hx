@@ -67,6 +67,7 @@ class PlayerdataManager
 				return false;
         
         char.abp--;
+        char.tree[i][j]++;
         Thread.create(updatePlayer.bind(login));
         return true;
     }
@@ -78,7 +79,10 @@ class PlayerdataManager
 		if (abCoords == null || char.tree[abCoords.i][abCoords.j] == 0)
             return false;
         
-		removeFromWheelByID(ability, char);
+        removeFromWheelByID(ability, char);
+        for (i in char.wheel.length...pos)
+            char.wheel.push(EmptyAbility.getName());
+        char.wheel[pos] = ability.getName();
         Thread.create(updatePlayer.bind(login));
 		return true;
     }

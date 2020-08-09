@@ -61,7 +61,7 @@ class Abilities
 			case LgRejuvenate: rejuvenate(level);
 			case LgDCForm: dcForm(level);
 			case LgACForm: acForm(level);
-			case LgDash: Assert.fail('$id is a danmaku skill; thus hit() has no sense'); //TODO: Make sure it's impossible to use danmaku skill out of BHGame
+			case LgDash: Assert.fail('$id is a danmaku skill; thus hit() has no sense');
 			case LgEnergyBarrier, LgThunderbirdSoul, LgStrikeback: Assert.fail('$id is passive; thus hit() has no sense');
 			case LgSwiftnessAura: Assert.fail('$id is aura; thus hit() has no sense');
 			case EmptyAbility, LockAbility: Assert.fail('$id has no implementation');

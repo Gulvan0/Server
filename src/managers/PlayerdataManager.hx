@@ -191,8 +191,8 @@ class PlayerdataManager
         return {
             name: char.name,
             element: Element.createByName(char.element),
-            hp: GameRules.basicHP + GameRules.hpStBonus(char.s),
-            mana: GameRules.basicMana + GameRules.manaInBonus(char.i),
+            hp: GameRules.hp(char.s),
+            mana: GameRules.mana(char.level),
             wheel: wheel,
             abilityLevels: abilityLevels,
             strength: char.s,

@@ -164,8 +164,8 @@ class Unit
 		this.healIn = subparams != null? subparams.healIn : new Linear(1, 0);
 		this.healOut = subparams != null? subparams.healOut : new Linear(1, 0);
 		
-		this.critChance = subparams != null? subparams.critChance : GameRules.basicCritChance;
-		this.critDamage = subparams != null? subparams.critDamage : new Linear(GameRules.basicCritMultiplier, 0);
+		this.critChance = subparams != null? subparams.critChance : GameRules.baseCritChance;
+		this.critDamage = subparams != null? subparams.critDamage : new Linear(GameRules.baseCritMultiplier, 0);
 
 		this.accuracyMultipliers = [];
 	}

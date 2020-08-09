@@ -23,7 +23,7 @@ class Utils
 	
 	public static function flipMiss(target:Unit, caster:Unit, ability:Active):Bool
 	{
-		var baseMissChance:Float = GameRules.baseMissChance + (target.intellect - caster.intellect) * GameRules.missChancePerDeltaIn;
+		var baseMissChance:Float = GameRules.missChance(target.intellect, caster.intellect);
 		var baseHitChance:Float = 1 - baseMissChance;
 
 		if (caster.accuracyMultipliers.has(Math.POSITIVE_INFINITY))

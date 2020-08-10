@@ -155,6 +155,13 @@ class ConnectionManager
 			if (l != null)
 				battleManager.getModel(l).useRequest(l, focus.abilityNum, focus.target);
 		});
+
+		server.events.on("SelectPattern", function(d:String, sender:IConnection){
+			var l:Null<String> = getFighting(sender);
+			var data:Array<String> = d.split("|");
+			if (l != null)
+				battleManager.getModel(l).selectPattern(l, AbilityID.createByName(data[0]), data[1]);
+		});
 		
 		server.events.on("SkipTurn", function(data:Dynamic, sender:IConnection){
 			var l:Null<String> = getFighting(sender);

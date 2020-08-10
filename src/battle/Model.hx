@@ -146,6 +146,12 @@ class Model implements IInteractiveModel implements IMutableModel
 	{
 		return getUnit(login).equals(currentUnit);
 	}
+
+	public function selectPattern(login:String, ability:AbilityID, ptnPos:Int)
+	{
+		if (ptnPos >= 0 && ptnPos < 3)
+			selectedPatterns.get(getUnit(login)).set(ability, ptnPos);
+	}
 	
     //================================================================================
     // Mutable

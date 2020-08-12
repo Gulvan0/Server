@@ -160,7 +160,7 @@ class ConnectionManager
 			var l:Null<String> = getFighting(sender);
 			var data:Array<String> = d.split("|");
 			if (l != null)
-				battleManager.getModel(l).selectPattern(l, AbilityID.createByName(data[0]), data[1]);
+				battleManager.getModel(l).selectPattern(l, AbilityID.createByName(data[0]), Std.parseInt(data[1]));
 		});
 		
 		server.events.on("SkipTurn", function(data:Dynamic, sender:IConnection){

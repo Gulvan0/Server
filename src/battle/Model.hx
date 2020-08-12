@@ -433,7 +433,6 @@ class Model implements IInteractiveModel implements IMutableModel
 			var haveBuffs:Array<Unit> = units.both.filter(function(u){return !Lambda.empty(u.buffQueue.queue); });
 			unit.tick();
 			for (o in observers) o.tick(unit);
-			for (o in observers) for (u in haveBuffs) o.buffQueueUpdate(UnitCoords.get(u), u.buffQueue.queue);
 			unit.buffQueue.state = BuffQueueState.OthersTurn;
 		}
 			

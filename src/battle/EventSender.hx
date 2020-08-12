@@ -70,7 +70,7 @@ class EventSender implements IModelObserver
 	
 	public function tick(current:Unit):Void 
 	{
-		room.player(current).send("Tick");
+		room.broadcast("Tick", UnitCoords.get(current));
 	}
 	
 	public function miss(target:UnitCoords, caster:UnitCoords, element:Element):Void 

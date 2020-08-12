@@ -1,5 +1,6 @@
 package battle;
 import battle.struct.UnitCoords;
+import ID.AbilityID;
 
 /**
  * @author Gulvan

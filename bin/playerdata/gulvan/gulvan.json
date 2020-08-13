@@ -1,13 +1,13 @@
 {
 	"character": {
-		"abp": 15,
-		"attp": 63,
+		"abp": 11,
+		"attp": 0,
 		"element": "Lightning",
-		"f": 31,
+		"f": 84,
 		"i": 130,
 		"level": 21,
 		"name": "Gulvan",
-		"s": 30,
+		"s": 40,
 		"tree": [
 			[
 				1,
@@ -17,12 +17,12 @@
 			],
 			[
 				1,
-				0,
-				0,
+				1,
+				1,
 				0
 			],
 			[
-				0,
+				2,
 				0,
 				0,
 				0
@@ -54,10 +54,10 @@
 		],
 		"wheel": [
 			"LgLightningBolt",
-			"EmptyAbility",
+			"LgArcFlash",
 			"LgCharge",
-			"EmptyAbility",
-			"EmptyAbility",
+			"LgDisrupt",
+			"LgVoltSnare",
 			"LgEnergyBarrier"
 		],
 		"xp": 12

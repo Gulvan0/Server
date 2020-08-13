@@ -63,8 +63,8 @@ class PlayerdataManager
 		if (char.tree[i][j] == AbilityManager.abilities.get(id).maxlvl)
             return false;
         
-        for (deltaI in tree.getReqDeltas(i, j))
-			if (char.tree[i + deltaI][j - 1] == 0)
+        for (deltaJ in tree.getReqDeltas(i, j))
+			if (char.tree[i - 1][j + deltaJ] == 0)
 				return false;
         
         char.abp--;

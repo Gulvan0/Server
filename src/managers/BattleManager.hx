@@ -40,31 +40,42 @@ class BattleManager
 				
 		rooms.remove(login);
 		openRooms.remove(login);
-    }
+	}
+	
+	public function confirmBattle(login:String) 
+	{
+		if (!rooms.exists(login) || rooms.get(login).confirmationsAwaited == 0)
+			return;
 
-    public function findMatch(peer:String)
+		rooms.get(login).confirmationsAwaited--;
+		if (rooms.get(login).confirmationsAwaited == 0)
+			models.get(login).start();
+	}
+
+    public function findMatch(peerLogin:String)
 	{
 		if (Lambda.empty(openRooms))
 		{
 			var room:BattleRoom = new BattleRoom();
-			room.add(peer); //Allowing to access from it by login
-			rooms[peer] = room; //Creating a link
-			openRooms.push(peer); //Hey, I'm lfg
+			room.add(peerLogin); //Allowing to access from it by login
+			rooms[peerLogin] = room; //Creating a link
+			openRooms.push(peerLogin); //Hey, I'm lfg
 		}
 		else
 		{
 			var enemy:String = openRooms.splice(0, 1)[0];
-			rooms[enemy].add(peer);
-			rooms[peer] = rooms[enemy];
+			rooms[enemy].add(peerLogin);
+			rooms[peerLogin] = rooms[enemy];
 			var p1:Unit = loadUnit(enemy, Team.Left, 0);
-			var p2:Unit = loadUnit(peer, Team.Right, 0);
-			models[enemy] = new Model([p1], [p2], rooms[peer], terminate);
-			models[peer] = models[enemy];
+			var p2:Unit = loadUnit(peerLogin, Team.Right, 0);
+			models[enemy] = new Model([p1], [p2], rooms[peerLogin], terminate);
+			models[peerLogin] = models[enemy];
+			rooms[peerLogin].confirmationsAwaited = rooms[peerLogin].clients.length;
 			
-			for (l in rooms[peer].clients)
+			for (l in rooms[peerLogin].clients)
 			{
 				var c:IConnection = LoginManager.instance.getConnection(l);
-				var d:String = models[peer].getBattleData(l);
+				var d:String = models[peerLogin].getBattleData(l);
 				c.send("BattleStarted", d);
 			}
 		}

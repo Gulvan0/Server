@@ -52,9 +52,7 @@ class EventSender implements IModelObserver
 	public function alacUpdate(unit:Unit, dalac:Float, source:Source):Void 
 	{
 		var writer = new JsonWriter<AlacUpdate>();
-		trace(writer.write({target: UnitCoords.get(unit), delta: dalac, newV: unit.alacrityPool.value}));
 		room.broadcast("AlacrityUpdate", writer.write({target: UnitCoords.get(unit), delta: dalac, newV: unit.alacrityPool.value}));
-		trace("ok");
 	}
 	
 	public function buffQueueUpdate(unit:UnitCoords, queue:Array<Buff>):Void 

@@ -47,21 +47,24 @@ class Wheel
 
 	public function actives():Array<AbilityID>
 	{
-		var activeAbs:Array<Ability> = wheel.filter(ab->ab.isActive());
+		var nonEmpty:Array<Ability> = wheel.filter(ab->!ab.checkEmpty());
+		var activeAbs:Array<Ability> = nonEmpty.filter(ab->ab.isActive());
 		var activeAbIDs:Array<AbilityID> = activeAbs.map(ab->ab.id);
 		return activeAbIDs;
 	}
 
 	public function bhAbs():Array<AbilityID>
 	{
-		var activeAbs:Array<Ability> = wheel.filter(ab->ab.isBH());
+		var nonEmpty:Array<Ability> = wheel.filter(ab->!ab.checkEmpty());
+		var activeAbs:Array<Ability> = nonEmpty.filter(ab->ab.isBH());
 		var activeAbIDs:Array<AbilityID> = activeAbs.map(ab->ab.id);
 		return activeAbIDs;
 	}
 
 	public function auras():Array<Ability>
 	{
-		return wheel.filter(ab->(ab.type == Aura));
+		var nonEmpty:Array<Ability> = wheel.filter(ab->!ab.checkEmpty());
+		return nonEmpty.filter(ab->(ab.type == Aura));
 	}
 	
 	public function passives(?trigger:Null<BattleEvent>):Array<AbilityID>
@@ -71,7 +74,8 @@ class Wheel
 
 	public function passiveAbs(?trigger:Null<BattleEvent>):Array<Ability>
 	{
-		var passiveAbs:Array<Ability> = wheel.filter(ab->!ab.isActive());
+		var nonEmpty:Array<Ability> = wheel.filter(ab->!ab.checkEmpty());
+		var passiveAbs:Array<Ability> = nonEmpty.filter(ab->!ab.isActive());
 		if (trigger == null)
 			passiveAbs = passiveAbs.filter(p->cast(p, Passive).reactsTo(trigger));
 		return passiveAbs;

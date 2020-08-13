@@ -150,6 +150,12 @@ class ConnectionManager
 		// BATTLE EVENTS
 		//======================================================================================================
 		
+		server.events.on("InitialDataRecieved", function(d:Dynamic, sender:IConnection){
+			var l:Null<String> = loginManager.getLogin(sender);
+			if (l != null)
+				battleManager.confirmBattle(l);
+		});
+		
 		server.events.on("UseRequest", function(focus:Focus, sender:IConnection){
 			var l:Null<String> = getFighting(sender);
 			if (l != null)

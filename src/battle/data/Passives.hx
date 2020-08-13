@@ -71,6 +71,6 @@ class Passives
 	{
 		var chances:Array<Float> = [0.1, 0.12, 0.14, 0.16, 0.18];
 		if (Math.random() < chances[level-1])
-			model.castBuff(LgEnergyBarrier, UnitCoords.get(data.target), UnitCoords.get(data.target), 2);
+			model.castBuff(LgEnergyBarrier, UnitCoords.get(data.target), UnitCoords.nullC(), 1);
 	}
 }

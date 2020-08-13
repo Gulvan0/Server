@@ -1,5 +1,6 @@
 package;
 
+import managers.PlayerdataManager;
 import managers.AbilityManager;
 import managers.BuffManager;
 import managers.LoginManager;
@@ -66,6 +67,14 @@ class Main
 		path = path.substring(0, path.lastIndexOf("\\"));
 		path += "\\data\\";
 		return path;
+	}
+
+	private function gainLevels(login:String, amount:Int) 
+	{
+		new PlayerdataManager();
+		PlayerdataManager.instance.loadPlayer(login);
+		for (i in 0...amount)
+			PlayerdataManager.instance.gainXP(GameRules.xpToLvlup(i+1), login);
 	}
 	
 }

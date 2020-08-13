@@ -50,4 +50,9 @@ class AbilityUtils
     {
         return AbilityManager.abilities.get(ab).danmakuType != null;
     }
+
+    public static function isEmpty(id:AbilityID):Bool 
+    {
+        return id == AbilityID.EmptyAbility || id == AbilityID.LockAbility;
+    }
 }

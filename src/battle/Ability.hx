@@ -1,4 +1,5 @@
 package battle;
+import io.AbilityUtils;
 import hxassert.Assert;
 import battle.enums.AttackType;
 import managers.AbilityManager;
@@ -67,11 +68,11 @@ class Ability
 	
 	public function new(id:AbilityID, level:Int) 
 	{
-		Assert.require(level > 0);
 		this.id = id;
 		this.level = level;
 		if (!checkEmpty())
 		{
+			Assert.require(level > 0);
 			var ab = AbilityManager.abilities.get(id);
 			this.name = ab.name;
 			this.type = ab.type;
@@ -81,7 +82,7 @@ class Ability
 	
 	public inline function checkEmpty():Bool
 	{
-		return id == AbilityID.EmptyAbility || id == AbilityID.LockAbility;
+		return AbilityUtils.isEmpty(id);
 	}
 	
 }

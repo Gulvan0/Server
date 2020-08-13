@@ -111,10 +111,13 @@ class EffectHandler implements IModelObserver
 		var c:Unit = getUnit(caster);
 		var data:EffectData = new EffectData(t, c, null, element, null);
 		
-		procAbilities(BattleEvent.IncomingMiss, t, data);
-		procBuffs(BattleEvent.IncomingMiss, t, data);
-		procAbilities(BattleEvent.OutgoingMiss, c, data);
-		procBuffs(BattleEvent.OutgoingMiss, c, data);
+		if (t.team != c.team)
+		{
+			procAbilities(BattleEvent.IncomingMiss, t, data);
+			procBuffs(BattleEvent.IncomingMiss, t, data);
+			procAbilities(BattleEvent.OutgoingMiss, c, data);
+			procBuffs(BattleEvent.OutgoingMiss, c, data);
+		}
 	}
 	
 	public function death(unit:UnitCoords):Void 
@@ -134,10 +137,13 @@ class EffectHandler implements IModelObserver
 		var c:Unit = getUnit(caster);
 		var data:EffectData = new EffectData(t, c, null, ab.element, null);
 		
-		procAbilities(BattleEvent.IncomingStrike, t, data);
-		procBuffs(BattleEvent.IncomingStrike, t, data);
-		procAbilities(BattleEvent.OutgoingStrike, c, data);
-		procBuffs(BattleEvent.OutgoingStrike, c, data);
+		if (t.team != c.team)
+		{
+			procAbilities(BattleEvent.IncomingStrike, t, data);
+			procBuffs(BattleEvent.IncomingStrike, t, data);
+			procAbilities(BattleEvent.OutgoingStrike, c, data);
+			procBuffs(BattleEvent.OutgoingStrike, c, data);
+		}
 	}
 	
 	public function abThrown(target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element):Void 

@@ -1,8 +1,5 @@
 package battle;
 import ID.AbilityID;
-import battle.Model.Pattern;
-import battle.Model.AbilityInfo;
-import battle.Model.UnitInfo;
 import battle.enums.AbilityType;
 import battle.enums.Source;
 

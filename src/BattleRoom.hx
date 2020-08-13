@@ -11,6 +11,7 @@ import mphx.connection.IConnection;
  */
 class BattleRoom
 {
+	public var confirmationsAwaited:Int = 0;
 	public var clients:Array<String> = new Array();
 	
 	public function add(login:String)

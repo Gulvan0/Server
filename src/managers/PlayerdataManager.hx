@@ -1,5 +1,6 @@
 package managers;
 
+import io.AbilityUtils;
 import GameRules.BattleOutcome;
 import battle.enums.Attribute;
 import battle.Unit.ParameterList;
@@ -184,9 +185,17 @@ class PlayerdataManager
         for (idStr in char.wheel)
         {
             var id:AbilityID = AbilityID.createByName(idStr);
-            var abPos:TreePos = AbilityManager.findAbility(id);
             wheel.push(id);
-            abilityLevels.set(id, char.tree[abPos.i][abPos.j]);
+            if (AbilityUtils.isEmpty(id))
+                abilityLevels.set(id, 1);
+            else 
+            {
+                var abPos:Null<TreePos> = AbilityManager.findAbility(id);
+                if (abPos != null)
+                    abilityLevels.set(id, char.tree[abPos.i][abPos.j]);
+                else 
+                    trace("Tree pos not found: " + id);
+            }
         }
         return {
             name: char.name,

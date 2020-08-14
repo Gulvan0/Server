@@ -17,7 +17,7 @@ class ConnectionManager
     public static function init() 
 	{
 		#if local
-		server = new Server("localhost", 5000);
+		server = new Server("localhost", 92);
 		#else
 		server = new Server("ec2-18-222-25-127.us-east-2.compute.amazonaws.com", 5000);
 		#end

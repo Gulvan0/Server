@@ -613,8 +613,12 @@ class Model implements IInteractiveModel implements IMutableModel
 		}
 				
 		var effectHandler:EffectHandler = new EffectHandler();
-		this.observers = [effectHandler, new EventSender(room)];
 		effectHandler.init(this);
+		this.observers = [effectHandler, new EventSender(room)];
+
+		#if logbattles
+		this.observers.push(new Logger(getUnits));
+		#end
 	}
 	
 }

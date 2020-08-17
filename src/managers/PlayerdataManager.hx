@@ -165,7 +165,7 @@ class PlayerdataManager
         char.abp += GameRules.abPointsLvlupBonus() * levelsGained;
         char.attp += GameRules.attPointsLvlupBonus() * levelsGained;
 
-        Thread.create(updatePlayer.bind(login));
+        updatePlayer(login);
     }
 
     public function earnRating(amount:Null<Int>, login:String) 
@@ -174,7 +174,7 @@ class PlayerdataManager
             return;
 
         cache.get(login).rating += amount;
-        Thread.create(updatePlayer.bind(login));
+        updatePlayer(login);
     }
 
     public function extractParams(login:String):ParameterList
@@ -251,6 +251,9 @@ class PlayerdataManager
     
     public function loadPlayer(login:String) 
     {
+        if (cache.exists(login))
+            return;
+
         var path = pdPath(login);
         if (FileSystem.exists(path))
         {

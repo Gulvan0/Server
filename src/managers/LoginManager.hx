@@ -91,7 +91,7 @@ class LoginManager
 	
 	private function register(pair:LoginPair, c:IConnection):Bool
 	{
-		if (pair.login.length >= 2)
+		if (pair.login.length < 2)
 		{
 			c.send("SmallLogin");
 			return false;
@@ -121,7 +121,7 @@ class LoginManager
 		return true;
 	}
 
-	private function createPlayer(login:String)
+	private function createPlayer(login:String, ?element:Element = Lightning)
 	{
 		var l = login.toLowerCase();
 		var path = Main.playersDir + l + "\\";
@@ -129,9 +129,27 @@ class LoginManager
 
 		var str:String = File.getContent(Main.playersDir + "default.json");
 		str = str.replace('dname', login);
+		str = str.replace('delement', element.getName());
 		str = str.replace('"dabp"', "" + GameRules.initialAbilityPoints);
 		str = str.replace('"dattp"', "" + GameRules.initialAttributePoints);
 		File.saveContent(path + l + ".json", str);
+		generatePatternFiles(login, element);
+	}
+
+	private function generatePatternFiles(login:String, element:Element)
+	{
+		var path = Main.playersDir + login.toLowerCase() + "\\patterns\\";
+		for (id in AbilityManager.trees.get(element).getAbilities())
+		{
+			var ab = AbilityManager.abilities.get(id);
+			if (ab.danmakuType != null)
+			{
+				var abFolderPath = path + ab.id.getName() + "\\";
+				FileSystem.createDirectory(abFolderPath);
+				for (i in 1...4)
+					File.saveContent(abFolderPath + i + ".json", "[]");
+			}
+		}
 	}
 	
 	private function checkPassword(pair:LoginPair):Bool

@@ -14,6 +14,7 @@ import battle.enums.AbilityType;
 typedef HPupdate = {target:UnitCoords, delta:Int, newV:Int, element:Element, crit:Bool, source:Source}
 typedef ManaUpdate = {target:UnitCoords, delta:Int, newV:Int}
 typedef AlacUpdate = {target:UnitCoords, delta:Float, newV:Float}
+typedef ShieldDetails = {target:UnitCoords, source:Source}
 typedef MissDetails = {target:UnitCoords, element:Element}
 typedef DeathDetails = {target:UnitCoords}
 typedef ThrowDetails = {target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element}
@@ -53,6 +54,12 @@ class EventSender implements IModelObserver
 	{
 		var writer = new JsonWriter<AlacUpdate>();
 		room.broadcast("AlacrityUpdate", writer.write({target: UnitCoords.get(unit), delta: dalac, newV: unit.alacrityPool.value}));
+	}
+
+	public function shielded(target:UnitCoords, source:Source)
+	{
+		var writer = new JsonWriter<ShieldDetails>();
+		room.broadcast("Shielded", writer.write({target: target, source: source}));
 	}
 	
 	public function buffQueueUpdate(unit:UnitCoords, queue:Array<Buff>):Void 

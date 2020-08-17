@@ -1,5 +1,7 @@
 package;
 
+import managers.CommandManager;
+import sys.thread.Thread;
 import managers.PlayerdataManager;
 import managers.AbilityManager;
 import managers.BuffManager;
@@ -50,6 +52,7 @@ class Main
 		Sys.println("Reading buffs");
 		BuffManager.init();
 		Sys.println("Initializing connection");
+		Thread.create(()->{CommandManager.processLine(Sys.stdin().readLine());});
 		ConnectionManager.init();
 	}
 	
@@ -67,14 +70,6 @@ class Main
 		path = path.substring(0, path.lastIndexOf("\\"));
 		path += "\\data\\";
 		return path;
-	}
-
-	private function gainLevels(login:String, amount:Int) 
-	{
-		new PlayerdataManager();
-		PlayerdataManager.instance.loadPlayer(login);
-		for (i in 0...amount)
-			PlayerdataManager.instance.gainXP(GameRules.xpToLvlup(i+1), login);
 	}
 	
 }

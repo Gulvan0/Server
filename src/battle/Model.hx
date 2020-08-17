@@ -108,9 +108,21 @@ class Model implements IInteractiveModel implements IMutableModel
 
 	private var onTerminate:(winners:Array<String>, losers:Array<String>, ?draw:Bool)->Void;
 
+	private var log:Bool = false;
+
 	public function getUnits():UPair<Unit>
 	{
 		return units;
+	}
+
+	public function toString():String
+	{
+		var writer:JsonWriter<Unit> = new JsonWriter<Unit>();
+		var s = '';
+		for (u in units)
+			s += writer.write(u, '\t') + '\n________________\n';
+		s += 'Current: ' + haxe.Json.stringify(currentUnit);
+		return s;
 	}
 	
 	public function getBattleData(login:String):String
@@ -166,14 +178,28 @@ class Model implements IInteractiveModel implements IMutableModel
 		if (source != Source.God)
 		{	
 			dhp = Utils.calcBoostedDHP(dhp, caster, target);
-			dhp = caster.rollCrit(dhp);
+			if (source == Source.Ability)
+				dhp = caster.rollCrit(dhp, log);
 
 			if (dhp < 0)
+			{
 				dhp = -target.shields.penetrate(-dhp);
+				if (dhp == 0)
+				{
+					for (o in observers) o.shielded(targetCoords, source);
+					return;
+				}
+			}
 		}
 
 		target.hpPool.value += dhp;	
 		for (o in observers) o.hpUpdate(target, caster, dhp, element, crit, source);
+		processPossibleDeath(target);
+	}
+
+	private function processPossibleDeath(target:Unit) 
+	{
+		var targetCoords = UnitCoords.get(target);
 		if (!target.isAlive())
 		{
 			for (ab in target.wheel.auras())
@@ -219,9 +245,8 @@ class Model implements IInteractiveModel implements IMutableModel
 	{
 		var target:Unit = units.get(targetCoords);
 		
-		target.buffQueue.dispellByElement(elements, count);
-		
-		for (o in observers) o.buffQueueUpdate(targetCoords, target.buffQueue.queue);
+		if (target.buffQueue.dispellByElement(elements, count))
+			for (o in observers) o.buffQueueUpdate(targetCoords, target.buffQueue.queue);
 	}
 	
 	//================================================================================
@@ -282,7 +307,7 @@ class Model implements IInteractiveModel implements IMutableModel
 			var tCoords:UnitCoords = UnitCoords.get(t);
 			abilityTargets.push(tCoords);
 
-			if (Utils.flipMiss(t, units.get(caster), ability))
+			if (Utils.flipMiss(t, units.get(caster), ability, log))
 			{
 				for (o in observers) o.miss(tCoords, caster, ability.element);
 				strikeFinished(tCoords);
@@ -525,7 +550,7 @@ class Model implements IInteractiveModel implements IMutableModel
 		}
 	}
 	
-	public function quit(peerID:String)
+	public function quit(peerID:String) //TODO: [Team Update] Update
 	{
 		for (u in units)
 			switch (u.id)
@@ -538,7 +563,7 @@ class Model implements IInteractiveModel implements IMutableModel
 					}
 				default:
 			}
-		throw "Player not found";
+		Assert.fail("Player not found");
 	}
 	
 	//================================================================================
@@ -618,6 +643,7 @@ class Model implements IInteractiveModel implements IMutableModel
 
 		#if logbattles
 		this.observers.push(new Logger(getUnits));
+		log = true;
 		#end
 	}
 	

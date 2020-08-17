@@ -106,10 +106,11 @@ class BuffQueue
 	 * If elements == null, buffs are dispelled irrespective of their elements
 	 * If count == null, every matching buff is dispelled
 	**/
-	public function dispellByElement(?elements:Array<Element>, ?count:Null<Int>)
+	public function dispellByElement(?elements:Array<Element>, ?count:Null<Int>):Bool
 	{
 		Assert.assert(count == null || count > 0);
 		
+		var startCount:Int = queue.length;
 		var candidates:Array<Buff> = new Array<Buff>();
 		
 		if (elements == null)
@@ -131,22 +132,30 @@ class BuffQueue
 		else
 			for (buff in candidates)
 				dispellBuff(indexOfBuff(buff.id));
+
+		return startCount != queue.length;
 	}
 	
 	private function dispellBuff(index:Int)
 	{
-		if (index >= 0)
-			if (index < activated.length)
-			{
-				activated[index].onEnd();
-				activated.splice(index, 1);
-			}
-			else 
-			{
-				var mergedIndex:Int = index - activated.length;
-				notActivated[mergedIndex].onEnd();
-				notActivated.splice(mergedIndex, 1);
-			}
+		if (index < 0 || index >= activated.length + notActivated.length)
+			return;
+
+		if (index < activated.length)
+		{
+			if (activated[index].undispellable())
+				return;
+			activated[index].onEnd();
+			activated.splice(index, 1);
+		}
+		else 
+		{
+			var mergedIndex:Int = index - activated.length;
+			if (notActivated[mergedIndex].undispellable())
+				return;
+			notActivated[mergedIndex].onEnd();
+			notActivated.splice(mergedIndex, 1);
+		}
 	}
 	
 	public function elementalCount(element:Element, ?onlyDispellable:Bool = false):Int
@@ -155,7 +164,7 @@ class BuffQueue
 		
 		for (buff in queue)
 			if (buff.element == element)
-				if (!onlyDispellable || !buff.flags.has(Undispellable))
+				if (!onlyDispellable || !buff.undispellable())
 					count++;
 				
 		return count;

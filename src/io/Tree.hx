@@ -36,6 +36,15 @@ class Tree
         return reqs;
     }
 
+    public function getAbilities():Array<AbilityID>
+    {
+        var a = [];
+        for (row in grid)
+            for (ab in row)
+                a.push(AbilityID.createByName(ab.id));
+        return a;
+    }
+
     public function new(grid:Array<Array<TreeAbility>>) 
     {
         this.grid = grid;

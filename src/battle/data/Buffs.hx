@@ -224,8 +224,8 @@ class Buffs
 
 	private static function acForm(properties:Map<String, String>)
 	{
-		Assert.require(properties.exists("mregen") && properties.exists("daminc"));
-		var mpenalty:Float = Std.parseInt(properties.get("daminc")) / 100;
+		Assert.require(properties.exists("mpenalty") && properties.exists("daminc"));
+		var mpenalty:Float = Std.parseInt(properties.get("mpenalty")) / 100;
 		var daminc:Float = Std.parseInt(properties.get("daminc")) / 100;
 		var modifier:Linear = new Linear(daminc, 0);
 		var absolutePenalty:Int = Math.round(mpenalty*target.manaPool.maxValue);

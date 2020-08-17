@@ -7,6 +7,7 @@ import ID.AbilityID;
  */
 interface IInteractiveModel 
 {
+	public function toString():String;
 	public function start():Void;
 	public function getBattleData(login:String):String;
 	public function selectPattern(login:String, ability:AbilityID, ptnPos:Int):Void;

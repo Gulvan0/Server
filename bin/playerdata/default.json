@@ -1,7 +1,7 @@
 {
     "character": {
         "name": "dname",
-        "element": "Lightning",
+        "element": "delement",
         "xp": 0,
         "level": 1,
         "abp": "dabp",

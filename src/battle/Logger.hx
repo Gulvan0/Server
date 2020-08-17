@@ -21,37 +21,45 @@ class Logger implements IModelObserver
             Sys.println('${caster.name} deals $totalAction to ${target.name} (BUFF)');
         else 
             Sys.println('${caster.name} deals $totalAction to ${target.name} (ABI)');
-        Sys.println('New HP value: ${target.hpPool.value}');
+        Sys.println('${target.name}\'s HP value: ${target.hpPool.value}');
 	}
 	
 	public function manaUpdate(target:Unit, dmana:Int, source:Source):Void 
 	{
-        var absvalue = Math.abs(dmana);
-        var action = dmana > 0? "loses" : "gains";
-		if (source == God)
-            Sys.println('${target.name} $action $absvalue mana (GOD)');
-        else if (source == Buff)
-            Sys.println('${target.name} $action $absvalue mana (BUFF)');
-        else
-            Sys.println('${target.name} $action $absvalue mana (ABI)');
-        Sys.println('New MANA value: ${target.manaPool.value}');
+		if (source != God)
+        {
+            var absvalue = Math.abs(dmana);
+            var action = dmana < 0? "loses" : "gains";
+            var sourceStr = source == Buff? "BUFF" : "ABI";
+            Sys.println('${target.name} $action $absvalue mana ($sourceStr)');
+        }
+        Sys.println('${target.name}\'s MANA value: ${target.manaPool.value}');
 	}
 	
 	public function alacUpdate(unit:Unit, dalac:Float, source:Source):Void 
 	{
         var absvalue = Math.abs(dalac);
-        var action = dalac > 0? "loses" : "gains";
+        var action = dalac < 0? "loses" : "gains";
         if (unit.alacrityPool.value == unit.alacrityPool.minValue && source == God)
+        {
+            Sys.println('--------------------------------------------------');
             Sys.println('${unit.name}\'s turn');
+        }
         else if (source == Buff)
             Sys.println('${unit.name} $action $absvalue alacrity (BUFF)');
         else if (source == Ability)
             Sys.println('${unit.name} $action $absvalue alacrity (ABI)');
+    }
+    
+    public function shielded(target:UnitCoords, source:Source)
+	{
+		Sys.println('Shielded!');
 	}
 	
 	public function buffQueueUpdate(unit:UnitCoords, queue:Array<Buff>):Void //TODO: [Improvements] Cast & Dispell events
 	{
-        var str = '${unit}\'s queue updated: ';
+        var u = getUnits().get(unit);
+        var str = '${u.name}\'s queue updated: ';
         if (Lambda.empty(queue))
             str += '[Empty]';
         else

@@ -91,6 +91,11 @@ class EffectHandler implements IModelObserver
 		procAbilities(BattleEvent.AlacUpdate, unit, data);
 		procBuffs(BattleEvent.AlacUpdate, unit, data);
 	}
+
+	public function shielded(target:UnitCoords, source:Source)
+	{
+		
+	}
 	
 	public function preTick(current:Unit):Void
 	{

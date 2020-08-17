@@ -10,6 +10,7 @@ import battle.IInteractiveModel;
 
 class BattleManager 
 {
+	public static var instance:BattleManager;
     private static var models:Map<String, IInteractiveModel> = new Map(); // login -> Model
 	private static var rooms:Map<String, BattleRoom> = new Map(); // login -> Room
 	private static var openRooms:Array<String> = [];
@@ -32,14 +33,17 @@ class BattleManager
     public function removePlayer(login:String) 
     {
 		if (isFighting(login))
-		{
-			rooms[login].clients.remove(login);
-			models[login].quit(login);
-			models.remove(login);
-		}
+			if (rooms.exists(login))
+				rooms[login].clients.remove(login);
 				
 		rooms.remove(login);
 		openRooms.remove(login);
+
+		if (isFighting(login))
+		{
+			models[login].quit(login);
+			models.remove(login);
+		}
 	}
 	
 	public function confirmBattle(login:String) 
@@ -102,9 +106,14 @@ class BattleManager
 			PlayerdataManager.instance.earnRating(ratingReward, login);
 
 			var resultString:String = outcome.getName().toUpperCase();
-			rooms.remove(login);
-			models.remove(login);
-			LoginManager.instance.getConnection(login).send("BattleEnded", {outcome: resultString, xp: xpReward, rating: ratingReward});
+			if (rooms.exists(login))
+			{
+				rooms[login].clients.remove(login);
+				rooms.remove(login);
+				models.remove(login);
+	
+				LoginManager.instance.getConnection(login).send("BattleEnded", {outcome: resultString, xp: xpReward, rating: ratingReward});
+			}
 		}
 
 		for (player in winners)
@@ -133,6 +142,6 @@ class BattleManager
 
     public function new() 
     {
-        
+        instance = this;
     }
 }

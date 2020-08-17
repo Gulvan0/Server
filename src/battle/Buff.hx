@@ -30,7 +30,7 @@ class LightweightBuff
  */
 class Buff
 {
-	private var model:Model;
+	@:jignored private var model:Model;
 	
 	public var id(default, null):BuffID;
 	public var name(default, null):String;
@@ -63,6 +63,11 @@ class Buff
 			if (e == event)
 				return true;
 		return false;
+	}
+
+	public function undispellable():Bool
+	{
+		return flags.has(Undispellable);
 	}
 	
 	public function tickAndCheckEnded():Bool

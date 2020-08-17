@@ -13,6 +13,7 @@ interface IModelObserver
 	public function hpUpdate(target:Unit, caster:Unit, dhp:Int, element:Element, crit:Bool, source:Source):Void;
 	public function manaUpdate(target:Unit, dmana:Int, source:Source):Void;
 	public function alacUpdate(unit:Unit, dalac:Float, source:Source):Void;
+	public function shielded(target:UnitCoords, source:Source):Void;
 	
 	public function buffQueueUpdate(unit:UnitCoords, queue:Array<Buff>):Void;
 	

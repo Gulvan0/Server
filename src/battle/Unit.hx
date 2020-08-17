@@ -121,9 +121,12 @@ class Unit
 		return hpPool.value > 0;
 	}
 
-	public function rollCrit(dhp:Int):Int
+	public function rollCrit(dhp:Int, ?log:Bool = false):Int
 	{
-		if (Math.random() < critChance)
+		var randValue = Math.random();
+		if (log)
+			Sys.println('Crit flipping: $randValue < $critChance?');
+		if (randValue < critChance)
 			return Math.round(critDamage.apply(Math.abs(dhp))) * MathUtils.sign(dhp);
 		return dhp;
 	}

@@ -1,37 +1,43 @@
 {
 	"character": {
-		"abp": 14,
+		"abp": 10,
 		"attp": 0,
 		"element": "Lightning",
-		"f": 30,
-		"i": 194,
+		"f": 66,
+		"i": 133,
 		"level": 21,
 		"name": "KazVixX",
-		"s": 30,
+		"s": 55,
 		"tree": [
 			[
 				1,
+				0,
+				0,
+				1
+			],
+			[
+				5,
+				0,
+				0,
+				0
+			],
+			[
+				0,
+				0,
+				0,
+				0
+			],
+			[
+				0,
+				0,
+				1,
+				0
+			],
+			[
 				1,
 				0,
-				0
-			],
-			[
 				0,
-				0,
-				0,
-				0
-			],
-			[
-				0,
-				0,
-				0,
-				0
-			],
-			[
-				0,
-				0,
-				1,
-				0
+				1
 			],
 			[
 				0,
@@ -43,24 +49,20 @@
 				0,
 				0,
 				0,
-				1
-			],
-			[
-				1,
-				0,
-				0,
-				1
+				0
 			]
 		],
 		"wheel": [
-			"LgCharge",
-			"LgGuardianOfLight",
-			"LgLightningBolt",
-			"LgACForm",
+			"LgElectricalStorm",
 			"LgRapidStrikes",
-			"LgSwiftnessAura"
+			"LgEnergyBarrier",
+			"EmptyAbility",
+			"EmptyAbility",
+			"EmptyAbility",
+			"LgLightningBolt",
+			"LgDash"
 		],
 		"xp": 12
 	},
-	"rating": -80
+	"rating": -3
 }

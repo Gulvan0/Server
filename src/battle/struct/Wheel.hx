@@ -76,7 +76,7 @@ class Wheel
 	{
 		var nonEmpty:Array<Ability> = wheel.filter(ab->!ab.checkEmpty());
 		var passiveAbs:Array<Ability> = nonEmpty.filter(ab->!ab.isActive());
-		if (trigger == null)
+		if (trigger != null)
 			passiveAbs = passiveAbs.filter(p->cast(p, Passive).reactsTo(trigger));
 		return passiveAbs;
 	}

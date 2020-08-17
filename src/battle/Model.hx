@@ -356,7 +356,9 @@ class Model implements IInteractiveModel implements IMutableModel
 
 	private function strikeFinished(target:UnitCoords) 
 	{
-		abilityTargets.remove(target);
+		for (i in 0...abilityTargets.length)
+			if (abilityTargets[i].equals(target))
+				abilityTargets.splice(i, 1);
 		if (abilityTargets.empty())
 		{
 			bhInfo = null;

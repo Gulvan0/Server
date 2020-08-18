@@ -206,7 +206,7 @@ class Buffs
 	{
 		Assert.require(properties.exists("mregen") && properties.exists("daminc"));
 		var mregen:Int = Std.parseInt(properties.get("mregen"));
-		var daminc:Float = Std.parseInt(properties.get("daminc")) / 100;
+		var daminc:Float = 1 + Std.parseInt(properties.get("daminc")) / 100;
 		var modifier:Linear = new Linear(daminc, 0);
 		
 		switch (mode)
@@ -226,7 +226,7 @@ class Buffs
 	{
 		Assert.require(properties.exists("mpenalty") && properties.exists("daminc"));
 		var mpenalty:Float = Std.parseInt(properties.get("mpenalty")) / 100;
-		var daminc:Float = Std.parseInt(properties.get("daminc")) / 100;
+		var daminc:Float = 1 + Std.parseInt(properties.get("daminc")) / 100;
 		var modifier:Linear = new Linear(daminc, 0);
 		var absolutePenalty:Int = Math.round(mpenalty*target.manaPool.maxValue);
 		

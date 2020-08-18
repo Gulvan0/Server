@@ -1,4 +1,5 @@
 package battle;
+import managers.AbilityManager;
 import io.AbilityParser.AbilityFlag;
 import hxassert.Assert;
 import battle.struct.BuffQueue.BuffQueueState;
@@ -179,8 +180,11 @@ class Model implements IInteractiveModel implements IMutableModel
 		{	
 			dhp = Utils.calcBoostedDHP(dhp, caster, target);
 			if (source == Source.Ability)
-				dhp = caster.rollCrit(dhp, log);
-
+			{
+				var updatedValue = caster.rollCrit(dhp, log);
+				crit = dhp != updatedValue;
+				dhp = updatedValue;
+			}
 			if (dhp < 0)
 			{
 				dhp = -target.shields.penetrate(-dhp);
@@ -255,13 +259,15 @@ class Model implements IInteractiveModel implements IMutableModel
 	
 	public function useRequest(login:String, abilityPos:Int, targetCoords:UnitCoords)
 	{
-		if (!checkTurn(login))
+		var casterCoords = getUnit(login);
+		var ability = units.get(casterCoords).wheel.get(abilityPos);
+		if (!checkTurn(login) && ability.type != BHSkill)
 		{
 			ConnectionManager.warn(login, "It's not your turn currently");
 			return;
 		}
 		
-		var chooseResult:ChooseResult = checkChoose(abilityPos);
+		var chooseResult:ChooseResult = checkChoose(abilityPos, casterCoords);
 		if (chooseResult != ChooseResult.Ok)
 		{
 			ConnectionManager.warn(login, switch (chooseResult)
@@ -275,10 +281,10 @@ class Model implements IInteractiveModel implements IMutableModel
 			return;
 		}
 		
-		switch (checkTarget(targetCoords, abilityPos))
+		switch (checkTarget(targetCoords, casterCoords, abilityPos))
 		{
 			case TargetResult.Ok:
-				useAbility(targetCoords, currentUnit, units.get(currentUnit).wheel.getActive(abilityPos));
+				useAbility(targetCoords, casterCoords, cast ability);
 			case TargetResult.Invalid:
 				ConnectionManager.warn(login, "Chosen ability cannot be used on this target");
 			default: //Skip
@@ -457,7 +463,6 @@ class Model implements IInteractiveModel implements IMutableModel
 		if (unit.isAlive())
 		{
 			for (o in observers) o.preTick(unit);
-			var haveBuffs:Array<Unit> = units.both.filter(function(u){return !Lambda.empty(u.buffQueue.queue); });
 			unit.tick();
 			for (o in observers) o.tick(unit);
 			unit.buffQueue.state = BuffQueueState.OthersTurn;
@@ -572,31 +577,33 @@ class Model implements IInteractiveModel implements IMutableModel
     // Checkers
     //================================================================================
 	
-	public function checkChoose(abilityPos:Int):ChooseResult
+	public function checkChoose(abilityPos:Int, casterCoords:UnitCoords):ChooseResult
 	{
-		var ability:Ability = units.get(currentUnit).wheel.get(abilityPos);
+		var ability:Ability = units.get(casterCoords).wheel.get(abilityPos);
 		
 		if (ability.checkEmpty())
 			return ChooseResult.Empty;
 		if (ability.type == AbilityType.Passive)
 			return ChooseResult.Passive;
 		
-		var activeAbility:Active = units.get(currentUnit).wheel.getActive(abilityPos);
+		var activeAbility:Active = cast ability;
 		
 		if (activeAbility.checkOnCooldown())
 			return ChooseResult.Cooldown;
-		if (!units.get(currentUnit).checkManacost(abilityPos))
+		if (!units.get(casterCoords).checkManacost(abilityPos))
 			return ChooseResult.Manacost;
 		
 		return ChooseResult.Ok;
 	}
 	
-	public function checkTarget(targetCoords:UnitCoords, abilityPos:Int):TargetResult
+	public function checkTarget(targetCoords:UnitCoords, casterCoords:UnitCoords, abilityPos:Int):TargetResult
 	{
 		var target:Unit = units.get(targetCoords);
-		var caster:Unit = units.get(currentUnit);
-		var ability:Active = units.get(currentUnit).wheel.getActive(abilityPos);
+		var caster:Unit = units.get(casterCoords);
+		var ability:Active = caster.wheel.getActive(abilityPos);
 		
+		if (ability.type == BHSkill)
+			return TargetResult.Ok;
 		if (target == null)
 			return TargetResult.Nonexistent;
 		if (target.hpPool.value == 0)

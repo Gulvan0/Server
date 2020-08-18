@@ -1,66 +1,68 @@
 {
 	"character": {
-		"abp": 3,
+		"abp": 0,
 		"attp": 0,
 		"element": "Lightning",
-		"f": 84,
-		"i": 130,
+		"f": 30,
+		"i": 194,
 		"level": 21,
 		"name": "Gulvan",
-		"s": 40,
+		"s": 30,
 		"tree": [
 			[
 				1,
-				3,
+				1,
+				1,
+				0
+			],
+			[
 				0,
+				1,
+				0,
+				0
+			],
+			[
+				1,
+				1,
+				0,
+				0
+			],
+			[
+				4,
+				1,
+				1,
+				0
+			],
+			[
+				0,
+				1,
+				1,
 				1
 			],
 			[
+				0,
 				1,
 				1,
+				1
+			],
+			[
+				0,
 				1,
-				0
-			],
-			[
-				2,
 				1,
-				0,
-				0
-			],
-			[
-				0,
-				7,
-				0,
-				0
-			],
-			[
-				0,
-				0,
-				0,
-				0
-			],
-			[
-				0,
-				0,
-				0,
-				0
-			],
-			[
-				0,
-				0,
-				0,
-				0
+				1
 			]
 		],
 		"wheel": [
-			"LgLightningBolt",
-			"LgArcFlash",
-			"LgCharge",
+			"LgDCForm",
+			"LgACForm",
 			"LgDisrupt",
-			"LgVoltSnare",
-			"LgEnergyBarrier"
+			"LgArcFlash",
+			"LgLightningShield",
+			"LgManaShift",
+			"LgRejuvenate",
+			"LgStrikeback"
 		],
 		"xp": 2
 	},
-	"rating": -25
+	"rating": -491
 }

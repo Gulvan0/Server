@@ -16,8 +16,10 @@ class ConnectionManager
     
     public static function init() 
 	{
-		#if local
+		#if lan
 		server = new Server("192.168.0.32", 92);
+		#elseif local
+		server = new Server("localhost", 92);
 		#else
 		server = new Server("ec2-18-222-25-127.us-east-2.compute.amazonaws.com", 5000);
 		#end
@@ -32,7 +34,7 @@ class ConnectionManager
 		var c:IConnection = loginManager.getConnection(login);
 		if (c != null)
 			c.send("BattleWarning", message);
-		trace(message);
+		trace('(WARN) $login: $message');
 	}
 
     private static function logOut(s:String, c:IConnection) 

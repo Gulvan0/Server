@@ -39,7 +39,7 @@ typedef Focus = {
  */
 class Main 
 {
-	public static var version:String = "alpha3.1";
+	public static var version:String = "alpha3.2";
 	public static var playersDir:String;
 	public static var gamedataDir:String;
 	

@@ -1,59 +1,53 @@
 package managers;
 using StringTools;
+using Lambda;
 
 class CommandManager 
 {
+    public static final commandArgs:Map<String, Int> = [
+    "help" => 0,
+    "printbattle" => 1, 
+    "lvlup" => 2
+    ];
+
     public static function processLine(line:String)
     {
-        var parts = line.split(' ');
-        var command = parts[0];
-        var args = parts.slice(1);
-
-        switch command
+        switch line.split(' ')
         {
-            case "printbattle":
-                printBattle(args);
-            case "lvlup":
-                gainLevels(args);
-            default:
-                Sys.println('Unknown command: $command');
+            case ["help"]:
+                help();
+            case ["printbattle", player]:
+                printBattle(player);
+            case ["lvlup", player, Std.parseInt(_) => amount]:
+                gainLevels(player, amount);
+            case seq if (commandArgs.exists(seq[0])):
+                Sys.println('Incorrect number of arguments, expected ${commandArgs.get(seq[0])}');
+            case seq:
+                Sys.println('Unknown command: ${seq[0]}');
         }
 
         processLine(Sys.stdin().readLine());
     }
 
-    private static function printBattle(args:Array<String>)
+    private static function help()
     {
-        var argsExpected:Int = 1;
-        if (args.length != argsExpected)
-        {
-            Sys.println('Incorrect number of arguments, expected $argsExpected');
-            return;
-        }
-
-        var login = args[0];
-        var model = BattleManager.instance.getModel(login);
-        if (model == null)
-        {
-            Sys.println('$login is not in battle');
-            return;
-        }
-
-        Sys.println(model.toString());
+        Sys.println("Available commands: ");
+        for (cmd in commandArgs.keys())
+            Sys.println('- $cmd');
     }
 
-	private static function gainLevels(args:Array<String>) 
-	{
-        var argsExpected:Int = 2;
-        if (args.length != argsExpected)
-        {
-            Sys.println('Incorrect number of arguments, expected $argsExpected');
-            return;
-        }
+    private static function printBattle(login:String)
+    {
+        var model = BattleManager.instance.getModel(login);
+        if (model == null)
+            Sys.println('$login is not in battle');
+        else
+            Sys.println(model.toString());
+    }
 
-        var login = args[0];
-        var amount = Std.parseInt(args[1]);
-		new PlayerdataManager();
+	private static function gainLevels(login:String, amount:Int) 
+	{
+        new PlayerdataManager();
 		PlayerdataManager.instance.loadPlayer(login);
 		for (i in 0...amount)
 			PlayerdataManager.instance.gainXP(GameRules.xpToLvlup(i+1), login);

@@ -453,12 +453,6 @@ class Model implements IInteractiveModel implements IMutableModel
 	private function postTurnProcess()
 	{
 		var unit:Unit = units.get(currentUnit);
-		
-		if (!bothTeamsAlive()) 
-		{
-			end(defineWinner());
-			return;
-		}
 			
 		if (unit.isAlive())
 		{

@@ -15,6 +15,11 @@ class BattleManager
 	private static var rooms:Map<String, BattleRoom> = new Map(); // login -> Room
 	private static var openRooms:Array<String> = [];
 
+	public static function getLFG():Array<String>
+	{
+		return openRooms.copy();
+	}
+
     public function getModel(l:String) 
     {
         return models.get(l);
@@ -83,7 +88,13 @@ class BattleManager
 				c.send("BattleStarted", d);
 			}
 		}
-    }
+	}
+	
+	public function stopSearch(peerLogin:String)
+	{
+		openRooms.remove(peerLogin);
+		rooms.remove(peerLogin);
+	}
     
     public static function terminate(winners:Array<String>, losers:Array<String>, ?draw:Bool = false)
 	{

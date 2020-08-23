@@ -6,6 +6,7 @@ class CommandManager
 {
     public static final commandArgs:Map<String, Int> = [
     "help" => 0,
+    "printlfg" => 0,
     "printbattle" => 1, 
     "lvlup" => 2
     ];
@@ -16,6 +17,8 @@ class CommandManager
         {
             case ["help"]:
                 help();
+            case ["printlfg"]:
+                printlfg();
             case ["printbattle", player]:
                 printBattle(player);
             case ["lvlup", player, Std.parseInt(_) => amount]:
@@ -34,6 +37,11 @@ class CommandManager
         Sys.println("Available commands: ");
         for (cmd in commandArgs.keys())
             Sys.println('- $cmd');
+    }
+
+    private static function printlfg()
+    {
+        Sys.println(BattleManager.getLFG().join(", "));
     }
 
     private static function printBattle(login:String)

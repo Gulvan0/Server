@@ -102,6 +102,10 @@ class ConnectionManager
 			asLogged(sender, battleManager.findMatch);
 		});
 
+		server.events.on("StopSearch", function(d, sender:IConnection){
+			asLogged(sender, battleManager.stopSearch);
+		});
+
 		//======================================================================================================
 		// ROAM EVENTS
 		//======================================================================================================

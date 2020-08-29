@@ -438,7 +438,7 @@ class Model implements IInteractiveModel implements IMutableModel
 		readyUnits = [];
 		changeAlacrity(currentUnit, currentUnit, -unit.alacrityPool.value, Source.God);
 			
-		if (!unit.isStunned() && checkAlive([unit]))
+		if (!unit.isStunned() && hasAvailableAbility(currentUnit) && checkAlive([unit]))
 		{
 			unit.buffQueue.state = BuffQueueState.OwnersTurn;
 			if (!unit.isPlayer())
@@ -571,7 +571,19 @@ class Model implements IInteractiveModel implements IMutableModel
     // Checkers
     //================================================================================
 	
-	public function checkChoose(abilityPos:Int, casterCoords:UnitCoords):ChooseResult
+	private function hasAvailableAbility(coords:UnitCoords):Bool
+	{
+		var u:Unit = units.get(coords);
+		for (i in 0...u.wheel.numOfSlots)
+		{
+			if (checkChoose(i, coords) == Ok)
+				if (u.wheel.get(i).type != BHSkill)
+					return true;
+		}
+		return false;
+	}
+	
+	private function checkChoose(abilityPos:Int, casterCoords:UnitCoords):ChooseResult
 	{
 		var ability:Ability = units.get(casterCoords).wheel.get(abilityPos);
 		
@@ -590,7 +602,7 @@ class Model implements IInteractiveModel implements IMutableModel
 		return ChooseResult.Ok;
 	}
 	
-	public function checkTarget(targetCoords:UnitCoords, casterCoords:UnitCoords, abilityPos:Int):TargetResult
+	private function checkTarget(targetCoords:UnitCoords, casterCoords:UnitCoords, abilityPos:Int):TargetResult
 	{
 		var target:Unit = units.get(targetCoords);
 		var caster:Unit = units.get(casterCoords);

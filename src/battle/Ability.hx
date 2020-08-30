@@ -15,6 +15,7 @@ class LightweightAbility
 	public var type:AbilityType;
 	public var element:Element;
 	public var level:Int;
+	public var patterns:Array<String>;
 	
 	public var target:Null<AbilityTarget>;
 	public var manacost:Null<Int>;
@@ -40,7 +41,7 @@ class Ability
 	public var element(default, null):Element;
 	public var level(default, null):Int;
 	
-	public function toLightweight():LightweightAbility
+	public function toLightweight(patterns:Array<String>):LightweightAbility
 	{
 		var la:LightweightAbility = new LightweightAbility();
 		la.id = id;
@@ -48,6 +49,7 @@ class Ability
 		la.type = type;
 		la.element = element;
 		la.level = level;
+		la.patterns = patterns;
 		return la;
 	}
 

@@ -128,6 +128,7 @@ class Model implements IInteractiveModel implements IMutableModel
 	
 	public function getBattleData(login:String):String
 	{
+		var requesterCoords = getUnit(login);
 		var writer = new JsonWriter<BattleData>();
 		return writer.write({common: [for (u in units) {
 		id: u.id,
@@ -139,7 +140,7 @@ class Model implements IInteractiveModel implements IMutableModel
 		mana: u.manaPool,
 		alacrity: u.alacrityPool,
 		buffs: [for (b in u.buffQueue.queue) b.toLightweight()]
-		}], personal: units.get(getUnit(login)).wheel.getlwArray()});
+		}], personal: units.get(requesterCoords).wheel.getlwArray(patterns.get(requesterCoords))});
 	}
 	
 	private function getUnit(login:String):UnitCoords
@@ -441,10 +442,9 @@ class Model implements IInteractiveModel implements IMutableModel
 		if (!unit.isStunned() && hasAvailableAbility(currentUnit) && checkAlive([unit]))
 		{
 			unit.buffQueue.state = BuffQueueState.OwnersTurn;
+			for (o in observers) o.turn(unit);
 			if (!unit.isPlayer())
 				botMakeTurn(unit);
-			else
-				room.player(unit).send("Turn");
 		}
 		else
 			postTurnProcess();

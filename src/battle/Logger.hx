@@ -40,12 +40,7 @@ class Logger implements IModelObserver
 	{
         var absvalue = Math.abs(dalac);
         var action = dalac < 0? "loses" : "gains";
-        if (unit.alacrityPool.value == unit.alacrityPool.minValue && source == God)
-        {
-            Sys.println('--------------------------------------------------');
-            Sys.println('${unit.name}\'s turn');
-        }
-        else if (source == Buff)
+        if (source == Buff)
             Sys.println('${unit.name} $action $absvalue alacrity (BUFF)');
         else if (source == Ability)
             Sys.println('${unit.name} $action $absvalue alacrity (ABI)');
@@ -69,6 +64,13 @@ class Logger implements IModelObserver
             str = str.substr(0, str.length - 2);
         }
 		Sys.println(str);
+    }
+    
+
+	public function turn(current:Unit):Void
+	{
+		Sys.println('--------------------------------------------------');
+            Sys.println('${current.name}\'s turn');
 	}
 	
 	public function preTick(current:Unit):Void 

@@ -72,6 +72,11 @@ class EventSender implements IModelObserver
 	{
 		
 	}
+
+	public function turn(current:Unit):Void 
+	{
+		room.broadcast("Turn", UnitCoords.get(current));
+	}
 	
 	public function tick(current:Unit):Void 
 	{

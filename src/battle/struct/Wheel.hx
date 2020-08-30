@@ -19,9 +19,9 @@ class Wheel
 	
 	public var numOfSlots:Int;
 	
-	public function getlwArray():Array<LightweightAbility>
+	public function getlwArray(patterns:Map<AbilityID, Array<String>>):Array<LightweightAbility>
 	{
-		return [for (a in wheel) a.toLightweight()];
+		return [for (a in wheel) a.toLightweight(patterns.get(a.id))];
 	}
 	
 	public function get(pos:Int):Ability

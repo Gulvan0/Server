@@ -101,6 +101,11 @@ class EffectHandler implements IModelObserver
 	{
 		//no action
 	}
+
+	public function turn(current:Unit):Void
+	{
+		//no action
+	}
 	
 	public function tick(current:Unit):Void 
 	{

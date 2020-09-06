@@ -53,16 +53,16 @@
 			]
 		],
 		"wheel": [
-			"LgDCForm",
-			"LgACForm",
-			"LgDisrupt",
-			"LgArcFlash",
-			"LgLightningShield",
-			"LgManaShift",
+			"EmptyAbility",
+			"EmptyAbility",
+			"EmptyAbility",
+			"EmptyAbility",
+			"EmptyAbility",
+			"EmptyAbility",
 			"LgRejuvenate",
 			"LgStrikeback"
 		],
-		"xp": 2
+		"xp": 12
 	},
-	"rating": -491
+	"rating": -292
 }

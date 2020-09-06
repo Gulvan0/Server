@@ -180,6 +180,8 @@ class ConnectionManager
 			if (l != null)
 				battleManager.getModel(l).skipTurn(l);
 		});
+
+		//TODO: On OfferDraw, on DrawAccepted
 		
 		server.events.on("QuitBattle", function(data:Dynamic, sender:IConnection){
 			var l:Null<String> = getFighting(sender);

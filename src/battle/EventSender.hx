@@ -82,6 +82,11 @@ class EventSender implements IModelObserver
 	{
 		room.broadcast("Tick", UnitCoords.get(current));
 	}
+
+	public function pass(current:UnitCoords):Void
+	{
+		room.broadcast("Pass", current);
+	}
 	
 	public function miss(target:UnitCoords, caster:UnitCoords, element:Element):Void 
 	{

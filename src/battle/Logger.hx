@@ -76,6 +76,11 @@ class Logger implements IModelObserver
 	public function preTick(current:Unit):Void 
 	{
 		//No action
+    }
+    
+    public function pass(current:UnitCoords):Void
+	{
+		//no action
 	}
 	
 	public function tick(current:Unit):Void 

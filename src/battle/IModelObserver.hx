@@ -20,6 +20,7 @@ interface IModelObserver
 	public function turn(current:Unit):Void;
 	public function preTick(current:Unit):Void;
 	public function tick(current:Unit):Void;
+	public function pass(current:UnitCoords):Void;
 	public function miss(target:UnitCoords, caster:UnitCoords, element:Element):Void;
 	public function death(unit:UnitCoords):Void;
 	

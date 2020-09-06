@@ -106,6 +106,11 @@ class EffectHandler implements IModelObserver
 	{
 		//no action
 	}
+
+	public function pass(current:UnitCoords):Void
+	{
+		//no action
+	}
 	
 	public function tick(current:Unit):Void 
 	{

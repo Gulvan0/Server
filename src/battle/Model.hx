@@ -546,6 +546,7 @@ class Model implements IInteractiveModel implements IMutableModel
 	{
 		if (checkTurn(peerID))
 		{
+			for (o in observers) o.pass(currentUnit);
 			changeAlacrity(currentUnit, currentUnit, -100, Source.God);
 			postTurnProcess();
 		}

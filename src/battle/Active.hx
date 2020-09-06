@@ -22,7 +22,7 @@ class Active extends Ability
 	public var maxCooldown(get, null):Int;
 	public var manacost(default, null):Int;
 	
-	public override function toLightweight():LightweightAbility
+	public override function toLightweight(patterns:Array<String>):LightweightAbility
 	{
 		var la:LightweightAbility = new LightweightAbility();
 		la.id = id;
@@ -30,6 +30,7 @@ class Active extends Ability
 		la.type = type;
 		la.element = element;
 		la.level = level;
+		la.patterns = patterns;
 		
 		la.cooldown = maxCooldown;
 		la.delay = cooldown;

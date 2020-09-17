@@ -156,7 +156,7 @@ class PlayerdataManager
             xpLeftToLvl = GameRules.xpToLvlup(char.level);
             levelsGained++;
         }
-        char.xp = amount;
+        char.xp += amount;
 
         var bonus =  GameRules.attributeLvlupBonus(Element.createByName(char.element));
         char.s += bonus[Strength] * levelsGained;

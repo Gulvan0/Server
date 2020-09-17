@@ -133,10 +133,13 @@ class ConnectionManager
 				sender.send("LoginNeeded");
 		});
 
-		server.events.on("IncrementAttribute", function(d:String, sender:IConnection){
+		server.events.on("AddAttributes", function(d:String, sender:IConnection){
 			var l:Null<String> = loginManager.getLogin(sender);
 			if (l != null)
-				playerManager.incrementAtt(Attribute.createByName(d), l);
+			{
+				var data:Array<String> = d.split("|");
+				playerManager.addAttributes(Attribute.createByName(data[0]), Std.parseInt(data[1]), l);
+			}
 			else
 				sender.send("LoginNeeded");
 		});

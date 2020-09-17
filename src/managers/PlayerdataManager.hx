@@ -95,18 +95,18 @@ class PlayerdataManager
         Thread.create(updatePlayer.bind(login));
     }
 
-    public function incrementAtt(a:Attribute, login:String)
+    public function addAttributes(a:Attribute, amount:Int, login:String)
 	{
         var char = cache.get(login).character;
-		if (char.attp > 0)
+		if (char.attp >= amount)
 		{
             switch a 
             {
-                case Strength: char.s++;
-                case Flow: char.f++;
-                case Intellect: char.i++;
+                case Strength: char.s += amount;
+                case Flow: char.f += amount;
+                case Intellect: char.i += amount;
             }
-            char.attp--;
+            char.attp -= amount;
             Thread.create(updatePlayer.bind(login));
         }
     }

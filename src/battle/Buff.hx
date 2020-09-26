@@ -15,6 +15,7 @@ class LightweightBuff
 	public var description:String;
 	public var element:Element;
 	public var properties:Map<String, String>;
+	public var danmaku:Bool;
 	
 	public var duration:Int;
 	
@@ -54,6 +55,7 @@ class Buff
 		lb.element = element;
 		lb.duration = duration;
 		lb.properties = properties;
+		lb.danmaku = flags.has(BuffFlag.Danmaku);
 		return lb;
 	}
 	

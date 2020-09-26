@@ -28,6 +28,10 @@
         "description": "This unit's soul is attracted towards the center of the danmaku box",
         "flags": ["danmaku"]
     },
+    "LgDash": {
+        "description": "Soul's speed increased",
+        "flags": ["danmaku"]
+    },
     "LgManaShiftPos": {
         "name": "Mana Shift",
         "description": "`mana` mana is restored to the owner each turn",
@@ -39,7 +43,7 @@
         "flags": ["overtime", "stackable"]
     },
     "LgLightningShield": {
-        "description": "Every unit that attacks this shield's owner has a `chanceIn`% chance to recieve `dam` damage. The owner also has a `chanceOut`% chance to deal `dam` additional damage to the target",
+        "description": "Every unit that attacks this shield's owner has a `ch1`% chance to recieve `dam` damage. The owner also has a `ch2`% chance to deal `dam` additional damage to the target",
         "triggers": ["IncomingStrike", "OutgoingStrike"]
     },
     "LgBlessed": {

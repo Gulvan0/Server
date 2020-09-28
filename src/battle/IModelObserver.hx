@@ -1,4 +1,5 @@
 package battle;
+import ID.SummonID;
 import ID.AbilityID;
 import battle.enums.AbilityType;
 import battle.enums.Source;
@@ -26,4 +27,9 @@ interface IModelObserver
 	
 	public function abThrown(target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element):Void;
 	public function abStriked(target:UnitCoords, caster:UnitCoords, ab:Ability, pattern:String):Void;
+
+	public function auraApplied(owner:UnitCoords, id:AbilityID):Void;
+	public function auraRemoved(owner:UnitCoords, id:AbilityID):Void;
+	public function summonAppeared(position:UnitCoords, id:SummonID):Void;
+	public function summonDead(position:UnitCoords):Void;
 }

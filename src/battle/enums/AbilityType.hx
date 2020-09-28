@@ -9,8 +9,8 @@ enum AbilityType
 	Bolt;
 	Spell;
 	Passive;
-	Aura;
+	Aura(affectsSummons:Bool, affectsAllies:Bool);
 	BHSkill;
 	Morph;
-	//Summon;
+	Summon;
 }

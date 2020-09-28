@@ -1,4 +1,5 @@
 package battle;
+import ID.SummonID;
 import ID.AbilityID;
 import battle.Model.Pattern;
 import MathUtils.Point;
@@ -170,6 +171,27 @@ class EffectHandler implements IModelObserver
 	{
 		//no action
 	}
+
+	public function auraApplied(owner:UnitCoords, id:AbilityID):Void
+	{
+
+	}
+
+	public function auraRemoved(owner:UnitCoords, id:AbilityID):Void
+	{
+
+	}
+	
+	public function summonAppeared(position:UnitCoords, id:SummonID):Void
+	{
+
+	}
+	
+	public function summonDead(position:UnitCoords):Void
+	{
+
+	}
+	
 	
 	//--------------------------------------------------------------------
 	

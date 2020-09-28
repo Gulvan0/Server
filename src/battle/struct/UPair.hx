@@ -27,6 +27,17 @@ class UPair<T>
 		var array:Array<T> = (coords.team == Team.Left)? left : right;
 		return array[coords.pos];
 	}
+
+	public function set(coords:UnitCoords, value:T)
+	{
+		var array:Array<T> = (coords.team == Team.Left)? left : right;
+		array[coords.pos] = value;
+	}
+
+	public function nullify(coords:UnitCoords)
+	{
+		set(coords, null);
+	}
 	
 	///Return an object bound to unit
 	public function getByUnit(unit:Unit):T
@@ -69,8 +80,13 @@ class UPair<T>
 	{
 		return left[0];
 	}
+
+	public function pmap<S>(func:T->S):UPair<S>
+	{
+		return UPair.map(left, right, func);
+	}
 	
-	public static function map<S, T>(left:Array<S>, right:Array<S>, func:S->T):UPair<T>
+	public static function map<T, S>(left:Array<T>, right:Array<T>, func:T->S):UPair<S>
 	{
 		return new UPair(Lambda.map(left, func).array(), Lambda.map(right, func).array());
 	}

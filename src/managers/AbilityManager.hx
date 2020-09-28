@@ -1,5 +1,7 @@
 package managers;
 
+import io.AbilityParser;
+import battle.Aura;
 import io.AbilityParser.Ability;
 import ID.AbilityID;
 import io.Tree;
@@ -25,7 +27,8 @@ class AbilityManager
 
     public static function init() 
     {
-        abilities = io.AbilityParser.createMap();
+        io.AbilityParser.initMaps();
+        abilities = AbilityParser.abilities;
         trees = TreeParser.createMap();
     }
 }

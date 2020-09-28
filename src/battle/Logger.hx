@@ -1,5 +1,6 @@
 package battle;
 
+import ID.SummonID;
 import battle.struct.UPair;
 import battle.enums.AbilityType;
 import ID.AbilityID;
@@ -110,6 +111,26 @@ class Logger implements IModelObserver
 	{
 		Sys.println('Hit!');
     }
+
+    public function auraApplied(owner:UnitCoords, id:AbilityID):Void
+	{
+		
+	}
+
+	public function auraRemoved(owner:UnitCoords, id:AbilityID):Void
+	{
+		
+	}
+	
+	public function summonAppeared(position:UnitCoords, id:SummonID):Void
+	{
+		
+	}
+	
+	public function summonDead(position:UnitCoords):Void
+	{
+		
+	}
     
     public function new(unitRetriever:Void->UPair<Unit>) 
     {

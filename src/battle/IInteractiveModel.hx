@@ -11,7 +11,7 @@ interface IInteractiveModel
 	public function start():Void;
 	public function getBattleData(login:String):String;
 	public function selectPattern(login:String, ability:AbilityID, ptnPos:Int):Void;
-	public function useRequest(login:String, abilityPos:Int, targetCoords:UnitCoords):Void;
+	public function useRequest(login:String, abilityPos:Int, targetCoords:UnitCoords, summon:Bool):Void;
 	public function skipTurn(login:String):Void;
 	public function quit(login:String):Void;
 	public function playerCollided(login:String):Void;

@@ -41,7 +41,7 @@ class Buffs
 			case LgSnared: snared();
 			case LgStrikeback: strikeback(properties);
 			case LgReboot: reboot(properties);
-			case LgMagnetized: return;
+			case LgMagnetized, LgDash: return;
 			case LgManaShiftPos: manaShiftPos(properties);
 			case LgManaShiftNeg: manaShiftNeg(properties);
 			case LgLightningShield: lightningShield(properties, procCause);

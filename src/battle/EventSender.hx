@@ -1,4 +1,5 @@
 package battle;
+import ID.SummonID;
 import battle.Model.Particle;
 import MathUtils.Point;
 
@@ -110,6 +111,26 @@ class EventSender implements IModelObserver
 	{
 		var writer = new JsonWriter<StrikeDetails>();
 		room.broadcast("Strike", writer.write({target: target, caster: caster, id: ab.id, level: ab.level, type: ab.type, element: ab.element, pattern: pattern}));
+	}
+
+	public function auraApplied(owner:UnitCoords, id:AbilityID):Void
+	{
+		room.broadcast("AuraApplied", {owner: owner, id: id.getName()});
+	}
+
+	public function auraRemoved(owner:UnitCoords, id:AbilityID):Void
+	{
+		room.broadcast("AuraRemoved", {owner: owner, id: id.getName()});
+	}
+	
+	public function summonAppeared(position:UnitCoords, id:SummonID):Void
+	{
+		room.broadcast("SummonAppeared", {position: position, id: id.getName()});
+	}
+	
+	public function summonDead(position:UnitCoords):Void
+	{
+		room.broadcast("SummonDead", {position: position});
 	}
 	
 }

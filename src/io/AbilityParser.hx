@@ -1,5 +1,6 @@
 package io;
 
+import managers.SummonManager;
 import battle.data.Passives.BattleEvent;
 import battle.enums.AttackType;
 import battle.enums.DispenserType;
@@ -38,27 +39,57 @@ typedef Ability =
 
 class AbilityParser 
 {
-    public static function createMap():Map<AbilityID, Ability>
+
+    public static var abilities(default, null):Map<AbilityID, Ability> = [];
+
+    public static function initMaps()
     {
-        var abilities:Map<AbilityID, Ability> = [];
+        Assert.assert(Lambda.empty(abilities));
         for (element in Element.createAll())
         {
             var path = Main.gamedataDir + AbilityUtils.getElementAbbreviation(element) + "\\abilities.json";
             if (!FileSystem.exists(path))
                 continue;
 
-            var full = Json.parse(File.getContent(path));
-            for (prop in Reflect.fields(full))
+            var abList = Json.parse(File.getContent(path));
+            for (ab in Reflect.fields(abList))
             {
-                var id:AbilityID = AbilityID.createByName(prop);
-                var abilityObject = Reflect.field(full, prop);
-                abilities.set(id, initAbility(abilityObject, id, element));
+                var id:AbilityID = AbilityID.createByName(ab);
+                var abilityObject = Reflect.field(abList, ab);
+                initAbility(abilityObject, id, element);
             }
         }
-        return abilities;
+
+        var aurasPath = Main.gamedataDir + "Summon\\auras.json";
+        var auraList = Json.parse(File.getContent(aurasPath));
+        for (aura in Reflect.fields(auraList))
+            initSummonAura(Reflect.field(auraList, aura), AbilityID.createByName(aura));
     }
 
-    private static function initAbility(obj:Dynamic, id:AbilityID, element:Element):Ability
+    private static function initSummonAura(obj:Dynamic, id:AbilityID) 
+    {
+        Assert.assert(obj.hasField("element"));
+        Assert.assert(obj.hasField("allies"));
+        Assert.assert(obj.hasField("summons"));
+
+        abilities.set(id, {
+            id:id,
+            name:"",
+            description: [],
+            element: obj.field("element"),
+            type: Aura(obj.field("summons"), obj.field("allies")),
+            target: null,
+            cooldown: [],
+            manacost: [],
+            maxlvl: -1,
+            danmakuType: null,
+            danmakuDispenser: null,
+            flags: [],
+            triggers: []
+        });
+    }
+
+    private static function initAbility(obj:Dynamic, id:AbilityID, element:Element)
     {
         Assert.assert(obj.hasField("description"));
         Assert.assert(obj.hasField("type"));
@@ -69,32 +100,26 @@ class AbilityParser
         var descObj = obj.field("description");
         for (prop in Reflect.fields(descObj))
             description.set(prop, Reflect.field(descObj, prop));
-        var type:AbilityType = AbilityType.createByName(obj.field("type"));
         var target:Null<AbilityTarget> = obj.hasField("target")? AbilityTarget.createByName(obj.field("target")) : null;
+        
+        var type:AbilityType;
+        var typeStr = obj.field("type");
+        if (typeStr == "Aura")
+        {
+            Assert.assert(obj.hasField("allied"));
+            Assert.assert(obj.hasField("summons"));
+            type = Aura(obj.field("summons"), obj.field("allied"));
+        }
+        else
+            type = AbilityType.createByName(typeStr);
 
         var maxlvl:Int = obj.field("maxlvl");
-        var manacost:Array<Int>;
-        if (!obj.hasField("manacost"))
-            manacost = [];
-        else
-        {
-            var value:Dynamic = obj.field("manacost");
-            if (Std.is(value, Int))
-                manacost = extend([value], maxlvl);
-            else 
-                manacost = value;
-        }
-        var cooldown:Array<Int>;
-        if (!obj.hasField("cooldown"))
-            cooldown = [];
-        else
-        {
-            var value:Dynamic = obj.field("cooldown");
-            if (Std.is(value, Int))
-                cooldown = extend([value], maxlvl);
-            else 
-                cooldown = value;
-        }
+        var manacost:Array<Int> = [];
+        if (obj.hasField("manacost"))
+            manacost = AbilityUtils.convertIntVariant(obj.field("manacost"), maxlvl);
+        var cooldown:Array<Int> = [];
+        if (obj.hasField("cooldown"))
+            manacost = AbilityUtils.convertIntVariant(obj.field("cooldown"), maxlvl);
 
         var danmakuType:Null<AttackType> = null;
         var danmakuDispenser:Null<DispenserType> = null;
@@ -125,7 +150,7 @@ class AbilityParser
         if (obj.hasField("triggers"))
             triggersStr = obj.field("triggers");
 
-        return {
+        abilities.set(id, {
             id:id,
             name:name,
             description: description,
@@ -139,15 +164,9 @@ class AbilityParser
             danmakuDispenser: danmakuDispenser,
             flags: flags,
             triggers: triggersStr.map(BattleEvent.createByName.bind(_, null))
-        };
-    }
+        });
 
-    private static function extend<T>(a:Array<T>, newLength:Int):Array<T>
-    {
-        Assert.require(a.length > 0);
-        var last:T = a[a.length-1];
-        while (a.length < newLength)
-            a.push(last);
-        return a;
+        if (type == Summon)
+            SummonManager.initSummon(obj);
     }
 }

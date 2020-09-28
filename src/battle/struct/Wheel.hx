@@ -61,10 +61,20 @@ class Wheel
 		return activeAbIDs;
 	}
 
-	public function auras():Array<Ability>
+	public function auras(wheelOwner:UnitCoords):Array<Aura>
 	{
+		var result:Array<Aura> = [];
 		var nonEmpty:Array<Ability> = wheel.filter(ab->!ab.checkEmpty());
-		return nonEmpty.filter(ab->(ab.type == Aura));
+		for (ab in nonEmpty)
+		{
+			switch ab.type 
+			{
+				case Aura(_, _):
+					result.push(new Aura(ab.id, ab.level, wheelOwner, false));
+				default:
+			}
+		}
+		return result;
 	}
 	
 	public function passives(?trigger:Null<BattleEvent>):Array<AbilityID>

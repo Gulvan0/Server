@@ -44,6 +44,10 @@ enum AbilityID
 	//Bot abilities
 	//...
 
+	//Summon abilities
+	SmnReluctantAura;
+	SmnSalvationAura;
+
 	//Special
 	EmptyAbility;
 	LockAbility;
@@ -75,4 +79,11 @@ enum BuffID
 
 	LgDCForm;
 	LgACForm;
+	LgDash;
+}
+
+enum SummonID
+{
+	ReluctantOrb;
+	SalvationOrb;
 }

@@ -31,6 +31,7 @@ typedef LoginPair = {
 typedef Focus = {
   var abilityNum:Int;
   var target:UnitCoords;
+  var summon:Bool;
 }
 
 /**

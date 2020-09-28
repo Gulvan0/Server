@@ -168,7 +168,7 @@ class ConnectionManager
 		server.events.on("UseRequest", function(focus:Focus, sender:IConnection){
 			var l:Null<String> = getFighting(sender);
 			if (l != null)
-				battleManager.getModel(l).useRequest(l, focus.abilityNum, focus.target);
+				battleManager.getModel(l).useRequest(l, focus.abilityNum, focus.target, focus.summon);
 		});
 
 		server.events.on("SelectPattern", function(d:String, sender:IConnection){

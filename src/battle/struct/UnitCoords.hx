@@ -13,10 +13,10 @@ class UnitCoords
 {
 	public var team:Team;
 	public var pos:Int;
-	
-	public static function player():UnitCoords
+
+	public static function revertTeam(t:Team):Team
 	{
-		return new UnitCoords(Team.Left, 0);
+		return t == Left? Right : Left;
 	}
 	
 	public static function nullC():UnitCoords

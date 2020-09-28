@@ -66,6 +66,7 @@ class Abilities
 			case LgSwiftnessAura: Assert.fail('$id is aura; thus hit() has no sense');
 			case EmptyAbility, LockAbility: Assert.fail('$id has no implementation');
 			case StubAbility: return;
+			default:
 		}
 	}
 

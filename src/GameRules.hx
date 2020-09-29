@@ -25,7 +25,7 @@ class GameRules
     public static var baseCritChance:Float = 0.1;
     public static var baseCritMultiplier:Float = 1.5;
 
-    public static var summonEvadeChance:Float = 0.1;
+    public static var summonEvadeChance:Float = 0;
 
     public static var treeWidth:Int = 4;
     public static var treeHeight:Int = 7;

@@ -40,6 +40,10 @@ enum AbilityID
 	LgRejuvenate;
 	LgDCForm;
 	LgACForm;
+
+	//Sh abilities
+	ShReluctantOrb;
+	ShSalvationOrb;
 	
 	//Bot abilities
 	//...

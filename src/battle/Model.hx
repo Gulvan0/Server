@@ -196,7 +196,7 @@ class Model implements IInteractiveModel implements IMutableModel
 				dhp = -target.shields.penetrate(-dhp);
 				if (dhp == 0)
 				{
-					for (o in observers) o.shielded(targetCoords, source);
+					for (o in observers) o.shielded(targetCoords, false, source);
 					return;
 				}
 			}
@@ -305,7 +305,7 @@ class Model implements IInteractiveModel implements IMutableModel
 	
 	private function useAbility(target:UnitCoords, caster:UnitCoords, ability:Active, summon:Bool)
 	{
-		throwAb(target, caster, ability);
+		throwAb(target, summon, caster, ability);
 		if (ability.type == BHSkill)
 			return;
 
@@ -315,6 +315,17 @@ class Model implements IInteractiveModel implements IMutableModel
 			{
 				var targetSummon = summons.get(target);
 				Assert.assert(targetSummon != null);
+				if (Math.random() >= targetSummon.evasionChance.apply(1))
+				{
+					for (o in observers) o.miss(target, true, caster, ability.element);
+					return;
+				}
+				if (targetSummon.shields.penetrate(1) == 0)
+				{
+					for (o in observers) o.shielded(target, true, Source.Ability);
+					return;
+				}
+				for (o in observers) o.abStriked(target, true, caster, ability, "");
 				targetSummon.decrementHP();
 				if (targetSummon.dead())
 				{
@@ -349,7 +360,7 @@ class Model implements IInteractiveModel implements IMutableModel
 
 			if (Utils.flipMiss(t, units.get(caster), ability, log))
 			{
-				for (o in observers) o.miss(tCoords, caster, ability.element);
+				for (o in observers) o.miss(tCoords, false, caster, ability.element);
 				strikeFinished(tCoords);
 			}
 			else 
@@ -369,11 +380,11 @@ class Model implements IInteractiveModel implements IMutableModel
 		return [units.get(target)];
 	}
 
-	private function throwAb(target:UnitCoords, caster:UnitCoords, ability:Active)
+	private function throwAb(target:UnitCoords, summon:Bool, caster:UnitCoords, ability:Active)
 	{
 		ability.putOnCooldown();
 		changeMana(caster, caster, -ability.manacost, Source.God);
-		for (o in observers) o.abThrown(target, caster, ability.id, ability.type, ability.element);
+		for (o in observers) o.abThrown(target, summon, caster, ability.id, ability.type, ability.element);
 	}
 
 	private function strikeAb(target:UnitCoords, caster:UnitCoords, ability:Active, danmakuType:AttackType, pattern:String, delayedQueue:DelayedPatternQueue)
@@ -381,14 +392,14 @@ class Model implements IInteractiveModel implements IMutableModel
 		if (danmakuType == AttackType.Instant)
 		{
 			delayedQueue.flush();
-			for (o in observers) o.abStriked(target, caster, ability, pattern);
+			for (o in observers) o.abStriked(target, false, caster, ability, pattern);
 			//TODO: [PvE Update] Bot danamku
 		}
 		else 
 		{
 			if (danmakuType == AttackType.Delayed)
 				delayedQueue.add(ability, pattern);
-			for (o in observers) o.abStriked(target, caster, ability, pattern);
+			for (o in observers) o.abStriked(target, false, caster, ability, pattern);
 			Abilities.hit(this, ability.id, ability.level, target, caster, ability.element);
 			strikeFinished(target);
 		}	

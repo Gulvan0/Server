@@ -64,35 +64,14 @@ class Abilities
 			case LgDash: Assert.fail('$id is a danmaku skill; thus hit() has no sense');
 			case LgEnergyBarrier, LgThunderbirdSoul, LgStrikeback: Assert.fail('$id is passive; thus hit() has no sense');
 			case LgSwiftnessAura: Assert.fail('$id is aura; thus hit() has no sense');
+
+			case ShReluctantOrb: reluctantOrb(targetCoords, level);
+			case ShSalvationOrb: salvationOrb(targetCoords, level);
+
 			case EmptyAbility, LockAbility: Assert.fail('$id has no implementation');
 			case StubAbility: return;
 			default:
 		}
-	}
-
-	//TODO: [Alpha 4.0] Make sure it's impossible to use danmaku skill out of BHGame
-	private static function defaultDistribution(hitNumber:Int, expectedHits:Int, expectedDamage:Int, id:AbilityID):Int
-	{
-		/*var totalParticles:Int = XMLUtils.getParticleCount(id);
-		var floatDamage:Float;
-		if (hitNumber <= expectedHits)
-		{
-			var xs:Float = hitNumber / expectedHits + 1;
-			floatDamage = (4 * expectedDamage * (Math.asin(xs - 2) + Math.PI / 2)) / (Math.PI * xs);
-		}
-		else
-		{
-			var xs:Float = -(hitNumber - expectedHits) / (totalParticles - expectedHits);
-			var shift:Float = totalParticles * expectedDamage / expectedHits;
-			floatDamage = shift - (4 * (shift - expectedDamage) * (Math.asin(xs) + Math.PI / 2)) / (Math.PI * (2 + xs));
-		}
-		return Math.round(floatDamage);*/
-		return 0;
-	}
-
-	private static function calculateParticleDamage(id:AbilityID, expectedHits:Int, expectedDamage:Int, hitNumber:Int):Int
-	{
-		return defaultDistribution(hitNumber, expectedHits, expectedDamage, id) - (hitNumber > 1? defaultDistribution(hitNumber-1, expectedHits, expectedDamage, id) : 0);
 	}
 	
 	//================================================================================
@@ -308,6 +287,20 @@ class Abilities
 	{
 		var manapenaltys:Array<Int> = [40, 30, 20];
 		model.castBuff(LgACForm, UnitCoords.get(target), UnitCoords.get(caster), 6, ['daminc' => '20', 'mpenalty' => '${manapenaltys[level-1]}']);
+	}
+	
+	//================================================================================
+    // Sh
+    //================================================================================
+	
+	private static function reluctantOrb(coords:UnitCoords, level:Int)
+	{
+		model.summon(new Summon(ReluctantOrb, coords, level), coords);
+	}
+
+	private static function salvationOrb(coords:UnitCoords, level:Int)
+	{
+		model.summon(new Summon(SalvationOrb, coords, level), coords);
 	}
 	
 	//================================================================================

@@ -14,7 +14,7 @@ interface IModelObserver
 	public function hpUpdate(target:Unit, caster:Unit, dhp:Int, element:Element, crit:Bool, source:Source):Void;
 	public function manaUpdate(target:Unit, dmana:Int, source:Source):Void;
 	public function alacUpdate(unit:Unit, dalac:Float, source:Source):Void;
-	public function shielded(target:UnitCoords, source:Source):Void;
+	public function shielded(target:UnitCoords, summon:Bool, source:Source):Void;
 	
 	public function buffQueueUpdate(unit:UnitCoords, queue:Array<Buff>):Void;
 	
@@ -22,11 +22,11 @@ interface IModelObserver
 	public function preTick(current:Unit):Void;
 	public function tick(current:Unit):Void;
 	public function pass(current:UnitCoords):Void;
-	public function miss(target:UnitCoords, caster:UnitCoords, element:Element):Void;
+	public function miss(target:UnitCoords, summon:Bool, caster:UnitCoords, element:Element):Void;
 	public function death(unit:UnitCoords):Void;
 	
-	public function abThrown(target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element):Void;
-	public function abStriked(target:UnitCoords, caster:UnitCoords, ab:Ability, pattern:String):Void;
+	public function abThrown(target:UnitCoords, summon:Bool, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element):Void;
+	public function abStriked(target:UnitCoords, summon:Bool, caster:UnitCoords, ab:Ability, pattern:String):Void;
 
 	public function auraApplied(owner:UnitCoords, id:AbilityID):Void;
 	public function auraRemoved(owner:UnitCoords, id:AbilityID):Void;

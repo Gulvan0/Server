@@ -1,5 +1,6 @@
 package battle;
 
+import battle.struct.ShieldQueue;
 import managers.SummonManager;
 import battle.struct.UnitCoords;
 import battle.struct.Pool;
@@ -16,6 +17,7 @@ class Summon
     public var position(default, null):Int;
 
     public var hpPool(default, null):Pool;
+    public var shields(default, null):ShieldQueue;
     public var evasionChance(default, null):Linear;
 
     public function decrementHP() 
@@ -39,6 +41,7 @@ class Summon
         this.name = parsedObj.name;
         var maxhp = parsedObj.maxhp[level];
         this.hpPool = new Pool(maxhp, maxhp);
+        this.shields = new ShieldQueue();
         this.evasionChance = new Linear(GameRules.summonEvadeChance, 0);
     }
 }

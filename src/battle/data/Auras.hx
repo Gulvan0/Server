@@ -9,6 +9,7 @@ enum AuraEvent
     Activation;
     OverTime;
     Deactivation;
+    SummonActivation(coords:UnitCoords);
 }
 
 class Auras 
@@ -19,6 +20,10 @@ class Auras
         {
             case LgSwiftnessAura:
                 swiftnessAura(aura.level, model, aura.owner, Activation);
+            case SmnReluctantAura:
+                reluctantAuraPassive(aura.level, model, aura.getAffectedTeam(), Activation);
+            case SmnSalvationAura:
+                salvationAura(aura.level, model, aura.getAffectedTeam(), Activation);
             default:
         }
     }
@@ -27,6 +32,8 @@ class Auras
     {
         switch aura.id
         {
+            case SmnReluctantAura:
+                reluctantAuraOvertime(aura.level, model, unitToAffect);
             default:
         }
     }
@@ -37,6 +44,10 @@ class Auras
         {
             case LgSwiftnessAura:
                 swiftnessAura(aura.level, model, aura.owner, Deactivation);
+            case SmnReluctantAura:
+                reluctantAuraPassive(aura.level, model, aura.getAffectedTeam(), Deactivation);
+            case SmnSalvationAura:
+                salvationAura(aura.level, model, aura.getAffectedTeam(), Deactivation);
             default:
         }
     }
@@ -46,6 +57,8 @@ class Auras
     {
         switch aura.id
         {
+            case SmnReluctantAura:
+                reluctantAuraPassive(aura.level, model, aura.getAffectedTeam(), SummonActivation(summonToActivate));
             default:
         }
     }
@@ -68,5 +81,50 @@ class Auras
                 u.speedBonus.detach(modifier);
         }
 
+    }
+
+    private static function reluctantAuraPassive(level:Int, model:Model, affectedTeam:Team, event:AuraEvent)
+    {
+        var chance = 0.5;
+        switch event 
+        {
+            case Activation:
+                for (u in model.units.getTeam(affectedTeam))
+                    u.shields.addRandom(chance);
+                for (s in model.summons.getTeam(affectedTeam))
+                    s.shields.addRandom(chance);
+            case Deactivation:
+                for (u in model.units.getTeam(affectedTeam))
+                {
+                    u.shields.removeRandom(chance);
+                    u.damageOut.detachBatch("reluctant");
+                }
+                for (s in model.summons.getTeam(affectedTeam))
+                    s.shields.removeRandom(chance);
+            case SummonActivation(coords):
+                model.summons.get(coords).shields.addRandom(chance);
+            default:
+        }
+    }
+
+    private static function reluctantAuraOvertime(level:Int, model:Model, affectedUnit:UnitCoords)
+    {
+        var damageInc = [1.05, 1.1, 1.15, 1.2][level];
+        model.units.get(affectedUnit).damageOut.combine(new Linear(damageInc, 0), "reluctant");
+    }
+
+    private static function salvationAura(level:Int, model:Model, affectedTeam:Team, event:AuraEvent)
+    {
+        var mod = new Linear(2, 0);
+        switch event 
+        {
+            case Activation:
+                for (u in model.units.getTeam(affectedTeam))
+                    u.healIn.combine(mod);
+            case Deactivation:
+                for (u in model.units.getTeam(affectedTeam))
+                    u.healIn.detach(mod);
+            default:
+        }
     }
 }

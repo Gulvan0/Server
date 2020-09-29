@@ -15,11 +15,11 @@ import battle.enums.AbilityType;
 typedef HPupdate = {target:UnitCoords, delta:Int, newV:Int, element:Element, crit:Bool, source:Source}
 typedef ManaUpdate = {target:UnitCoords, delta:Int, newV:Int}
 typedef AlacUpdate = {target:UnitCoords, delta:Float, newV:Float}
-typedef ShieldDetails = {target:UnitCoords, source:Source}
-typedef MissDetails = {target:UnitCoords, element:Element}
+typedef ShieldDetails = {target:UnitCoords, summon:Bool, source:Source}
+typedef MissDetails = {target:UnitCoords, summon:Bool, element:Element}
 typedef DeathDetails = {target:UnitCoords}
-typedef ThrowDetails = {target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element}
-typedef StrikeDetails = {target:UnitCoords, caster:UnitCoords, id:AbilityID, level:Int, type:AbilityType, element:Element, pattern:String}
+typedef ThrowDetails = {target:UnitCoords, summon:Bool, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element}
+typedef StrikeDetails = {target:UnitCoords, summon:Bool, caster:UnitCoords, id:AbilityID, level:Int, type:AbilityType, element:Element, pattern:String}
 typedef BuffQueueUpdate = {target:UnitCoords, queue:Array<LightweightBuff>}
 
 /**
@@ -57,10 +57,10 @@ class EventSender implements IModelObserver
 		room.broadcast("AlacrityUpdate", writer.write({target: UnitCoords.get(unit), delta: dalac, newV: unit.alacrityPool.value}));
 	}
 
-	public function shielded(target:UnitCoords, source:Source)
+	public function shielded(target:UnitCoords, summon:Bool, source:Source)
 	{
 		var writer = new JsonWriter<ShieldDetails>();
-		room.broadcast("Shielded", writer.write({target: target, source: source}));
+		room.broadcast("Shielded", writer.write({target: target, summon: summon, source: source}));
 	}
 	
 	public function buffQueueUpdate(unit:UnitCoords, queue:Array<Buff>):Void 
@@ -89,10 +89,10 @@ class EventSender implements IModelObserver
 		room.broadcast("Pass", current);
 	}
 	
-	public function miss(target:UnitCoords, caster:UnitCoords, element:Element):Void 
+	public function miss(target:UnitCoords, summon:Bool, caster:UnitCoords, element:Element):Void 
 	{
 		var writer = new JsonWriter<MissDetails>();
-		room.broadcast("Miss", writer.write({target: target, element: element}));
+		room.broadcast("Miss", writer.write({target: target, summon: summon, element: element}));
 	}
 	
 	public function death(unit:UnitCoords):Void 
@@ -101,16 +101,16 @@ class EventSender implements IModelObserver
 		room.broadcast("Death", writer.write({target: unit}));
 	}
 	
-	public function abThrown(target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element):Void 
+	public function abThrown(target:UnitCoords, summon:Bool, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element):Void 
 	{
 		var writer = new JsonWriter<ThrowDetails>();
-		room.broadcast("Throw", writer.write({target: target, caster: caster, id: id, type: type, element: element}));
+		room.broadcast("Throw", writer.write({target: target, summon: summon, caster: caster, id: id, type: type, element: element}));
 	}
 	
-	public function abStriked(target:UnitCoords, caster:UnitCoords, ab:Ability, pattern:String):Void 
+	public function abStriked(target:UnitCoords, summon:Bool, caster:UnitCoords, ab:Ability, pattern:String):Void 
 	{
 		var writer = new JsonWriter<StrikeDetails>();
-		room.broadcast("Strike", writer.write({target: target, caster: caster, id: ab.id, level: ab.level, type: ab.type, element: ab.element, pattern: pattern}));
+		room.broadcast("Strike", writer.write({target: target, summon: summon, caster: caster, id: ab.id, level: ab.level, type: ab.type, element: ab.element, pattern: pattern}));
 	}
 
 	public function auraApplied(owner:UnitCoords, id:AbilityID):Void

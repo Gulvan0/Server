@@ -93,7 +93,7 @@ class EffectHandler implements IModelObserver
 		procBuffs(BattleEvent.AlacUpdate, unit, data);
 	}
 
-	public function shielded(target:UnitCoords, source:Source)
+	public function shielded(target:UnitCoords, summon:Bool, source:Source)
 	{
 		
 	}
@@ -121,7 +121,7 @@ class EffectHandler implements IModelObserver
 		procBuffs(BattleEvent.Tick, current, data);
 	}
 	
-	public function miss(target:UnitCoords, caster:UnitCoords, element:Element):Void 
+	public function miss(target:UnitCoords, summon:Bool, caster:UnitCoords, element:Element):Void 
 	{
 		var t:Unit = getUnit(target);
 		var c:Unit = getUnit(caster);
@@ -129,8 +129,11 @@ class EffectHandler implements IModelObserver
 		
 		if (t.team != c.team)
 		{
-			procAbilities(BattleEvent.IncomingMiss, t, data);
-			procBuffs(BattleEvent.IncomingMiss, t, data);
+			if (!summon)
+			{
+				procAbilities(BattleEvent.IncomingMiss, t, data);
+				procBuffs(BattleEvent.IncomingMiss, t, data);
+			}
 			procAbilities(BattleEvent.OutgoingMiss, c, data);
 			procBuffs(BattleEvent.OutgoingMiss, c, data);
 		}
@@ -147,13 +150,13 @@ class EffectHandler implements IModelObserver
 		}
 	}
 	
-	public function abStriked(target:UnitCoords, caster:UnitCoords, ab:Ability, pattern:String):Void 
+	public function abStriked(target:UnitCoords, summon:Bool, caster:UnitCoords, ab:Ability, pattern:String):Void 
 	{
 		var t:Unit = getUnit(target);
 		var c:Unit = getUnit(caster);
 		var data:EffectData = new EffectData(t, c, null, ab.element, null);
 		
-		if (t.team != c.team)
+		if (t.team != c.team && !summon)
 		{
 			procAbilities(BattleEvent.IncomingStrike, t, data);
 			procBuffs(BattleEvent.IncomingStrike, t, data);
@@ -162,7 +165,7 @@ class EffectHandler implements IModelObserver
 		}
 	}
 	
-	public function abThrown(target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element):Void 
+	public function abThrown(target:UnitCoords, summon:Bool, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element):Void 
 	{
 		//no action - for now
 	}

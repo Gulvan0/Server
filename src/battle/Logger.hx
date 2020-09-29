@@ -47,7 +47,7 @@ class Logger implements IModelObserver
             Sys.println('${unit.name} $action $absvalue alacrity (ABI)');
     }
     
-    public function shielded(target:UnitCoords, source:Source)
+    public function shielded(target:UnitCoords, summon:Bool, source:Source)
 	{
 		Sys.println('Shielded!');
 	}
@@ -89,7 +89,7 @@ class Logger implements IModelObserver
 		Sys.println('${current.name} is being processed');
 	}
 	
-	public function miss(target:UnitCoords, caster:UnitCoords, element:Element):Void 
+	public function miss(target:UnitCoords, summon:Bool, caster:UnitCoords, element:Element):Void 
 	{
 		Sys.println('Miss!'); //Names are printed in abThrow
 	}
@@ -100,14 +100,14 @@ class Logger implements IModelObserver
 		Sys.println('${u.name} dies');
 	}
 	
-	public function abThrown(target:UnitCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element):Void 
+	public function abThrown(target:UnitCoords, summon:Bool, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element):Void 
 	{
-        var c = getUnits().get(caster);
+		var c = getUnits().get(caster);
         var t = getUnits().get(target);
-		Sys.println('${c.name} uses ${id.getName()} on ${t.name}');
+		Sys.println('${c.name} uses ${id.getName()} on ${t.name}' + (summon? "'s summon" : ""));
 	}
 	
-	public function abStriked(target:UnitCoords, caster:UnitCoords, ab:Ability, pattern:String):Void 
+	public function abStriked(target:UnitCoords, summon:Bool, caster:UnitCoords, ab:Ability, pattern:String):Void 
 	{
 		Sys.println('Hit!');
     }

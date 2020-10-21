@@ -4,17 +4,16 @@ import battle.struct.UnitCoords;
 import battle.enums.Team;
 import ID.AbilityID;
 
-enum AuraEvent
+enum AuraMode
 {
-    Activation;
+    Enable;
     OverTime;
-    Deactivation;
-    SummonActivation(coords:UnitCoords);
+    Disable;
 }
 
 class Auras 
 {
-    public static function activate(aura:Aura, model:Model)
+    public static function unitAct(aura:Aura, model:Model)
     {
         switch aura.id
         {
@@ -28,37 +27,12 @@ class Auras
         }
     }
 
-    public static function overtime(aura:Aura, model:Model, unitToAffect:UnitCoords)
+    public static function smnAct(aura:Aura, model:Model, unitToAffect:UnitCoords)
     {
         switch aura.id
         {
             case SmnReluctantAura:
                 reluctantAuraOvertime(aura.level, model, unitToAffect);
-            default:
-        }
-    }
-
-    public static function deactivate(aura:Aura, model:Model)
-    {
-        switch aura.id
-        {
-            case LgSwiftnessAura:
-                swiftnessAura(aura.level, model, aura.owner, Deactivation);
-            case SmnReluctantAura:
-                reluctantAuraPassive(aura.level, model, aura.getAffectedTeam(), Deactivation);
-            case SmnSalvationAura:
-                salvationAura(aura.level, model, aura.getAffectedTeam(), Deactivation);
-            default:
-        }
-    }
-
-    /**Use only when the new summon appears under the already active aura**/
-    public static function activateForSummon(aura:Aura, model:Model, summonToActivate:UnitCoords)
-    {
-        switch aura.id
-        {
-            case SmnReluctantAura:
-                reluctantAuraPassive(aura.level, model, aura.getAffectedTeam(), SummonActivation(summonToActivate));
             default:
         }
     }

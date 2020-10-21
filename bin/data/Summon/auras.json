@@ -2,14 +2,14 @@
     "SmnReluctantAura": {
         "origin": "ShReluctantOrb",
         "element": "Shadow",
-        "allied": true,
-        "summons": true
+        "affects": ["Allied"],
+        "summonsAffected": true
     },
 
     "SmnSalvationAura": {
         "origin": "ShSalvationOrb",
         "element": "Shadow",
-        "allied": true,
-        "summons": false
+        "affects": ["Allied"],
+        "summonsAffected": false
     }
 }

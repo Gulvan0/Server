@@ -1,4 +1,5 @@
 package battle;
+import managers.AbilityManager.RelativeTeam;
 import battle.enums.AbilityType;
 using Lambda;
 
@@ -7,6 +8,16 @@ using Lambda;
  */
 class Utils 
 {
+	
+	public static function getTeamByRelation(t:Team, rel:RelativeTeam) 
+	{
+		return rel == Allied? t : oppositeTeam(t);
+	}
+
+	public static function oppositeTeam(t:Team) 
+	{
+		return t == Left? Right : Left;
+	}
 	
 	public static function calcBoostedDHP(dhp:Int, caster:Unit, target:Unit):Int
 	{

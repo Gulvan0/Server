@@ -250,8 +250,8 @@
             "Allied Speed Boost": "<20>%"
         },
         "type": "Aura",
-        "allied": true,
-        "summons": false,
+        "affects": ["Allied"],
+        "summonsAffected": false,
         "maxlvl": 5
     },
     "LgMagneticField": {

@@ -1,5 +1,6 @@
 package io;
 
+import battle.enums.AbilityType;
 import hxassert.Assert;
 import ID.AbilityID;
 import managers.AbilityManager;
@@ -72,5 +73,10 @@ class AbilityUtils
     public static function isEmpty(id:AbilityID):Bool 
     {
         return id == AbilityID.EmptyAbility || id == AbilityID.LockAbility;
+    }
+
+    public static function isActive(type:AbilityType):Bool 
+    {
+        return type != Passive && type != Aura;
     }
 }

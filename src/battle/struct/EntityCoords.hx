@@ -1,15 +1,49 @@
 package battle.struct;
 
-class EntityCoords extends UnitCoords 
+enum EntityRelation
 {
-    public var summon:Bool;
+	Enemy;
+	Ally(self:Bool);
+}
 
-    //TODO: getByEntity
+class EntityCoords
+{
+	public var team:Team;
+	public var pos:Int;
+    public var summon:Bool;
+	
+	public static function copy():EntityCoords
+	{
+		return new EntityCoords(team, pos, summon);
+	}
+	
+	public function equals(coords:EntityCoords):Bool
+	{
+		return pos == coords.pos && team == coords.team && summon == coords.summon;
+	}
+
+	public function nearbyUnit():UnitCoords
+	{
+		return new UnitCoords(team, pos);
+	}
+
+	public function figureRelation(coords:EntityCoords):EntityRelation
+	{
+		if (team == coords.team)
+			if (pos == coords.pos)
+				return Ally(true);
+			else
+				return Ally(false);
+		else
+			return Enemy;
+	}
     
     public function new(team:Team, pos:Int, summon:Bool) 
 	{
-		super(team, pos);
-		
+		Assert.assert(pos.inRange(0, 2));
+
+		this.team = team;
+		this.pos = pos;
 		this.summon = summon;
 	}
 }

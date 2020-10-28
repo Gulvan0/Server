@@ -2,7 +2,6 @@ package managers;
 
 import hxassert.Assert;
 import io.AbilityParser;
-import battle.Aura;
 import io.AbilityParser.Ability;
 import ID.AbilityID;
 import io.Tree;

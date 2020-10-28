@@ -1,4 +1,7 @@
 package battle;
+import io.AbilityUtils;
+import io.AbilityParser.AbilityProperites;
+import battle.struct.EntityCoords;
 import battle.data.SummonActions;
 import ID.SummonID;
 import battle.enums.AbilityTarget;
@@ -17,7 +20,6 @@ import MathUtils.IntPoint;
 import MathUtils.Point;
 
 import Element;
-import battle.Ability;
 import battle.IInteractiveModel;
 import battle.data.Abilities;
 import battle.data.Units;
@@ -32,22 +34,12 @@ import battle.struct.UnitCoords;
 import json2object.JsonWriter;
 using Lambda;
 
-enum ChooseResult 
+enum AbilityAction
 {
-	Ok;
-	Empty;
-	Manacost;
-	Cooldown;
-	Passive;
+	General;
+	Summoning;
+	AttackOnSummon;
 }
-
-enum TargetResult 
-{
-	Ok;
-	Invalid;
-	Nonexistent;
-	Dead;
-} 
 
 typedef UnitData = {
 	var id:UnitID;
@@ -121,6 +113,15 @@ class Model implements IInteractiveModel implements IMutableModel
 		return units;
 	}
 
+	private function getEntity(coords:EntityCoords):Null<Entity>
+	{
+		var uc = coords.nearbyUnit();
+		if (coords.summon)
+			return summons.get(uc);
+		else 
+			return units.get(uc);
+	}
+
 	public function toString():String
 	{
 		var writer:JsonWriter<Unit> = new JsonWriter<Unit>();
@@ -148,7 +149,7 @@ class Model implements IInteractiveModel implements IMutableModel
 		}], personal: units.get(requesterCoords).wheel.getlwArray(patterns.get(requesterCoords))});
 	}
 	
-	private function getUnit(login:String):UnitCoords
+	private function getUnit(login:String):Null<UnitCoords>
 	{
 		for (u in units)
 			switch (u.id) 
@@ -158,7 +159,7 @@ class Model implements IInteractiveModel implements IMutableModel
 						return UnitCoords.get(u);
 				default:
 			}
-		return UnitCoords.nullC();
+		return null;
 	}
 	
 	private function checkTurn(login:String):Bool
@@ -207,7 +208,7 @@ class Model implements IInteractiveModel implements IMutableModel
 		processPossibleDeath(target);
 	}
 
-	private function processPossibleDeath(target:Unit) 
+	private function processPossibleDeath(target:Unit) //Rewrite later
 	{
 		var targetCoords = UnitCoords.get(target);
 		if (!target.isAlive())
@@ -239,12 +240,12 @@ class Model implements IInteractiveModel implements IMutableModel
 		for (o in observers) o.alacUpdate(target, dalac, source);
 	}
 	
-	public function castBuff(id:BuffID, targetCoords:UnitCoords, casterCoords:UnitCoords, duration:Int, ?properties:Map<String, String>)
+	public function castBuff(id:BuffID, targetCoords:UnitCoords, casterCoords:UnitCoords, duration:Int, ?properties:Map<String, String>, ?castedPassively:Bool = false)
 	{
 		var target:Unit = units.get(targetCoords);
 		var caster:Unit = units.get(casterCoords);
 		
-		if (targetCoords.equals(casterCoords))
+		if (targetCoords.equals(casterCoords) && !castedPassively)
 			duration++;
 		
 		target.buffQueue.addBuff(new Buff(this, id, duration, targetCoords, casterCoords, properties));
@@ -260,7 +261,7 @@ class Model implements IInteractiveModel implements IMutableModel
 			for (o in observers) o.buffQueueUpdate(targetCoords, target.buffQueue.queue);
 	}
 
-	public function summon(s:Summon, position:UnitCoords) 
+	public function summon(s:Summon, position:EntityCoords) //Rewrite later
 	{
 		summons.set(position, s);
 		for (o in observers) o.summonAppeared(position, s.id);
@@ -270,7 +271,7 @@ class Model implements IInteractiveModel implements IMutableModel
 		SummonActions.act(this, s.id, new UnitCoords(s.team, s.position), SummonEvent.Summoned, s.level);
 	}
 
-	public function applyAura(aura:Aura) 
+	public function applyAura(aura:Aura) //Rewrite later
 	{
 		auras.get(aura.getAffectedTeam()).push(aura);
 		Auras.activate(aura, this);
@@ -278,7 +279,7 @@ class Model implements IInteractiveModel implements IMutableModel
 	}
 
 	//Doesn't belong to mutable
-	private function removeAura(aura:Aura) 
+	private function removeAura(aura:Aura) //Rewrite later
 	{
 		auras.get(aura.getAffectedTeam()).remove(aura);
 		Auras.deactivate(aura, this);
@@ -289,60 +290,74 @@ class Model implements IInteractiveModel implements IMutableModel
     // Using Ability
     //================================================================================
 	
-	public function useRequest(login:String, abilityPos:Int, targetCoords:UnitCoords, summon:Bool)
+	public function useRequest(login:String, abilityPos:Int, targetCoords:EntityCoords)
 	{
 		var casterCoords = getUnit(login);
-		var ability = units.get(casterCoords).wheel.get(abilityPos);
-		if (!checkTurn(login) && ability.type != BHSkill)
-			return;
-		
-		if (checkChoose(abilityPos, casterCoords) != Ok)
-			return;
-		
-		if (checkTarget(targetCoords, casterCoords, abilityPos, summon) == Ok)
-			useAbility(targetCoords, casterCoords, cast ability, summon);
-	}
-	
-	private function useAbility(target:UnitCoords, caster:UnitCoords, ability:Active, summon:Bool)
-	{
-		throwAb(target, summon, caster, ability);
-		if (ability.type == BHSkill)
+		var caster = units.get(casterCoords);
+		var abID = caster.wheel.abilities[abilityPos];
+
+		if (!AbilityManager.actives.exists(abID))
 			return;
 
-		if (summon)
-		{
-			if (ability.type != Summon)
+		var ability:AbilityProperites = AbilityManager.abilities.get(abID);
+		var activeAbility:Active = caster.wheel.actives.get(abID);
+
+		if (!activeAbility.checkOnCooldown() && caster.checkManacost(abilityPos))
+			if (ability.type == BHSkill)
+				throwAb(targetCoords, casterCoords, abilityPos);
+			else if (checkTurn(login))
 			{
-				var targetSummon = summons.get(target);
-				Assert.assert(targetSummon != null);
-				if (Math.random() >= targetSummon.evasionChance.apply(1))
+				var action = checkAndResolveAction(targetCoords, casterCoords, ability.type, activeAbility);
+				if (action != null)
 				{
-					for (o in observers) o.miss(target, true, caster, ability.element);
-					return;
-				}
-				if (targetSummon.shields.penetrate(1) == 0)
-				{
-					for (o in observers) o.shielded(target, true, Source.Ability);
-					return;
-				}
-				for (o in observers) o.abStriked(target, true, caster, ability, "");
-				targetSummon.decrementHP();
-				if (targetSummon.dead())
-				{
-					summons.nullify(target);
-					for (o in observers) o.summonDead(target);
-					for (aura in auras[Left].concat(auras[Right]))
-						if (aura.owner.equals(target) && aura.summonOwner)
-							removeAura(aura);
+					throwAb(targetCoords, casterCoords, abilityPos);
+					useAbility(targetCoords, casterCoords, wheel.actives.get(abID));
 				}
 			}
-			else if (summons.get(target) == null)
+	}
+
+	public function checkAndResolveAction(target:EntityCoords, caster:UnitCoords, abType:AbilityType, ability:Active):Null<AbilityAction>
+	{
+		var uc = target.nearbyUnit();
+		var targetedUnit = units.get(uc);
+		var targetedSummon = summons.get(uc);
+		if (abType == Summon)
+		{
+			if (target.summon && targetedSummon == null)
+				return Summoning;
+		}
+		else 
+			if (target.summon && targetedSummon != null && ability.validForSummon())
+				return AttackOnSummon;
+			else if (!target.summon && targetedUnit != null && targetedUnit.isAlive() && ability.validForUnit(caster.figureRelation(target)))
+				return General;
+		return null;
+	}
+	
+	private function useAbility(target:EntityCoords, caster:UnitCoords, ability:Active, action:AbilityAction)
+	{
+		switch action 
+		{
+			case General:
+
+			case Summoning:
 				Abilities.hit(this, ability.id, ability.level, target, caster, ability.element);
-			postTurnProcess();
-			return;
+				postTurnProcess();
+			case AttackOnSummon:
+				var targetedSummon = summons.get(target.nearbyUnit());
+				if (targetSummon.shields.penetrate(1) > 0)
+				{
+					for (o in observers) o.abStriked(target, true, caster, ability, "");
+					targetSummon.decrementHP();
+					if (targetSummon.dead())
+						processSummonDeath(target.nearbyUnit());
+				}
+				else 
+					for (o in observers) o.shielded(target, true, Source.Ability);
+				postTurnProcess();
 		}
 			
-		var danmakuType:Null<AttackType> = ability.danmakuType();
+		var danmakuType:Null<AttackType> = ability.danmakuType(); //To general
 		var pattern:String = "";
 		if (danmakuType != null)
 		{
@@ -368,6 +383,15 @@ class Model implements IInteractiveModel implements IMutableModel
 		}
 	}
 
+	private function processSummonDeath(target:UnitCoords) //Rewrite
+	{
+		summons.nullify(target);
+		for (o in observers) o.summonDead(target);
+		for (aura in auras[Left].concat(auras[Right]))
+		if (aura.owner.equals(target) && aura.summonOwner)
+			removeAura(aura);
+	}
+
 	private function buildTargets(target:UnitCoords, ability:Active):Array<Unit>
 	{
 		for (flag in ability.flags)
@@ -380,11 +404,11 @@ class Model implements IInteractiveModel implements IMutableModel
 		return [units.get(target)];
 	}
 
-	private function throwAb(target:UnitCoords, summon:Bool, caster:UnitCoords, ability:Active)
+	private function throwAb(target:EntityCoords, caster:UnitCoords, ability:Active)
 	{
 		ability.putOnCooldown();
 		changeMana(caster, caster, -ability.manacost, Source.God);
-		for (o in observers) o.abThrown(target, summon, caster, ability.id, ability.type, ability.element);
+		for (o in observers) o.abThrown(target, caster, ability.id, ability.type, ability.element);
 	}
 
 	private function strikeAb(target:UnitCoords, caster:UnitCoords, ability:Active, danmakuType:AttackType, pattern:String, delayedQueue:DelayedPatternQueue)
@@ -626,10 +650,6 @@ class Model implements IInteractiveModel implements IMutableModel
 		Assert.fail("Player not found");
 	}
 	
-	//================================================================================
-    // Checkers
-    //================================================================================
-	
 	private function hasAvailableAbility(coords:UnitCoords):Bool
 	{
 		var u:Unit = units.get(coords);
@@ -640,60 +660,6 @@ class Model implements IInteractiveModel implements IMutableModel
 					return true;
 		}
 		return false;
-	}
-	
-	private function checkChoose(abilityPos:Int, casterCoords:UnitCoords):ChooseResult
-	{
-		var ability:Ability = units.get(casterCoords).wheel.get(abilityPos);
-		
-		if (ability.checkEmpty())
-			return ChooseResult.Empty;
-		if (ability.type == AbilityType.Passive)
-			return ChooseResult.Passive;
-		
-		var activeAbility:Active = cast ability;
-		
-		if (activeAbility.checkOnCooldown())
-			return ChooseResult.Cooldown;
-		if (!units.get(casterCoords).checkManacost(abilityPos))
-			return ChooseResult.Manacost;
-		
-		return ChooseResult.Ok;
-	}
-	
-	private function checkTarget(targetCoords:UnitCoords, casterCoords:UnitCoords, abilityPos:Int, summon:Bool):TargetResult
-	{
-		var caster:Unit = units.get(casterCoords);
-		var ability:Active = caster.wheel.getActive(abilityPos);
-
-		if (summon)
-		{
-			var targetSummon = summons.get(targetCoords);
-			if (targetSummon == null && ability.type != Summon)
-				return Nonexistent;
-			else if (ability.type == Summon)
-				if (targetSummon != null)
-					return Invalid;
-				else
-					return Ok;
-			else if (![All, Enemy].has(ability.possibleTarget))
-				return Invalid;
-			else 
-				return Ok;
-		}
-
-		var target:Unit = units.get(targetCoords);
-		
-		if (ability.type == BHSkill)
-			return Ok;
-		if (target == null)
-			return Nonexistent;
-		if (target.hpPool.value == 0)
-			return Dead;
-		if (!ability.checkValidity(caster.figureRelation(target)))
-			return Invalid;
-			
-		return Ok;
 	}
 	
     //================================================================================

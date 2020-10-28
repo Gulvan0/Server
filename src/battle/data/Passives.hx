@@ -57,20 +57,20 @@ class Passives
 	private static function strikeback(level:Int)
 	{
 		var muls:Array<Float> = [1.3, 1.3, 1.3, 1.3, 1.3, 1.5, 1.75];
-		model.castBuff(LgStrikeback, UnitCoords.get(data.target), UnitCoords.nullC(), 1, ["mul" => ""+muls[level-1]]);
+		model.castBuff(LgStrikeback, data.target.coords, data.target.coords, 1, ["mul" => ""+muls[level-1]]);
 	}
 	
 	private static function thunderbirdSoul(level:Int)
 	{
 		var coeffs:Array<Float> = [0.1, 0.2, 0.3, 0.4, 0.5];
 		var regen:Int = -Math.round(coeffs[level-1] * Math.min(0, data.delta));
-		model.changeHP(UnitCoords.get(data.caster), UnitCoords.get(data.caster), regen, Element.Lightning, Source.Buff);
+		model.changeHP(data.caster.coords, data.caster.coords, regen, Element.Lightning, Source.Buff);
 	}
 
 	private static function energyBarrier(level:Int)
 	{
 		var chances:Array<Float> = [0.1, 0.12, 0.14, 0.16, 0.18];
 		if (Math.random() < chances[level-1])
-			model.castBuff(LgEnergyBarrier, UnitCoords.get(data.target), UnitCoords.nullC(), 1);
+			model.castBuff(LgEnergyBarrier, data.target.coords, data.target.coords, 1);
 	}
 }

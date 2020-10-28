@@ -1,44 +1,26 @@
 package battle;
+import battle.struct.EntityCoords;
+import battle.struct.EntityCoords.EntityRelation;
 import io.AbilityParser.AbilityFlag;
 import ID.AbilityID;
-import battle.Ability.LightweightAbility;
 import battle.enums.AbilityTarget;
 import managers.AbilityManager;
 
-import battle.enums.UnitType;
 import battle.struct.Countdown;
 
 /**
  * Active ability
  * @author Gulvan
  */
-class Active extends Ability 
-{
-	public var possibleTarget(default, null):AbilityTarget;
-	public var flags(default, null):Array<AbilityFlag>;
-	
+class Active
+{	
+	public var id:AbilityID;
+	public var level:Int;
 	private var _cooldown:Countdown;
 	public var cooldown(get, null):Int;
 	public var maxCooldown(get, null):Int;
 	public var manacost(default, null):Int;
-	
-	public override function toLightweight(patterns:Array<String>):LightweightAbility
-	{
-		var la:LightweightAbility = new LightweightAbility();
-		la.id = id;
-		la.name = name;
-		la.type = type;
-		la.element = element;
-		la.level = level;
-		la.patterns = patterns;
-		
-		la.cooldown = maxCooldown;
-		la.delay = cooldown;
-		la.manacost = manacost;
-		la.target = possibleTarget;
-		
-		return la;
-	}
+	public var possibleTarget(default, null):AbilityTarget;
 	
 	public function putOnCooldown()
 	{
@@ -51,44 +33,38 @@ class Active extends Ability
 			_cooldown.value--;
 	}
 	
-	public function new(id:AbilityID, level:Int) 
-	{
-		super(id, level);
-		
-		if (!checkEmpty())
-		{
-			var ab = AbilityManager.abilities.get(id);
-			this._cooldown = new Countdown(0, ab.cooldown[level-1]);
-			this.manacost = ab.manacost[level-1];
-			this.possibleTarget = ab.target;
-			this.flags = ab.flags;
-		}
-	}
-	
-	//================================================================================
-    // Checkers
-    //================================================================================
-	
 	public inline function checkOnCooldown():Bool
 	{
 		return _cooldown.value > 0;
 	}
 	
-	public inline function checkValidity(relation:UnitType):Bool
+	public function new(id:AbilityID, level:Int) 
 	{
-		switch (possibleTarget)
+		this.id = id;
+		this.level = level;
+		
+		if (!checkEmpty())
 		{
-			case AbilityTarget.Enemy:
-				return relation == UnitType.Enemy;
-			case AbilityTarget.Allied:
-				return relation == UnitType.Ally || relation == UnitType.Self;
-			case AbilityTarget.Self:
-				return relation == UnitType.Self;
-			case AbilityTarget.All:
-				return true;
-			default:
-				return false;
+			var ab = AbilityManager.actives.get(id);
+			this._cooldown = new Countdown(0, ab.cooldown[level-1]);
+			this.manacost = ab.manacost[level-1];
+			this.possibleTarget = ab.target;
 		}
+	}
+
+	public function validForUnit(relation:EntityRelation):Bool
+	{
+		var validTargets:Array<AbilityTarget> = switch relation 
+		{
+			case Enemy: [All, Enemy];
+			case Ally(self): self? [All, Allied, Self] : [All, Allied];
+		}
+		return Lambda.has(validTargets, possibleTarget);
+	}
+
+	public function validForSummon():Bool
+	{
+		return possibleTarget == All || possibleTarget == Enemy;
 	}
 	
 	//================================================================================

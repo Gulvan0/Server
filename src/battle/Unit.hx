@@ -1,6 +1,6 @@
 package battle;
+import battle.struct.UnitCoords;
 import battle.enums.Team;
-import battle.enums.UnitType;
 import battle.struct.BuffQueue;
 import battle.struct.ShieldQueue;
 import battle.struct.FloatPool;
@@ -24,43 +24,26 @@ typedef ParameterList = {
 	var intellect:Int;
 }
 
-typedef SubordinaryParameterList = {
-	var buffQueue:BuffQueue;
-	
-	var critChance:Float;
-	var critDamage:Linear;
-	var damageIn:Linear;
-	var damageOut:Linear;
-	var healIn:Linear;
-	var healOut:Linear;
-}
-
 /**
  * Represents unit in battle
  * @author Gulvan
  */
  
-class Unit
+class Unit extends Entity
 {
 	
 	public var id(default, null):UnitID;
-	public var name(default, null):String;
 	public var element(default, null):Element;
-	public var team(default, null):Team;
-	public var position(default, null):Int;
 	
 	public var wheel(default, null):Wheel;
-	public var hpPool(default, null):Pool;
 	public var manaPool(default, null):Pool;
 	public var alacrityPool(default, null):FloatPool;
 	public var buffQueue(default, null):BuffQueue;
 	public var delayedPatterns(default, null):DelayedPatternQueue;
-	public var shields(default, null):ShieldQueue;
 	
-	private var _strength:Int;
-	private var _flow:Int;
-	private var _intellect:Int;
-	public var speed(get, never):Int;
+	private var basicStrength:Int;
+	private var basicFlow:Int;
+	private var basicIntellect:Int;
 	
 	public var stBonus:Linear;
 	public var flBonus:Linear;
@@ -73,6 +56,7 @@ class Unit
 	public var healOut:Linear;
 	public var critChance(default, null):Float;
 	public var critDamage:Linear;
+	public var evasionMultipliers(default, null):Array<Float>;
 	public var accuracyMultipliers(default, null):Array<Float>;
 
 	public var strength(get, never):Int;
@@ -90,9 +74,10 @@ class Unit
 	public var intellect(get, never):Int;
 	public function get_intellect():Int
 	{
-		return Math.round(speedBonus.apply(_intellect));
+		return Math.round(inBonus.apply(_intellect));
 	}
 
+	public var speed(get, never):Int;
 	public function get_speed():Int
 	{
 		return Math.round(speedBonus.apply(flow));
@@ -115,11 +100,6 @@ class Unit
 	{
 		return buffQueue.stunCondition();
 	}
-	
-	public function isAlive():Bool
-	{
-		return hpPool.value > 0;
-	}
 
 	public function rollCrit(dhp:Int, ?log:Bool = false):Int
 	{
@@ -130,57 +110,49 @@ class Unit
 			return Math.round(critDamage.apply(Math.abs(dhp))) * MathUtils.sign(dhp);
 		return dhp;
 	}
-	
-	public function new(id:UnitID, team:Team, position:Int, ?params:Null<ParameterList>, ?subparams:Null<SubordinaryParameterList>) 
+
+	public override function asUnit():Unit
 	{
-		Assert.assert(position >= 0 && position <= 2);
-		
+		return this;
+	}
+	
+	public function new(id:UnitID, team:Team, position:Int, ?params:Null<ParameterList>) 
+	{
 		/*if (params == null)
 			params = XMLUtils.parseUnit(id);*///TODO: [PvE Update] Rewrite
+
+		super(params.name, new UnitCoords(team, position), params.hp);	
+
 		this.id = id;
-		this.name = params.name;
 		this.element = params.element;
-		this.team = team;
-		this.position = position;
 		
 		this.wheel = new Wheel(params.wheel, params.abilityLevels, 8);
 
-		this.hpPool = new Pool(params.hp, params.hp);
 		this.manaPool = new Pool(params.mana, params.mana);
 		this.alacrityPool = new FloatPool(0, 100);
 		
-		this._strength = params.strength;
-		this._flow = params.flow;
-		this._intellect = params.intellect;
+		this.basicStrength = params.strength;
+		this.basicFlow = params.flow;
+		this.basicIntellect = params.intellect;
 
 		this.stBonus = new Linear(1, 0);
 		this.flBonus = new Linear(1, 0);
 		this.inBonus = new Linear(1, 0);
 		this.speedBonus = new Linear(1, 0);
 		
-		this.buffQueue = subparams != null? subparams.buffQueue : new BuffQueue();
+		this.buffQueue = new BuffQueue();
 		this.delayedPatterns = new DelayedPatternQueue();
-		this.shields = new ShieldQueue();
 		
-		this.damageIn = subparams != null? subparams.damageIn : new Linear(1, 0);
-		this.damageOut = subparams != null? subparams.damageOut : new Linear(1, 0);
-		this.healIn = subparams != null? subparams.healIn : new Linear(1, 0);
-		this.healOut = subparams != null? subparams.healOut : new Linear(1, 0);
+		this.damageIn = new Linear(1, 0);
+		this.damageOut = new Linear(1, 0);
+		this.healIn = new Linear(1, 0);
+		this.healOut = new Linear(1, 0);
 		
-		this.critChance = subparams != null? subparams.critChance : GameRules.baseCritChance;
-		this.critDamage = subparams != null? subparams.critDamage : new Linear(GameRules.baseCritMultiplier, 0);
+		this.critChance = GameRules.baseCritChance;
+		this.critDamage = new Linear(GameRules.baseCritMultiplier, 0);
 
 		this.accuracyMultipliers = [];
-	}
-	
-	public function figureRelation(unit:Unit):UnitType
-	{
-		if (team != unit.team)
-			return UnitType.Enemy;
-		else if (position == unit.position)
-			return UnitType.Self;
-		else
-			return UnitType.Ally;
+		this.evasionMultipliers = [];
 	}
 	
 	public inline function checkManacost(abilityNum:Int):Bool
@@ -204,11 +176,6 @@ class Unit
 			case UnitID.Player(v): v;
 			default: "ERROR!";
 		};
-	}
-	
-	public inline function same(unit:Unit):Bool
-	{
-		return team == unit.team && position == unit.position;
 	}
 	
 }

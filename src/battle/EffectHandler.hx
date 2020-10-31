@@ -1,4 +1,6 @@
 package battle;
+import managers.AbilityManager;
+import battle.struct.EntityCoords;
 import ID.SummonID;
 import ID.AbilityID;
 import battle.Model.Pattern;
@@ -52,8 +54,10 @@ class EffectHandler implements IModelObserver
 	
 	private function procAbilities(e:BattleEvent, unit:Unit, data:EffectData)
 	{
-		for (passive in unit.wheel.passiveAbs(e))
-			Passives.handle(model, passive.id, passive.level, e, data);
+		for (ab in unit.wheel.abilities)
+			if (AbilityManager.passives.exists(ab))
+				if (AbilityManager.reactsTo(ab, e))
+					Passives.handle(model, AbilityManager.passives.get(ab).id, unit.wheel.levelByID(ab), e, data);
 	}
 	
 	private function procBuffs(e:BattleEvent, unit:Unit, ?data:EffectData)
@@ -93,7 +97,7 @@ class EffectHandler implements IModelObserver
 		procBuffs(BattleEvent.AlacUpdate, unit, data);
 	}
 
-	public function shielded(target:UnitCoords, summon:Bool, source:Source)
+	public function shielded(target:EntityCoords, summon:Bool, source:Source)
 	{
 		
 	}
@@ -121,15 +125,15 @@ class EffectHandler implements IModelObserver
 		procBuffs(BattleEvent.Tick, current, data);
 	}
 	
-	public function miss(target:UnitCoords, summon:Bool, caster:UnitCoords, element:Element):Void 
+	public function miss(target:EntityCoords, caster:UnitCoords, element:Element):Void 
 	{
-		var t:Unit = getUnit(target);
-		var c:Unit = getUnit(caster);
+		var t:Unit = getUnit(target.nearbyUnit());
+		var c:Unit = getUnit(caster.nearbyUnit());
 		var data:EffectData = new EffectData(t, c, null, element, null);
 		
 		if (t.team != c.team)
 		{
-			if (!summon)
+			if (!target.summon)
 			{
 				procAbilities(BattleEvent.IncomingMiss, t, data);
 				procBuffs(BattleEvent.IncomingMiss, t, data);
@@ -139,9 +143,12 @@ class EffectHandler implements IModelObserver
 		}
 	}
 	
-	public function death(unit:UnitCoords):Void 
+	public function death(coords:EntityCoords):Void 
 	{
-		var data:EffectData = new EffectData(getUnit(unit), null, null, null, null);
+		if (coords.summon)
+			return;
+
+		var data:EffectData = new EffectData(getUnit(coords.nearbyUnit()), null, null, null, null);
 		
 		for (u in model.getUnits())
 		{
@@ -150,13 +157,13 @@ class EffectHandler implements IModelObserver
 		}
 	}
 	
-	public function abStriked(target:UnitCoords, summon:Bool, caster:UnitCoords, ab:Ability, pattern:String):Void 
+	public function abStriked(target:EntityCoords, caster:UnitCoords, ab:Active, pattern:String):Void 
 	{
 		var t:Unit = getUnit(target);
 		var c:Unit = getUnit(caster);
 		var data:EffectData = new EffectData(t, c, null, ab.element, null);
 		
-		if (t.team != c.team && !summon)
+		if (t.team != c.team && !target.summon)
 		{
 			procAbilities(BattleEvent.IncomingStrike, t, data);
 			procBuffs(BattleEvent.IncomingStrike, t, data);
@@ -165,7 +172,7 @@ class EffectHandler implements IModelObserver
 		}
 	}
 	
-	public function abThrown(target:UnitCoords, summon:Bool, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element):Void 
+	public function abThrown(target:EntityCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element):Void 
 	{
 		//no action - for now
 	}
@@ -180,17 +187,12 @@ class EffectHandler implements IModelObserver
 
 	}
 
-	public function auraRemoved(owner:UnitCoords, id:AbilityID):Void
+	public function auraRemoved(owner:UnitCoords):Void
 	{
 
 	}
 	
-	public function summonAppeared(position:UnitCoords, id:SummonID):Void
-	{
-
-	}
-	
-	public function summonDead(position:UnitCoords):Void
+	public function summonAppeared(position:EntityCoords, id:SummonID, maxHP:Int):Void
 	{
 
 	}

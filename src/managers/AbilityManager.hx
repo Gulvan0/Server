@@ -1,5 +1,6 @@
 package managers;
 
+import battle.data.Passives.BattleEvent;
 import hxassert.Assert;
 import io.AbilityParser;
 import io.AbilityParser.Ability;
@@ -35,7 +36,7 @@ class AbilityManager
         return null;
     }
 
-    public function reactsTo(passive:AbilityID, event:BattleEvent):Bool
+    public static function reactsTo(passive:AbilityID, event:BattleEvent):Bool
 	{
         var ab:PassiveProperties = passives.get(id);
         Assert.assert(ab != null);

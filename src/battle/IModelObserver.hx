@@ -23,13 +23,13 @@ interface IModelObserver
 	public function preTick(current:Unit):Void;
 	public function tick(current:Unit):Void;
 	public function pass(current:UnitCoords):Void;
-	public function miss(target:UnitCoords, summon:Bool, caster:UnitCoords, element:Element):Void;
+	public function miss(target:EntityCoords, caster:UnitCoords, element:Element):Void;
 	public function death(coords:EntityCoords):Void;
 	
-	public function abThrown(target:UnitCoords, summon:Bool, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element):Void;
-	public function abStriked(target:UnitCoords, summon:Bool, caster:UnitCoords, ab:Ability, pattern:String):Void;
+	public function abThrown(target:EntityCoords, caster:UnitCoords, id:AbilityID, type:AbilityType, element:Element):Void;
+	public function abStriked(target:EntityCoords, caster:UnitCoords, ab:Active, pattern:String):Void;
 
-	public function auraApplied(owner:UnitCoords, id:AbilityID):Void;
-	public function aurasRemoved(owner:UnitCoords):Void;
+	public function auraApplied(owner:EntityCoords, id:AbilityID):Void;
+	public function aurasRemoved(owner:EntityCoords):Void;
 	public function summonAppeared(position:EntityCoords, id:SummonID, maxHP:Int):Void;
 }

@@ -1,4 +1,5 @@
 package battle;
+import battle.struct.Wheel.LightweightAbility;
 import hl.types.ArrayObj;
 import io.AbilityUtils;
 import io.AbilityParser.AbilityProperites;
@@ -330,12 +331,12 @@ class Model implements IInteractiveModel implements IMutableModel
 				var targetedSummon = summons.get(target.nearbyUnit());
 				if (targetSummon.shields.penetrate(1) > 0)
 				{
-					for (o in observers) o.abStriked(target, true, caster, ability, ""); //TODO: Change notifications signatures
+					for (o in observers) o.abStriked(target, caster, ability, ""); //TODO: Change notifications signatures
 					targetSummon.decrementHP();
 					processPossibleDeath(target);
 				}
 				else 
-					for (o in observers) o.shielded(target, true, Source.Ability);
+					for (o in observers) o.shielded(target, Source.Ability);
 				postTurnProcess();
 		}
 	}
@@ -351,7 +352,7 @@ class Model implements IInteractiveModel implements IMutableModel
 
 			for (t in targets)
 				if (Utils.flipMiss(t, c, ability, log))
-					for (o in observers) o.miss(t.coords, false, caster, ability.element);
+					for (o in observers) o.miss(t.coords, caster, ability.element);
 				else 
 				{
 					activeBH.targets.push(t.coords);
@@ -363,7 +364,7 @@ class Model implements IInteractiveModel implements IMutableModel
 		{
 			for (t in targets)
 				if (Utils.flipMiss(t, c, ability, log))
-					for (o in observers) o.miss(t.coords, false, caster, ability.element);
+					for (o in observers) o.miss(t.coords, caster, ability.element);
 				else
 					strikeNonDanmaku(t.coords, caster, ability);
 			postTurnProcess();

@@ -1,5 +1,7 @@
 package;
 
+import hxassert.Assert;
+
 class Point
 {
 	public var x:Float;
@@ -90,23 +92,6 @@ class MathUtils
 		return false;
 	}
 	
-	public static inline function inside(point:Point, field:Rectangle):Bool
-	{
-		if ((point.x >= field.x && point.x <= field.x + field.width) && (point.y >= field.y && point.y <= field.y + field.height))
-			return true;
-		return false;
-	}
-	
-	public static function distance(point1:Point, point2:Point):Float
-	{
-		var x1:Float = point1.x;
-		var x2:Float = point2.x;
-		var y1:Float = point1.y;
-		var y2:Float = point2.y;
-		
-		return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
-	}
-	
 	public static function randomInt(leftBorder:Int, rightBorder:Int):Int
 	{
 		return leftBorder + Math.round(Math.random() * (rightBorder - leftBorder));
@@ -115,6 +100,54 @@ class MathUtils
 	public static function flip():Bool
 	{
 		return Math.random() >= 0.5;
+	}
+
+	public static function argmax<T>(arr:Array<T>, f:T->Float):{arg:Array<T>, val:Float}
+	{
+		Assert.assert(!Lambda.empty(arr));
+		var max:Float = f(arr[0]);
+		var candidates:Array<T> = [arr[0]];
+		for (i in 1...arr.length)
+		{
+			var arg = arr[i];
+			var val = f(arg);
+			if (val > max)
+			{
+				max = val;
+				candidates = [arg];
+			}
+			else if (val == max)
+				candidates.push(arg);
+		}
+		return {arg:candidates, val:max};
+	}
+
+	public static function argmin<T>(arr:Array<T>, f:T->Float):{arg:Array<T>, val:Float}
+	{
+		return argmax(arr, (t -> -f(t)));
+	}
+
+	public static function sum<T>(arr:Array<T>, f:T->Float):Float
+	{
+		var s:Float = 0;
+		for (el in arr)
+			sum += f(el);
+		return s;
+	}
+
+	public static function rand<T>(arr:Array<T>):T
+	{
+		return arr[Math.floor(Math.random() * arr.length)];
+	}
+
+	public static function removeOn<T>(arr:Array<T>, pred:T->Bool)
+	{
+		for (el in arr)
+			if (pred(el))
+			{
+				arr.remove(el);
+				return;
+			}
 	}
 	
 }

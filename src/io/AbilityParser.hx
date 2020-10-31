@@ -1,5 +1,6 @@
 package io;
 
+import managers.AbilityManager.RelativeTeam;
 import managers.SummonManager;
 import battle.data.Passives.BattleEvent;
 import battle.enums.AttackType;
@@ -20,7 +21,7 @@ enum AbilityFlag
 }
 
 //Name and description are not parsed on server
-typedef AbilityProperites =
+typedef AbilityProperties =
 {
     var id:AbilityID;
     var element:Element;

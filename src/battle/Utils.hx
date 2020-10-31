@@ -38,7 +38,7 @@ class Utils
 		var hitChance:Float = 1 - baseMissChance;
 
 		if (caster.accuracyMultipliers.has(Math.POSITIVE_INFINITY))
-			if (caster.accuracyMultipliers.has(Math.NEGATIVE_INFINITY))
+			if (caster.accuracyMultipliers.has(Math.NEGATIVE_INFINITY) || target.evasionMultipliers.has(Math.POSITIVE_INFINITY))
 				hitChance = 0.5;
 			else
 				hitChance = Math.POSITIVE_INFINITY;
@@ -51,6 +51,12 @@ class Utils
 					hitChance *= m; 							//Decreasing hit chance
 				else 
 					hitChance = 1 - ((1 - hitChance) / m);  //Decreasing miss chance
+
+			for (m in target.evasionMultipliers)          
+				if (m >= 1)
+					hitChance /= m; 							
+				else 
+					hitChance = 1 - ((1 - hitChance) * m);
 			
 			if (ability.type == Kick)
 				hitChance *= 0.75;

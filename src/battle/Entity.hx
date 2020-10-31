@@ -1,4 +1,5 @@
 package battle;
+import battle.struct.AuraQueue;
 import battle.struct.UnitCoords;
 import battle.struct.EntityCoords;
 import battle.enums.Team;
@@ -24,6 +25,7 @@ class Entity
 	
 	public var hpPool(default, null):Pool;
 	public var shields(default, null):ShieldQueue;
+	public var auraQueue(default, null):AuraQueue;
 	
 	public function isAlive():Bool
 	{

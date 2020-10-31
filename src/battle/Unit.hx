@@ -1,4 +1,6 @@
 package battle;
+import battle.struct.PatternCollection;
+import managers.AbilityManager;
 import battle.struct.UnitCoords;
 import battle.enums.Team;
 import battle.struct.BuffQueue;
@@ -59,6 +61,8 @@ class Unit extends Entity
 	public var evasionMultipliers(default, null):Array<Float>;
 	public var accuracyMultipliers(default, null):Array<Float>;
 
+	public var patterns:Map<AbilityID, PatternCollection> = [];
+
 	public var strength(get, never):Int;
 	public function get_strength():Int
 	{
@@ -85,6 +89,34 @@ class Unit extends Entity
 
 	//==========================================================================================================
 	
+	public function iterationsToFullAlac(totalSpeed:Float):Int
+	{
+		return Math.ceil((alacrityPool.maxValue - alacrityPool.value) / alacGain(totalSpeed));
+	}
+
+	public function alacGain(totalSpeed:Float):Float
+	{
+		return speed / totalSpeed;
+	}
+
+	public function canMakeTurn():Bool
+	{
+		for (ab in wheel.actives)
+			if (!ab.checkOnCooldown() && manaPool.value >= ab.manacost && AbilityManager.abilities.get(ab.id).type != BHSkill)
+				return true;
+		return false;
+	}
+
+	public function getPattern(ability:AbilityID):String 
+	{
+		return patterns[ability].selected();
+	}
+
+	public function selectPattern(ability:AbilityID, i:Int):String 
+	{
+		patterns[ability].selectedNum = i;
+	}
+
 	public function tick()
 	{
 		wheel.tick();
@@ -153,11 +185,14 @@ class Unit extends Entity
 
 		this.accuracyMultipliers = [];
 		this.evasionMultipliers = [];
+
+		for (ab in wheel.abilities.filter(AbilityManager.danmaku.exists))
+			this.patterns.set(ab, new PatternCollection(ab, id));
 	}
 	
 	public inline function checkManacost(abilityNum:Int):Bool
 	{
-		return manaPool.value >= wheel.getActive(abilityNum).manacost;
+		return manaPool.value >= wheel.actives.get(wheel.abilities[abilityNum]).manacost;
 	}
 	
 	public inline function isPlayer():Bool
@@ -169,12 +204,12 @@ class Unit extends Entity
 		};
 	}
 
-	public inline function playerLogin():String
+	public inline function playerLogin():Null<String>
 	{
 		return switch (id)
 		{
 			case UnitID.Player(v): v;
-			default: "ERROR!";
+			default: null;
 		};
 	}
 	

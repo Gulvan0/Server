@@ -1,5 +1,8 @@
 package battle.struct;
 
+import battle.enums.Team;
+import managers.AbilityManager.RelativeTeam;
+
 enum EntityRelation
 {
 	Enemy;
@@ -25,6 +28,11 @@ class EntityCoords
 	public function nearbyUnit():UnitCoords
 	{
 		return new UnitCoords(team, pos);
+	}
+
+	public function absoulteTeam(rel:RelativeTeam):Team
+	{
+		return rel == Allied? team : Utils.oppositeTeam(team);
 	}
 
 	public function figureRelation(coords:EntityCoords):EntityRelation

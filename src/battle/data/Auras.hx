@@ -13,26 +13,16 @@ enum AuraMode
 
 class Auras 
 {
-    public static function unitAct(aura:Aura, model:Model)
+    public static function act(aura:AuraEffect, model:Model, affectedEntity:Entity, mode:AuraMode)
     {
         switch aura.id
         {
             case LgSwiftnessAura:
-                swiftnessAura(aura.level, model, aura.owner, Activation);
+                swiftnessAura(aura.level, model, aura.owner, mode);
             case SmnReluctantAura:
-                reluctantAuraPassive(aura.level, model, aura.getAffectedTeam(), Activation);
+                reluctantAuraPassive(aura.level, model, aura.getAffectedTeam(), mode);
             case SmnSalvationAura:
-                salvationAura(aura.level, model, aura.getAffectedTeam(), Activation);
-            default:
-        }
-    }
-
-    public static function smnAct(aura:Aura, model:Model, unitToAffect:UnitCoords)
-    {
-        switch aura.id
-        {
-            case SmnReluctantAura:
-                reluctantAuraOvertime(aura.level, model, unitToAffect);
+                salvationAura(aura.level, model, aura.getAffectedTeam(), mode);
             default:
         }
     }

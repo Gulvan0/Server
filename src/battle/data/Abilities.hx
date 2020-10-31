@@ -8,7 +8,6 @@ import battle.enums.AbilityType;
 import battle.enums.Source;
 import Element;
 import battle.enums.Team;
-import battle.enums.UnitType;
 import battle.struct.UPair;
 import battle.struct.UnitCoords;
 import haxe.Constraints.Function;
@@ -29,7 +28,7 @@ class Abilities
 	private static var caster:Unit;
 	private static var element:Element;
 	
-	public static function hit(m:IMutableModel, id:AbilityID, level:Int, targetCoords:UnitCoords, casterCoords:UnitCoords, e:Element, ?hitNumber:Int)
+	public static function hit(m:IMutableModel, id:AbilityID, level:Int, targetCoords:UnitCoords, casterCoords:UnitCoords, e:Element)
 	{
 		Assert.require(level > 0);
 		model = m;

@@ -1,4 +1,5 @@
 package battle.struct;
+import battle.data.Abilities;
 import managers.AbilityManager;
 import ID.AbilityID;
 import battle.Active;
@@ -36,6 +37,15 @@ class Wheel
 			ab.patterns = patterns.get(a.id);
 		}
 		return array;
+	}
+
+	public function auraIndexes():Array<Int>
+	{
+		var res = [];
+		for (i in 0...abilities.length)
+			if (AbilityManager.abilities.get(abilities[i]).type == Aura)
+				res.push(i);
+		return res;
 	}
 
 	public function levelByID(id:AbilityID):Null<Int>

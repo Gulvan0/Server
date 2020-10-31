@@ -15,10 +15,10 @@ class UPair<T>
 	public var right(default, null):Array<T>;
 	public var both(get, never):Array<T>;
 	
-	///Return an array consisting of elemnts from both arrays
+	///Return an array consisting of elemnts from both arrays (excluding nulls)
 	public function get_both():Array<T>
 	{
-		return left.concat(right);
+		return left.concat(right).filter(t -> (t != null));
 	}
 	
 	///Return an object bound to unit
@@ -49,6 +49,13 @@ class UPair<T>
 	public function getTeam(team:Team):Array<T>
 	{
 		return team == Team.Left? left : right;
+	}
+
+	public function any(team:Team):T
+	{
+		var a = getTeam(team).filter(t -> t != null);
+		Assert.assert(!Lambda.empty(a));
+		return a[0];
 	}
 	
 	///Return an array of unit's enemies (or objects bound to them)
